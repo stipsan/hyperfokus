@@ -1,0 +1,16 @@
+{
+  "scripts": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,md,html,css,yml,json}": "prettier --write",
+    "package.json": "prettier-package-json --write"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  }
+}

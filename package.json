@@ -6,8 +6,8 @@
   },
   "dependencies": {
     "next": "^9.4.0",
-    "react": "0.0.0-experimental-33c3af284",
-    "react-dom": "0.0.0-experimental-33c3af284"
+    "react": "16.13.1",
+    "react-dom": "16.13.1"
   },
   "devDependencies": {
     "@types/node": "^14.0.1",

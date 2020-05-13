@@ -1,5 +1,4 @@
 {
-  "extends": [
-    "github>finn-no/renovate-presets:js"
-  ]
+  "extends": ["github>finn-no/renovate-presets:js"],
+  "masterIssue": true
 }

@@ -7,7 +7,9 @@ export default () => {
 
   return (
     <>
-      The auth provider is {authState.provider}.<br />
+      <h1 className="text-gray-600">
+        The auth provider is {authState.provider}.<br />
+      </h1>
       {authState.provider === 'demo' && (
         <button
           className="bg-blue-500 text-white font-bold py-2 px-4 rounded"

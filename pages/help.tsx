@@ -30,8 +30,8 @@ export default () => {
           Logout
         </button>
       )}
-      <Link href="/bar">
-        <a>Go to bar</a>
+      <Link href="/">
+        <a>Go back</a>
       </Link>
     </>
   )

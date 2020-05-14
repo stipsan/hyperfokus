@@ -1,0 +1,30 @@
+/* Used to detect in JavaScript if apps have loaded styles or not. */
+:root {
+  --reach-menu-button: 1;
+}
+
+[data-reach-menu],
+[data-reach-menu-popover] {
+  @apply block absolute z-20;
+}
+
+[data-reach-menu][hidden],
+[data-reach-menu-popover][hidden] {
+  @apply hidden;
+}
+
+[data-reach-menu-list],
+[data-reach-menu-items] {
+  @apply block whitespace-no-wrap outline-none py-2 bg-white rounded text-sm text-black;
+  box-shadow: theme('boxShadow.lg'), theme('boxShadow.xs'),
+    theme('boxShadow.xs');
+}
+
+[data-reach-menu-item] {
+  @apply block select-none cursor-pointer no-underline px-4 py-1;
+}
+
+/* pseudo pseudo selector */
+[data-reach-menu-item][data-selected] {
+  @apply bg-blue-500 text-white outline-none;
+}

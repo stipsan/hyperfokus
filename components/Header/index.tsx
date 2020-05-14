@@ -5,41 +5,13 @@ import { forwardRef } from 'react'
 
 import styles from './index.module.css'
 
-const NavLink: React.FC<{ href: string }> = forwardRef(
-  ({ children, href, ...props }, ref: React.Ref<HTMLAnchorElement>) => (
-    <Link href={href}>
-      <a {...props} ref={ref}>
-        {children}
-      </a>
-    </Link>
-  )
-)
-
-const DefaultMenu: React.FC = () => {
-  return (
-    <Menu>
-      <MenuButton className="btn-blue my-1">Menu</MenuButton>
-      <MenuList>
-        <MenuLink as={NavLink} href="/activities">
-          Completed Activities
-        </MenuLink>
-        <MenuLink as={NavLink} href="/settings">
-          Settings
-        </MenuLink>
-        <MenuLink as={NavLink} href="/help">
-          Help
-        </MenuLink>
-      </MenuList>
-    </Menu>
-  )
-}
-
 type Props = {
   left?: React.ReactNode
   title?: React.ReactNode
+  right?: React.ReactNode
 }
 
-export default ({ left = <DefaultMenu />, title }: Props) => {
+export default ({ left, title, right }: Props) => {
   const navSideClassNames = 'flex items-center w-full'
   return (
     <header
@@ -52,7 +24,7 @@ export default ({ left = <DefaultMenu />, title }: Props) => {
       <div className="flex items-center flex-shrink-0 h-inherit">
         {title ?? 'HyperFokus'}
       </div>
-      <div className={cx(navSideClassNames, 'justify-end')}>Right</div>
+      <div className={cx(navSideClassNames, 'justify-end')}>{right}</div>
     </header>
   )
 }

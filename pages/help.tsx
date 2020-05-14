@@ -1,6 +1,10 @@
 import Link from 'next/link'
 import { useAuthState, useAuthDispatch } from 'components/Auth'
 import Head from 'next/head'
+import HeadTitle from 'components/HeadTitle'
+import Header from 'components/Header'
+
+const title = 'Help'
 
 export default () => {
   const authState = useAuthState()
@@ -8,9 +12,8 @@ export default () => {
 
   return (
     <>
-      <Head>
-        <title>Foo page</title>
-      </Head>
+      <HeadTitle>{title}</HeadTitle>
+      <Header title={title} />
       <h1 className="text-gray-600">
         The auth provider is {authState.provider}.<br />
       </h1>

@@ -8,7 +8,7 @@ type Props = {
 
 export const className = ({ className, variant = 'default' }: Props) =>
   cx(
-    'py-2 px-4 rounded',
+    'py-2 px-4 rounded focus:outline-none focus:shadow-outline',
     {
       'bg-transparent hover:bg-gray-300 text-gray-800 font-semibold':
         variant === 'default',

@@ -1,10 +1,9 @@
 import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
+import { className } from 'components/Button'
 import Counter from 'components/Counter'
-import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import Header from 'components/Header'
 import Link from 'next/link'
 import { forwardRef } from 'react'
-import { className } from 'components/Button'
 
 const NavLink: React.FC<{ href: string }> = forwardRef(
   ({ children, href, ...props }, ref: React.Ref<HTMLAnchorElement>) => (
@@ -18,7 +17,6 @@ const NavLink: React.FC<{ href: string }> = forwardRef(
 export default () => {
   return (
     <>
-      <GetStartedBroadcast />
       <Header
         left={
           <Menu>
@@ -41,9 +39,7 @@ export default () => {
       />
       <p>Schedules selector</p>
       <p>Schedules container</p>
-      <div className="container hero bg-gray-300">
-        Hello world! <Counter />
-      </div>
+      <div className="hero bg-gray-300">Hello world!</div>
     </>
   )
 }

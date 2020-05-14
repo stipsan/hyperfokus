@@ -1,8 +1,7 @@
-import Link from 'next/link'
-import { useAuthState, useAuthDispatch } from 'components/Auth'
-import Head from 'next/head'
-import HeadTitle from 'components/HeadTitle'
+import { useAuthDispatch, useAuthState } from 'components/Auth'
 import Header from 'components/Header'
+import HeadTitle from 'components/HeadTitle'
+import Link from 'next/link'
 
 const title = 'Help'
 
@@ -33,9 +32,6 @@ export default () => {
           Logout
         </button>
       )}
-      <Link href="/">
-        <a>Go back</a>
-      </Link>
     </>
   )
 }

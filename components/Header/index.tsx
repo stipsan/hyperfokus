@@ -7,13 +7,11 @@ type Props = {
 }
 
 export default ({ title }: Props) => {
-  const asideClassNames = 'flex'
-
   return (
     <header className={styles.navbar}>
-      <div className={cx(asideClassNames, 'justify-start')}>Left</div>
-      <div>{title ?? 'HyperFokus'}</div>
-      <div className={cx(asideClassNames, 'justify-end')}>
+      <div className={cx(styles.left, 'justify-start')}>Left</div>
+      <div className={styles.center}>{title ?? 'HyperFokus'}</div>
+      <div className={cx(styles.right, 'justify-end')}>
         Right <br />
         Right
       </div>

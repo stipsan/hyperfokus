@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --navbar-height: 44px;
-}
-
 .h-inherit {
   height: inherit;
 }

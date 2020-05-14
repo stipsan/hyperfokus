@@ -4,6 +4,7 @@ import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import Header from 'components/Header'
 import Link from 'next/link'
 import { forwardRef } from 'react'
+import { className } from 'components/Button'
 
 const NavLink: React.FC<{ href: string }> = forwardRef(
   ({ children, href, ...props }, ref: React.Ref<HTMLAnchorElement>) => (
@@ -21,7 +22,9 @@ export default () => {
       <Header
         left={
           <Menu>
-            <MenuButton className="btn-blue my-1">Menu</MenuButton>
+            <MenuButton className={className({ variant: 'primary' })}>
+              Menu
+            </MenuButton>
             <MenuList>
               <MenuLink as={NavLink} href="/activities">
                 Completed Activities

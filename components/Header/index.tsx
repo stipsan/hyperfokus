@@ -2,6 +2,7 @@ import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
 import cx from 'classnames'
 import Link from 'next/link'
 import { forwardRef } from 'react'
+import Button from 'components/Button'
 
 import styles from './index.module.css'
 
@@ -11,7 +12,15 @@ type Props = {
   right?: React.ReactNode
 }
 
-export default ({ left, title, right }: Props) => {
+export default ({
+  left = (
+    <Link href="/">
+      <Button variant="default">Back</Button>
+    </Link>
+  ),
+  title,
+  right,
+}: Props) => {
   const navSideClassNames = 'flex items-center w-full'
   return (
     <header

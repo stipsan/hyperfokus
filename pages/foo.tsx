@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { useAuthState, useAuthDispatch } from '../components/Auth'
+import Head from 'next/head'
 
 export default () => {
   const authState = useAuthState()
@@ -7,6 +8,9 @@ export default () => {
 
   return (
     <>
+      <Head>
+        <title>Foo page</title>
+      </Head>
       <h1 className="text-gray-600">
         The auth provider is {authState.provider}.<br />
       </h1>
@@ -26,7 +30,9 @@ export default () => {
           Logout
         </button>
       )}
-      <Link href="/bar">Go to bar</Link>
+      <Link href="/bar">
+        <a>Go to bar</a>
+      </Link>
     </>
   )
 }

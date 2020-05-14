@@ -8,3 +8,5 @@
  * 1. Can localstorage be used? Check if the user is in a mode where it fails (like incognito or safari in private mode).
  * If not then fallback to demo but store each failed test in a report state.
  */
+
+export default () => null

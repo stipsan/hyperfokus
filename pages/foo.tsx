@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useAuthState, useAuthDispatch } from '../components/Auth'
+import { useAuthState, useAuthDispatch } from 'components/Auth'
 import Head from 'next/head'
 
 export default () => {

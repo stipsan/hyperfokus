@@ -5,9 +5,19 @@ type AuthActions = { type: 'LOGIN' } | { type: 'LOGOUT' }
 
 type AuthState = {
   provider: 'demo' | 'localstorage' | 'firebase'
+  readyState: 'init' | 'failure' | 'ready'
 }
 
-const AuthStateContext = createContext<AuthState>({ provider: 'demo' })
+/**
+ * The flow:
+ *   1. Demo provider by default.
+ *   2. Check if a provider is set in local storage.
+ *   3. If so, set it according to the discovered value
+ */
+
+const initialState: AuthState = { provider: 'demo', readyState: 'init' }
+
+const AuthStateContext = createContext(initialState)
 
 const AuthDispatchContext = createContext<Dispatch<AuthActions>>(() => {})
 
@@ -26,7 +36,7 @@ const reducer = (state: AuthState, action: AuthActions): AuthState => {
 export const Provider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(reducer, { provider: 'demo' })
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   return (
     <AuthDispatchContext.Provider value={dispatch}>

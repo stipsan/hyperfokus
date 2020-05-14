@@ -1,0 +1,9 @@
+.navbar {
+  @apply flex items-center flex-shrink-0 px-8;
+  height: 44px;
+}
+
+.left,
+.right {
+  @apply flex;
+}

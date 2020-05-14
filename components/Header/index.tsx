@@ -8,7 +8,7 @@ type Props = {
 
 export default ({ title }: Props) => {
   return (
-    <header className={styles.navbar}>
+    <header className={cx(styles.navbar)}>
       <div className={cx(styles.left, 'justify-start')}>Left</div>
       <div className={cx(styles.center, 'h-inherit')}>
         {title ?? 'HyperFokus'}

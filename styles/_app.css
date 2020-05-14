@@ -16,6 +16,7 @@
 
 .hero {
   @apply px-24 py-20 bg-gray-300;
+  height: var(--navbar-height);
 }
 
 .title {

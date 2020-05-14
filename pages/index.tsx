@@ -1,6 +1,5 @@
 import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
 import { className } from 'components/Button'
-import Counter from 'components/Counter'
 import Header from 'components/Header'
 import Link from 'next/link'
 import { forwardRef } from 'react'

@@ -1,7 +1,6 @@
 import { useAuthState } from 'components/Auth'
 import Header from 'components/Header'
 import HeadTitle from 'components/HeadTitle'
-import Link from 'next/link'
 
 const title = 'Settings'
 

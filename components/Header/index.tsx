@@ -7,13 +7,19 @@ type Props = {
 }
 
 export default ({ title }: Props) => {
+  const navSideClassNames = 'flex items-center w-full'
   return (
-    <header className={cx(styles.navbar)}>
-      <div className={cx(styles.left, 'justify-start')}>Left</div>
-      <div className={cx(styles.center, 'h-inherit')}>
+    <header
+      className={cx(
+        styles.navbar,
+        'flex items-center flex-shrink-0 px-2 top-0 sticky z-10 bg-white border-b border-black border-opacity-25'
+      )}
+    >
+      <div className={cx(navSideClassNames, 'justify-start')}>Left</div>
+      <div className="flex items-center flex-shrink-0 h-inherit">
         {title ?? 'HyperFokus'}
       </div>
-      <div className={cx(styles.right, 'justify-end')}>
+      <div className={cx(navSideClassNames, 'justify-end')}>
         Right <br />
         Right
       </div>

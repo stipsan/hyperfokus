@@ -13,25 +13,14 @@ export default () => {
     <>
       <HeadTitle>{title}</HeadTitle>
       <Header title={title} />
-      <h1 className="text-gray-600">
-        The auth provider is {authState.provider}.<br />
-      </h1>
-      {authState.provider === 'demo' && (
-        <button
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
-          onClick={() => authDispatch({ type: 'LOGIN' })}
+      <main className="min-h-50vh flex items-center justify-center">
+        <a
+          className="rounded-lg px-4 md:px-5 xl:px-4 py-3 md:py-4 xl:py-3 bg-gray-500 hover:bg-gray-600 md:text-lg xl:text-base text-white font-semibold leading-tight shadow-md"
+          href="mailto:stipsan@gmail.com"
         >
-          Login
-        </button>
-      )}
-      {authState.provider === 'localstorage' && (
-        <button
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
-          onClick={() => authDispatch({ type: 'LOGOUT' })}
-        >
-          Logout
-        </button>
-      )}
+          Get help
+        </a>
+      </main>
     </>
   )
 }

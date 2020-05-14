@@ -9,6 +9,10 @@
   height: inherit;
 }
 
+.min-h-50vh {
+  min-height: 50vh;
+}
+
 .hero {
   @apply px-24 py-20 bg-gray-300;
   height: 150vh;

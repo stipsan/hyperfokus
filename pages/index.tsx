@@ -14,10 +14,6 @@ const NavLink: React.FC<{ href: string }> = forwardRef(
   )
 )
 export default () => {
-  // @ts-ignore
-  if (typeof window !== 'undefined') {
-    throw new Error('Uh oh!')
-  }
   return (
     <>
       <Header

@@ -33,27 +33,30 @@ const reducer = (state: AuthState, action: AuthActions): AuthState => {
   }
 }
 
-function test() {
-  const foo = new Promise((resolve) => setTimeout(() => resolve(123), 1000))
-  if (true) {
-    throw foo
-  }
-}
+let promise = null
+let isResolved = false
 
 export const Provider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const foo = test()
+  if (!isResolved) {
+    if (promise === null) {
+      promise = new Promise((resolve) => {
+        setTimeout(() => {
+          isResolved = true
+          resolve()
+        }, 6000)
+      })
+    }
+    throw promise
+  }
 
   return (
     <AuthDispatchContext.Provider value={dispatch}>
       <AuthStateContext.Provider value={state}>
-        <>
-          {children}
-          <footer>Test: {foo}</footer>
-        </>
+        <>{children}</>
       </AuthStateContext.Provider>
     </AuthDispatchContext.Provider>
   )

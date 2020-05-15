@@ -1,3 +1,4 @@
+import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import Header from 'components/Header'
 import HeadTitle from 'components/HeadTitle'
 
@@ -8,6 +9,7 @@ export default () => {
     <>
       <HeadTitle>{title}</HeadTitle>
       <Header title={title} />
+      <GetStartedBroadcast />
     </>
   )
 }

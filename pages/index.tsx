@@ -1,5 +1,6 @@
 import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
 import { className } from 'components/Button'
+import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import Header from 'components/Header'
 import Link from 'next/link'
 import { forwardRef } from 'react'
@@ -36,6 +37,7 @@ export default () => {
           </Menu>
         }
       />
+      <GetStartedBroadcast />
       <p>Schedules selector</p>
       <p>Schedules container</p>
       <button
@@ -45,7 +47,7 @@ export default () => {
       >
         Throw error
       </button>
-      <div className="hero bg-gray-300">Hello world!</div>
+      <div className="bg-gray-300 min-h-screen">Hello world!</div>
     </>
   )
 }

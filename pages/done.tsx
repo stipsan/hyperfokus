@@ -1,7 +1,7 @@
-import { useSessionValue } from 'components/SessionProvider'
+import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import Header from 'components/Header'
 import HeadTitle from 'components/HeadTitle'
-import Link from 'next/link'
+import { useSessionValue } from 'components/SessionProvider'
 
 const title = 'Completed Activities'
 
@@ -12,6 +12,7 @@ export default () => {
     <>
       <HeadTitle>{title}</HeadTitle>
       <Header title={title} />
+      <GetStartedBroadcast />
       <h1 className="text-gray-900">The session provider is {session}.</h1>
     </>
   )

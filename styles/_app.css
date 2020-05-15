@@ -13,13 +13,19 @@
   min-height: 50vh;
 }
 
-.hero {
-  @apply px-24 py-20 bg-gray-300;
-  height: 150vh;
+.loading {
+  opacity: 0;
+  animation: fadein 300ms 1s both;
+}
+body.loaded .loading {
+  animation-delay: 0s;
 }
 
-.title {
-  @apply text-5xl text-center;
-  color: #333;
-  line-height: 1.15;
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

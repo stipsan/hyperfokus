@@ -29,7 +29,7 @@ export default ({
         Menu
       </MenuButton>
       <MenuList>
-        <MenuLink as={NavLink} href="/todos">
+        <MenuLink as={NavLink} href="/">
           Todos
         </MenuLink>
         <MenuLink as={NavLink} href="/schedules">

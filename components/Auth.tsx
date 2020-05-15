@@ -33,24 +33,15 @@ const reducer = (state: AuthState, action: AuthActions): AuthState => {
   }
 }
 
-let promise = null
-let isResolved = false
-
 export const Provider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  if (!isResolved) {
-    if (promise === null) {
-      promise = new Promise((resolve) => {
-        setTimeout(() => {
-          isResolved = true
-          resolve()
-        }, 6000)
-      })
-    }
-    throw promise
+  // Suspend on the server only as we're reading the provider state from localStorage
+  // which is a sync operation, thus we don't need to suspend on it in the client
+  if (typeof window === 'undefined') {
+    throw new Promise((resolve) => setTimeout(() => resolve()))
   }
 
   return (

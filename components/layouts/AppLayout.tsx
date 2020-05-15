@@ -22,6 +22,7 @@ export default ({ children }: Props) => {
       >
         <main>{children}</main>
       </Suspense>
+      <footer />
     </>
   )
 }

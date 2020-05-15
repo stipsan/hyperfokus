@@ -38,6 +38,13 @@ export default () => {
       />
       <p>Schedules selector</p>
       <p>Schedules container</p>
+      <button
+        onClick={() => {
+          throw new Error('Uh oh!')
+        }}
+      >
+        Throw error
+      </button>
       <div className="hero bg-gray-300">Hello world!</div>
     </>
   )

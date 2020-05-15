@@ -1,7 +1,8 @@
+import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
 import cx from 'classnames'
-import Button from 'components/Button'
-
+import { className } from 'components/Button'
 import Link from 'next/link'
+import { forwardRef } from 'react'
 
 import styles from './index.module.css'
 
@@ -11,11 +12,40 @@ type Props = {
   right?: React.ReactNode
 }
 
+const NavLink: React.FC<{ href: string }> = forwardRef(
+  ({ children, href, ...props }, ref: React.Ref<HTMLAnchorElement>) => (
+    <Link href={href}>
+      <a {...props} ref={ref}>
+        {children}
+      </a>
+    </Link>
+  )
+)
+
 export default ({
   left = (
-    <Link href="/">
-      <Button variant="default">Back</Button>
-    </Link>
+    <Menu>
+      <MenuButton className={className({ variant: 'primary' })}>
+        Menu
+      </MenuButton>
+      <MenuList>
+        <MenuLink as={NavLink} href="/todos">
+          Todos
+        </MenuLink>
+        <MenuLink as={NavLink} href="/schedules">
+          Schedules
+        </MenuLink>
+        <MenuLink as={NavLink} href="/done">
+          Completed Activities
+        </MenuLink>
+        <MenuLink as={NavLink} href="/settings">
+          Settings
+        </MenuLink>
+        <MenuLink as={NavLink} href="/help">
+          Help
+        </MenuLink>
+      </MenuList>
+    </Menu>
   ),
   title,
   right,

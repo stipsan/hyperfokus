@@ -1,4 +1,10 @@
-import { createContext, useState, useContext, useCallback } from 'react'
+import {
+  createContext,
+  useState,
+  useContext,
+  useCallback,
+  useEffect,
+} from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 
 type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
@@ -26,6 +32,10 @@ const Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       : () =>
           sanitize(localStorage.getItem('hyperfokus.storage') as SessionState)
   )
+
+  useEffect(() => localStorage.setItem('hyperfokus.storage', session), [
+    session,
+  ])
 
   return (
     <SessionSetStateContext.Provider value={setSession}>

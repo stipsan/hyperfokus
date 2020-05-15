@@ -32,27 +32,6 @@ const EnableFirebase = () => {
   )
 }
 
-const EnableDemo = () => {
-  const session = useSessionValue()
-  const setSession = useSessionSetState()
-
-  return (
-    <Button
-      onClick={() => setSession('demo')}
-      variant={session === 'demo' ? 'primary' : 'default'}
-    >
-      {session === 'demo' ? 'Using demo' : 'Use demo'}
-    </Button>
-  )
-}
-
-const ResetButton = () => {
-  const session = useSessionValue()
-  const setSession = useSessionSetState()
-
-  return session !== '' && <Button onClick={() => setSession('')}>Reset</Button>
-}
-
 export default () => {
   const session = useSessionValue()
 
@@ -67,10 +46,6 @@ export default () => {
       <EnableLocalStorage />
       <br />
       <EnableFirebase />
-      <br />
-      <EnableDemo />
-      <br />
-      <ResetButton />
     </>
   )
 }

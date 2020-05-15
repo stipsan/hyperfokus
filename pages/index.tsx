@@ -23,7 +23,7 @@ export default () => {
               Menu
             </MenuButton>
             <MenuList>
-              <MenuLink as={NavLink} href="/activities">
+              <MenuLink as={NavLink} href="/done">
                 Completed Activities
               </MenuLink>
               <MenuLink as={NavLink} href="/settings">

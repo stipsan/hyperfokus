@@ -1,38 +1,76 @@
-import { useAuthDispatch, useAuthState } from 'components/Auth'
+import Button from 'components/Button'
 import HeadTitle from 'components/HeadTitle'
+import { useSessionSetState, useSessionValue } from 'components/SessionProvider'
 import Link from 'next/link'
 
 const title = 'Setup'
 
+const EnableLocalStorage = () => {
+  const session = useSessionValue()
+  const setSession = useSessionSetState()
+
+  return (
+    <Button
+      onClick={() => setSession('localstorage')}
+      variant={session === 'localstorage' ? 'primary' : 'default'}
+    >
+      {session === 'localstorage' ? 'Using local storage' : 'Use local storage'}
+    </Button>
+  )
+}
+const EnableFirebase = () => {
+  const session = useSessionValue()
+  const setSession = useSessionSetState()
+
+  return (
+    <Button
+      onClick={() => setSession('firebase')}
+      variant={session === 'firebase' ? 'primary' : 'default'}
+    >
+      {session === 'firebase' ? 'Using firebase' : 'Use firebase'}
+    </Button>
+  )
+}
+
+const EnableDemo = () => {
+  const session = useSessionValue()
+  const setSession = useSessionSetState()
+
+  return (
+    <Button
+      onClick={() => setSession('demo')}
+      variant={session === 'demo' ? 'primary' : 'default'}
+    >
+      {session === 'demo' ? 'Using demo' : 'Use demo'}
+    </Button>
+  )
+}
+
+const ResetButton = () => {
+  const session = useSessionValue()
+  const setSession = useSessionSetState()
+
+  return session !== '' && <Button onClick={() => setSession('')}>Reset</Button>
+}
+
 export default () => {
-  const authState = useAuthState()
-  const authDispatch = useAuthDispatch()
+  const session = useSessionValue()
 
   return (
     <>
       <HeadTitle>{title}</HeadTitle>
-      <h1 className="text-gray-900">
-        The auth provider is {authState.provider}.
-      </h1>
+      <h1 className="text-gray-900">The session provider is {session}.</h1>
       <Link href="/">
         <a>Go back</a>
       </Link>
-      {authState.provider === 'demo' && (
-        <button
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
-          onClick={() => authDispatch({ type: 'LOGIN' })}
-        >
-          Login
-        </button>
-      )}
-      {authState.provider === 'localstorage' && (
-        <button
-          className="bg-blue-500 text-white font-bold py-2 px-4 rounded"
-          onClick={() => authDispatch({ type: 'LOGOUT' })}
-        >
-          Logout
-        </button>
-      )}
+      <br />
+      <EnableLocalStorage />
+      <br />
+      <EnableFirebase />
+      <br />
+      <EnableDemo />
+      <br />
+      <ResetButton />
     </>
   )
 }

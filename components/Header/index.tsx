@@ -33,11 +33,6 @@ export const moreLinks = [
   ['Help', '/help'],
 ]
 
-// @TODO remove this
-if (process.env.NODE_ENV === 'development') {
-  moreLinks.push(['Welcome', '/welcome'])
-}
-
 const TopLink: React.FC<{
   className?: string
   href: string
@@ -101,7 +96,7 @@ export default ({
       <header
         className={cx(
           styles.navbar,
-          'hidden sm:flex items-center flex-shrink-0 px-2 top-0 sticky z-10 bg-white'
+          'hidden sm:flex items-center flex-shrink-0 px-4 top-0 sticky z-10 bg-white'
         )}
       >
         <div className={cx(navSideClassNames, 'justify-start')}>

@@ -8,7 +8,7 @@ export default () => (
   <div
     className={cx(
       styles.wrapper,
-      'flex items-center px-2 justify-center sm:justify-start'
+      'flex items-center px-4 justify-center sm:justify-start'
     )}
   >
     <Logo />

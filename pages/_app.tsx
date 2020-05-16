@@ -3,7 +3,6 @@ import SessionProvider from 'components/SessionProvider'
 import type { AppProps } from 'next/app'
 import { Suspense, useEffect } from 'react'
 import { RecoilRoot } from 'recoil'
-
 import 'styles/_app.css'
 
 // @TODO install @types/recoil when available

@@ -1,6 +1,7 @@
 import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
 import cx from 'classnames'
 import { className } from 'components/Button'
+import Logo from 'components/Logo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef } from 'react'
@@ -32,6 +33,11 @@ export const moreLinks = [
   ['Completed Todos', '/done'],
   ['Help', '/help'],
 ]
+
+// @TODO remove this
+if (process.env.NODE_ENV === 'development') {
+  moreLinks.push(['Welcome', '/welcome'])
+}
 
 const TopLink: React.FC<{
   className?: string
@@ -99,7 +105,9 @@ export default ({
           'hidden sm:flex items-center flex-shrink-0 px-2 top-0 sticky z-10 bg-white'
         )}
       >
-        <div className={cx(navSideClassNames, 'justify-start')}>HyperFokus</div>
+        <div className={cx(navSideClassNames, 'justify-start')}>
+          <Logo />
+        </div>
         <div className="flex items-center flex-shrink-0 h-inherit">
           <nav className="gap-px grid grid-flow-col text-xs">
             {topLinks.map(([text, href], key) => (

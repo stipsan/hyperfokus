@@ -1,4 +1,5 @@
 import Button from 'components/Button'
+import HeaderLogo from 'components/HeaderLogo'
 import HeadTitle from 'components/HeadTitle'
 import { useSessionSetState, useSessionValue } from 'components/SessionProvider'
 import Link from 'next/link'
@@ -38,6 +39,7 @@ export default () => {
   return (
     <>
       <HeadTitle>{title}</HeadTitle>
+      <HeaderLogo />
       <main>
         <h1 className="text-gray-900">The session provider is {session}.</h1>
         <Link href="/">

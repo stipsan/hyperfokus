@@ -1,3 +1,4 @@
+import HeaderLogo from 'components/HeaderLogo'
 import HeadTitle from 'components/HeadTitle'
 import { useSessionSetState } from 'components/SessionProvider'
 import Link from 'next/link'
@@ -9,13 +10,16 @@ export default () => {
   const setSession = useSessionSetState()
 
   return (
-    <main>
+    <>
       <HeadTitle>{title}</HeadTitle>
-      Welcome welcome welcome
-      <button onClick={() => setSession('demo')}>Start demo</button>
-      <Link href="/setup">
-        <a>Get started</a>
-      </Link>
-    </main>
+      <HeaderLogo />
+      <main>
+        Welcome welcome welcome
+        <button onClick={() => setSession('demo')}>Start demo</button>
+        <Link href="/setup">
+          <a>Get started</a>
+        </Link>
+      </main>
+    </>
   )
 }

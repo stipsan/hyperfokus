@@ -38,14 +38,16 @@ export default () => {
   return (
     <>
       <HeadTitle>{title}</HeadTitle>
-      <h1 className="text-gray-900">The session provider is {session}.</h1>
-      <Link href="/">
-        <a>Go back</a>
-      </Link>
-      <br />
-      <EnableLocalStorage />
-      <br />
-      <EnableFirebase />
+      <main>
+        <h1 className="text-gray-900">The session provider is {session}.</h1>
+        <Link href="/">
+          <a>Go back</a>
+        </Link>
+        <br />
+        <EnableLocalStorage />
+        <br />
+        <EnableFirebase />
+      </main>
     </>
   )
 }

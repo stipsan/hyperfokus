@@ -32,10 +32,12 @@ export default () => {
       <HeadTitle>{title}</HeadTitle>
       <Header title={title} />
       <GetStartedBroadcast />
-      <br />
-      <EnableDemo />
-      <br />
-      <ResetButton />
+      <main>
+        <br />
+        <EnableDemo />
+        <br />
+        <ResetButton />
+      </main>
     </>
   )
 }

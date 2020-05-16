@@ -5,8 +5,10 @@ export default () => {
   return (
     <AppLayout>
       <GetStartedBroadcast />
-      <p>Schedules selector</p>
-      <p>Schedules container</p>
+      <main>
+        <p>Schedules selector</p>
+        <p>Schedules container</p>
+      </main>
     </AppLayout>
   )
 }

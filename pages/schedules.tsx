@@ -9,6 +9,7 @@ export default () => (
     <HeadTitle>{title}</HeadTitle>
     <AppLayout>
       <GetStartedBroadcast />
+      <main />
     </AppLayout>
   </>
 )

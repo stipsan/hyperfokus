@@ -17,9 +17,9 @@ export default ({ Component, pageProps }: AppProps) => {
   return (
     <Suspense
       fallback={
-        <main className="flex h-screen items-center justify-center text-gray-700 text-xl w-screen loading">
+        <div className="flex h-screen items-center justify-center text-gray-700 text-xl w-screen loading">
           Loading...
-        </main>
+        </div>
       }
     >
       <HeadTitle />

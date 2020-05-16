@@ -16,7 +16,9 @@ export default () => (
     <HeadTitle>{title}</HeadTitle>
     <AppLayout>
       <GetStartedBroadcast />
-      <CurrentSession />
+      <main>
+        <CurrentSession />
+      </main>
     </AppLayout>
   </>
 )

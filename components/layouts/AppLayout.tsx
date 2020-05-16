@@ -15,12 +15,12 @@ export default ({ children }: Props) => {
       <Header />
       <Suspense
         fallback={
-          <main className="flex h-screen items-center justify-center text-gray-700 text-xl w-screen loading">
+          <div className="flex h-screen items-center justify-center text-gray-700 text-xl w-screen loading">
             Loading...
-          </main>
+          </div>
         }
       >
-        <main className="bg-gray-100 min-h-screen">{children}</main>
+        <div className="bg-gray-100 min-h-screen">{children}</div>
       </Suspense>
       <footer />
     </>

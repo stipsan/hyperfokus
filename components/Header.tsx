@@ -89,7 +89,7 @@ export default ({
       >
         <div className={cx(navSideClassNames, 'justify-start')}>{left}</div>
         <div className="flex items-center flex-shrink-0 h-inherit">
-          {title ?? 'HyperFokus'}
+          <Logo />
         </div>
         <div className={cx(navSideClassNames, 'justify-end')}>{right}</div>
       </header>

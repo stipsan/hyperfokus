@@ -6,6 +6,33 @@ import { useSessionSetState, useSessionValue } from 'components/SessionProvider'
 
 const title = 'Settings'
 
+const EnableLocalStorage = () => {
+  const session = useSessionValue()
+  const setSession = useSessionSetState()
+
+  return (
+    <Button
+      onClick={() => setSession('localstorage')}
+      variant={session === 'localstorage' ? 'primary' : 'default'}
+    >
+      {session === 'localstorage' ? 'Using local storage' : 'Use local storage'}
+    </Button>
+  )
+}
+const EnableFirebase = () => {
+  const session = useSessionValue()
+  const setSession = useSessionSetState()
+
+  return (
+    <Button
+      onClick={() => setSession('firebase')}
+      variant={session === 'firebase' ? 'primary' : 'default'}
+    >
+      {session === 'firebase' ? 'Using firebase' : 'Use firebase'}
+    </Button>
+  )
+}
+
 const EnableDemo = () => {
   const session = useSessionValue()
   const setSession = useSessionSetState()
@@ -37,6 +64,10 @@ export default () => {
           <EnableDemo />
           <br />
           <ResetButton />
+          <br />
+          <EnableLocalStorage />
+          <br />
+          <EnableFirebase />
         </MoreContainer>
       </AppLayout>
     </>

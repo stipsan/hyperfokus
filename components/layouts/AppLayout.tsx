@@ -1,5 +1,5 @@
-import { Suspense } from 'react'
 import Header from 'components/Header'
+import { Suspense } from 'react'
 
 /**
  * Main app frame includes a header and footer
@@ -20,7 +20,7 @@ export default ({ children }: Props) => {
           </main>
         }
       >
-        <main>{children}</main>
+        <main className="bg-gray-100 min-h-screen">{children}</main>
       </Suspense>
       <footer />
     </>

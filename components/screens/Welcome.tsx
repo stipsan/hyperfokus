@@ -38,13 +38,13 @@ export default () => {
             </p>
             <div className="flex justify-center">
               <button
-                className="inline-flex font-bold text-white bg-green-500 border-0 py-2 px-6 focus:outline-none hover:bg-green-600 rounded text-lg"
+                className="inline-flex font-bold text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none focus:shadow-outline hover:bg-blue-600 rounded text-lg"
                 onClick={() => setSession('demo')}
               >
                 Try demo
               </button>
               <button
-                className="ml-4 inline-flex text-gray-700 bg-gray-200 border-0 py-2 px-6 focus:outline-none hover:bg-gray-300 rounded text-lg"
+                className="ml-4 inline-flex text-gray-700 bg-gray-200 border-0 py-2 px-6 focus:outline-none focus:shadow-outline hover:bg-gray-300 rounded text-lg"
                 onClick={() => setSession('localstorage')}
               >
                 Get started

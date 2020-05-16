@@ -5,7 +5,6 @@ import Logo from 'components/Logo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef } from 'react'
-
 import styles from './index.module.css'
 
 type Props = {
@@ -90,7 +89,7 @@ export default ({
       <header
         className={cx(
           styles.navbar,
-          'flex sm:hidden items-center flex-shrink-0 px-2 top-0 sticky z-10 bg-white border-b border-black border-opacity-25'
+          'flex sm:hidden items-center flex-shrink-0 px-2 top-0 sticky z-10 bg-white'
         )}
       >
         <div className={cx(navSideClassNames, 'justify-start')}>{left}</div>

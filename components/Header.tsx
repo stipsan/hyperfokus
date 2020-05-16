@@ -44,9 +44,10 @@ const TopLink: React.FC<{
     <Link href={href}>
       <a
         className={cx(
-          'py-1 px-4 focus:outline-none bg-gray-200 hover:bg-gray-300 active:bg-gray-400',
+          'py-1 px-4 focus:outline-none ',
           {
             'bg-blue-500 hover:bg-blue-500 active:bg-blue-500 text-white': active,
+            'bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900': !active,
           },
           className
         )}

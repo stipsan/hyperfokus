@@ -1,6 +1,6 @@
 import cx from 'classnames'
-import styles from 'components/HeaderLogo.module.css'
 import Logo from 'components/Logo'
+import styles from './HeaderLogo.module.css'
 
 // Designed to put the logo in relatively the same position as the header does, when you're not using the header
 

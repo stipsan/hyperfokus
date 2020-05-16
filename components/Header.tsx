@@ -5,7 +5,7 @@ import Logo from 'components/Logo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef } from 'react'
-import styles from './index.module.css'
+import styles from './Header.module.css'
 
 type Props = {
   left?: React.ReactNode

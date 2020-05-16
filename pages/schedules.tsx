@@ -1,15 +1,17 @@
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
-import { AppLayout } from 'components/layouts'
+import { AppLayout, MainContainer } from 'components/layouts'
 
 const title = 'Schedules'
 
 export default () => (
   <>
     <HeadTitle>{title}</HeadTitle>
-    <AppLayout>
+    <AppLayout title={title}>
       <GetStartedBroadcast />
-      <main />
+      <MainContainer>
+        <p>List over schedules</p>
+      </MainContainer>
     </AppLayout>
   </>
 )

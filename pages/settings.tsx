@@ -1,7 +1,7 @@
 import Button from 'components/Button'
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
-import Header from 'components/Header'
 import HeadTitle from 'components/HeadTitle'
+import { AppLayout, MoreContainer } from 'components/layouts'
 import { useSessionSetState, useSessionValue } from 'components/SessionProvider'
 
 const title = 'Settings'
@@ -30,14 +30,15 @@ export default () => {
   return (
     <>
       <HeadTitle>{title}</HeadTitle>
-      <Header title={title} />
-      <GetStartedBroadcast />
-      <main>
-        <br />
-        <EnableDemo />
-        <br />
-        <ResetButton />
-      </main>
+      <AppLayout title={title}>
+        <GetStartedBroadcast />
+        <MoreContainer>
+          <br />
+          <EnableDemo />
+          <br />
+          <ResetButton />
+        </MoreContainer>
+      </AppLayout>
     </>
   )
 }

@@ -1,9 +1,9 @@
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
-import { AppLayout } from 'components/layouts'
+import { AppLayout, MoreContainer } from 'components/layouts'
 import { useSessionValue } from 'components/SessionProvider'
 
-const title = 'Completed Activities'
+const title = 'Completed Todos'
 
 const CurrentSession = () => {
   const session = useSessionValue()
@@ -14,11 +14,11 @@ const CurrentSession = () => {
 export default () => (
   <>
     <HeadTitle>{title}</HeadTitle>
-    <AppLayout>
+    <AppLayout title={title}>
       <GetStartedBroadcast />
-      <main>
+      <MoreContainer>
         <CurrentSession />
-      </main>
+      </MoreContainer>
     </AppLayout>
   </>
 )

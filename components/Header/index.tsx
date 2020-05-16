@@ -29,7 +29,7 @@ const topLinks = [
 ]
 export const moreLinks = [
   ['Settings', '/settings'],
-  ['Completed Activities', '/done'],
+  ['Completed Todos', '/done'],
   ['Help', '/help'],
 ]
 

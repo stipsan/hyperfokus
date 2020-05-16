@@ -33,11 +33,11 @@ export const moreLinks = [
   ['Help', '/help'],
 ]
 
-const TopLink: React.FC<{ className?: string; href: string }> = ({
-  href,
-  children,
-  className,
-}) => {
+const TopLink: React.FC<{
+  className?: string
+  href: string
+  active: boolean
+}> = ({ active, href, children, className }) => {
   const router = useRouter()
 
   return (
@@ -46,8 +46,7 @@ const TopLink: React.FC<{ className?: string; href: string }> = ({
         className={cx(
           'py-1 px-4 focus:outline-none bg-gray-200 hover:bg-gray-300 active:bg-gray-400',
           {
-            'bg-blue-500 hover:bg-blue-500 active:bg-blue-500 text-white':
-              router.pathname === href,
+            'bg-blue-500 hover:bg-blue-500 active:bg-blue-500 text-white': active,
           },
           className
         )}
@@ -105,6 +104,7 @@ export default ({
           <nav className="gap-px grid grid-flow-col text-xs">
             {topLinks.map(([text, href], key) => (
               <TopLink
+                active={router.pathname === href}
                 className={cx({ 'rounded-l-lg': key === 0 })}
                 key={href}
                 href={href}
@@ -112,7 +112,14 @@ export default ({
                 {text}
               </TopLink>
             ))}
-            <TopLink className="rounded-r-lg" href="/more">
+            <TopLink
+              active={
+                moreLinks.some(([, href]) => router.pathname === href) ||
+                router.pathname === '/more'
+              }
+              className="rounded-r-lg"
+              href="/more"
+            >
               More
             </TopLink>
           </nav>

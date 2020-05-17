@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
 
 export type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
@@ -37,14 +36,10 @@ export const useSessionValue = () => {
 export const useSessionSetState = () => {
   const setState = useSetRecoilState(sessionProviderState)
 
-  return useCallback(
-    (unsafeSession: SessionState) => {
-      console.warn('calling setState', unsafeSession)
-      const session = sanitize(unsafeSession)
+  return (unsafeSession: SessionState) => {
+    const session = sanitize(unsafeSession)
 
-      setState(session)
-      localStorage.setItem('hyperfokus.storage', session)
-    },
-    [setState]
-  )
+    setState(session)
+    localStorage.setItem('hyperfokus.storage', session)
+  }
 }

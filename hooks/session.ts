@@ -14,7 +14,7 @@ const sanitize = (unsafeState: SessionState): SessionState => {
   }
 }
 
-const sessionProviderState = atom({
+export const sessionProviderState = atom({
   key: 'SessionProvider',
   default:
     typeof window === 'undefined'
@@ -39,7 +39,9 @@ export const useSessionSetState = () => {
 
   return useCallback(
     (unsafeSession: SessionState) => {
+      console.warn('calling setState', unsafeSession)
       const session = sanitize(unsafeSession)
+
       setState(session)
       localStorage.setItem('hyperfokus.storage', session)
     },

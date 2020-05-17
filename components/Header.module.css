@@ -1,3 +1,6 @@
 .navbar {
+  /* Used to hide the header that isn't currently in use, it's a perf optimization */
+  --header-breakpoint: theme('screens.sm');
+
   height: var(--navbar-height);
 }

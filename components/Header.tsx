@@ -4,7 +4,7 @@ import { className } from 'components/Button'
 import Logo from 'components/Logo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 import styles from './Header.module.css'
 
 type Props = {
@@ -80,55 +80,84 @@ export default ({
 
   const router = useRouter()
 
+  const [larger, setLarger] = useState(null)
+  const domRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const breakpoint = window
+      .getComputedStyle(domRef.current)
+      .getPropertyValue(`--header-breakpoint`)
+
+    const mql = window.matchMedia(`(min-width: ${breakpoint})`)
+    setLarger(mql.matches)
+
+    const handler = (event) => {
+      setLarger(event.matches)
+    }
+    mql.addListener(handler)
+
+    return () => mql.removeListener(handler)
+  }, [])
+
   return (
     <>
-      <header
-        className={cx(
-          styles.navbar,
-          'flex sm:hidden items-center flex-shrink-0 px-2 top-0 sticky z-10 bg-white'
-        )}
-      >
-        <div className={cx(navSideClassNames, 'justify-start')}>{left}</div>
-        <div className="flex items-center flex-shrink-0 h-inherit">
-          <Logo />
-        </div>
-        <div className={cx(navSideClassNames, 'justify-end')}>{right}</div>
-      </header>
-      <header
-        className={cx(
-          styles.navbar,
-          'hidden sm:flex items-center flex-shrink-0 px-4 top-0 sticky z-10 bg-white'
-        )}
-      >
-        <div className={cx(navSideClassNames, 'justify-start')}>
-          <Logo />
-        </div>
-        <div className="flex items-center flex-shrink-0 h-inherit">
-          <nav className="gap-px grid grid-flow-col text-xs">
-            {topLinks.map(([text, href], key) => (
+      {(larger === false || larger === null) && (
+        <header
+          key="small"
+          ref={domRef}
+          className={cx(
+            styles.navbar,
+            'flex items-center flex-shrink-0 px-2 top-0 sticky z-10 bg-white',
+            { 'sm:hidden': larger === null }
+          )}
+        >
+          <div className={cx(navSideClassNames, 'justify-start')}>{left}</div>
+          <div className="flex items-center flex-shrink-0 h-inherit">
+            <Logo />
+          </div>
+          <div className={cx(navSideClassNames, 'justify-end')}>{right}</div>
+        </header>
+      )}
+      {(larger === true || larger === null) && (
+        <header
+          key="larger"
+          ref={domRef}
+          className={cx(
+            styles.navbar,
+            'items-center flex-shrink-0 px-4 top-0 sticky z-10 bg-white',
+            { 'hidden sm:flex': larger === null, flex: larger !== null }
+          )}
+        >
+          <div className={cx(navSideClassNames, 'justify-start')}>
+            <Logo />
+          </div>
+          <div className="flex items-center flex-shrink-0 h-inherit">
+            <nav className="gap-px grid grid-flow-col text-xs">
+              {topLinks.map(([text, href], key) => (
+                <TopLink
+                  active={router.pathname === href}
+                  className={cx({ 'rounded-l-lg': key === 0 })}
+                  key={href}
+                  href={href}
+                >
+                  {text}
+                </TopLink>
+              ))}
               <TopLink
-                active={router.pathname === href}
-                className={cx({ 'rounded-l-lg': key === 0 })}
-                key={href}
-                href={href}
+                active={
+                  moreLinks.some(([, href]) => router.pathname === href) ||
+                  router.pathname === '/more'
+                }
+                className="rounded-r-lg"
+                href="/more"
               >
-                {text}
+                More
               </TopLink>
-            ))}
-            <TopLink
-              active={
-                moreLinks.some(([, href]) => router.pathname === href) ||
-                router.pathname === '/more'
-              }
-              className="rounded-r-lg"
-              href="/more"
-            >
-              More
-            </TopLink>
-          </nav>
-        </div>
-        <div className={cx(navSideClassNames, 'justify-end')}>{right}</div>
-      </header>
+            </nav>
+          </div>
+          <div className={cx(navSideClassNames, 'justify-end')}>{right}</div>
+        </header>
+      )}
     </>
   )
 }

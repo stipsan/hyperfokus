@@ -1,10 +1,11 @@
 import { useSessionValue } from 'hooks/session'
-import { selectorFamily, useRecoilValue } from 'recoil'
+import type { SessionState } from 'hooks/session'
 
-let test = null
+const loading = new Map()
+const loaded = new Map<SessionState, any>()
 
-const loadDatabase = (provider) => {
-  console.log('loadDatabase', provider)
+const loadDatabase = async (provider) => {
+  console.count(`loadDatabase: ${provider}`)
   switch (provider) {
     case 'localstorage':
       return import('database/localstorage')
@@ -15,28 +16,30 @@ const loadDatabase = (provider) => {
   }
 }
 
-// @TODO move away from using recoil to load db for now, wait with using recoil elsewhere until it's mature
-const databaseProvider = selectorFamily({
-  key: 'DatabaseProvider',
-  get: (session) => async ({ get }) => {
-    console.log('databaseProvider!', get, session)
-    //const provider = get(sessionProviderState)
-
-    console.log('session', session)
-    if (!test) {
-      test = session
-      //  test = await loadDatabase(session)
-    }
-
-    return test
-  },
-})
-
 export const useDatabase = () => {
-  // @TODO Workaround infinite loop
   const session = useSessionValue()
 
-  const provider = useRecoilValue(databaseProvider(session))
+  // Ensure this hook is never called without a valid provider
+  if (session !== 'localstorage' && session !== 'demo') {
+    throw new TypeError(
+      session ? `Invalid provider: ${session}` : 'No database provider set'
+    )
+  }
 
-  return provider
+  if (loaded.has(session)) {
+    return loaded.get(session)
+  }
+
+  if (!loading.has(session)) {
+    loading.set(
+      session,
+      loadDatabase(session).then(
+        (database) => loaded.set(session, database.default),
+        (reason) => console.error(reason)
+      )
+    )
+  }
+
+  // Suspend on the loading promise
+  throw loading.get(session)
 }

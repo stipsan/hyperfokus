@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
 
-type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
+export type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
 
 const sanitize = (unsafeState: SessionState): SessionState => {
   switch (unsafeState) {

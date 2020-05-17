@@ -1,9 +1,13 @@
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
+import { useDatabase } from 'hooks/database'
 
 const title = 'Help'
 
 export default () => {
+  const database = useDatabase()
+
+  console.log('database useDatabase', database)
   return (
     <>
       <HeadTitle>{title}</HeadTitle>

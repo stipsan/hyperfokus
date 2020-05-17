@@ -1,1 +1,1 @@
-export const test = 'localstorage'
+export default 'localstorage'

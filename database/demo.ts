@@ -1,1 +1,1 @@
-export const test = 'demo'
+export default 'demo'

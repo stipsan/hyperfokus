@@ -1,4 +1,5 @@
 import { useSessionSetState, useSessionValue } from 'hooks/session'
+import Router from 'next/router'
 
 // @TODO change behavior if the user clicks "Stop the demo, I'm ready!"
 // just in case the "Get started" button is missed on the start page.
@@ -24,7 +25,10 @@ export default () => {
       </p>
       <button
         className="inline-block text-sm font-bold rounded-full text-yellow-100 bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800 py-1 px-2 mt-1 focus:outline-none focus:shadow-outline"
-        onClick={() => setSession('')}
+        onClick={() => {
+          setSession('')
+          Router.push('/')
+        }}
       >
         Stop the demo, I'm ready!
       </button>

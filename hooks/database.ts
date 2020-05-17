@@ -1,8 +1,9 @@
+import type { DatabaseType } from 'database/types'
 import { useSessionValue } from 'hooks/session'
 import type { SessionState } from 'hooks/session'
 
 const loading = new Map()
-const loaded = new Map<SessionState, any>()
+const loaded = new Map<SessionState, DatabaseType>()
 
 const loadDatabase = async (provider) => {
   switch (provider) {

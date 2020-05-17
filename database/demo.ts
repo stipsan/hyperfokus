@@ -8,6 +8,7 @@ import {
   Activity,
   ActivityDelta,
   Area,
+  DatabaseType,
   Opportunity,
   OpportunityDelta,
   Repeat,
@@ -51,7 +52,7 @@ const Memory = (
     opportunities: Opportunity[]
     activities: Activity[]
   } = defaultState
-) => {
+): DatabaseType => {
   let areas: Area[] = initialState.areas
   const areasUpdated = new EventEmitter<Area[]>()
 
@@ -124,7 +125,6 @@ const Memory = (
       nextOpportunities.forEach(
         ({ added, edited, deleted, ...nextOpportunity }) => {
           if (added) {
-            // @ts-expect-error
             opportunities.push({
               ...nextOpportunity,
             })

@@ -105,11 +105,9 @@ export default ({
         <header
           key="small"
           ref={domRef}
-          className={cx(
-            styles.navbar,
-            'flex items-center flex-shrink-0 px-2 top-0 sticky z-10 bg-white',
-            { 'sm:hidden': larger === null }
-          )}
+          className={cx(styles.navbar, 'flex px-2', {
+            'sm:hidden': larger === null,
+          })}
         >
           <div className={cx(navSideClassNames, 'justify-start')}>{left}</div>
           <div className="flex items-center flex-shrink-0 h-inherit">
@@ -122,11 +120,10 @@ export default ({
         <header
           key="larger"
           ref={domRef}
-          className={cx(
-            styles.navbar,
-            'items-center flex-shrink-0 px-4 top-0 sticky z-10 bg-white',
-            { 'hidden sm:flex': larger === null, flex: larger !== null }
-          )}
+          className={cx(styles.navbar, 'px-4', {
+            'hidden sm:flex': larger === null,
+            flex: larger !== null,
+          })}
         >
           <div className={cx(navSideClassNames, 'justify-start')}>
             <Logo />

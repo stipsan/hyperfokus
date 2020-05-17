@@ -1,4 +1,6 @@
 import { Dialog } from '@reach/dialog'
+import Button from 'components/Button'
+import DialogToolbar from 'components/DialogToolbar'
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MainContainer } from 'components/layouts'
@@ -20,11 +22,14 @@ const CreateDialog = () => {
 
   return (
     <Dialog onDismiss={close} aria-label="Create new schedule">
-      <p>
-        I don’t use <code>isOpen</code>, I just render when I should and not
-        when I shouldn’t.
-      </p>
-      <button onClick={close}>Okay</button>
+      <p className="py-16">The ability to create schedules is coming soon!</p>
+      <DialogToolbar
+        right={
+          <Button variant="primary" onClick={close}>
+            Okay
+          </Button>
+        }
+      />
     </Dialog>
   )
 }

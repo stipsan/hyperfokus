@@ -1,4 +1,6 @@
 import { Dialog } from '@reach/dialog'
+import Button from 'components/Button'
+import DialogToolbar from 'components/DialogToolbar'
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import { AppLayout } from 'components/layouts'
 import Welcome from 'components/screens/Welcome'
@@ -26,11 +28,14 @@ const CreateDialog = () => {
 
   return (
     <Dialog onDismiss={close} aria-label="Create new todo">
-      <p>
-        I don’t use <code>isOpen</code>, I just render when I should and not
-        when I shouldn’t.
-      </p>
-      <button onClick={close}>Okay</button>
+      <p className="py-16">The ability to create todos is on its way!</p>
+      <DialogToolbar
+        right={
+          <Button variant="primary" onClick={close}>
+            Okay
+          </Button>
+        }
+      />
     </Dialog>
   )
 }

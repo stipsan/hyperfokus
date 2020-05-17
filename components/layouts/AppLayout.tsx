@@ -22,7 +22,7 @@ export default ({ children, title, createLink }: Props) => {
           </div>
         }
       >
-        <div className="bg-gray-100 min-h-screen">{children}</div>
+        <div className="">{children}</div>
       </Suspense>
       <footer />
     </>

@@ -1,7 +1,7 @@
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import { AppLayout } from 'components/layouts'
 import Welcome from 'components/screens/Welcome'
-import { useSessionValue } from 'components/SessionProvider'
+import { useSessionValue } from 'hooks/session'
 
 export default () => {
   const session = useSessionValue()

@@ -2,7 +2,7 @@ import Button from 'components/Button'
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
-import { useSessionSetState, useSessionValue } from 'components/SessionProvider'
+import { useSessionSetState, useSessionValue } from 'hooks/session'
 
 const title = 'Settings'
 

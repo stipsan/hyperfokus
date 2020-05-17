@@ -1,4 +1,4 @@
-import { useSessionSetState, useSessionValue } from './SessionProvider'
+import { useSessionSetState, useSessionValue } from 'hooks/session'
 
 // @TODO change behavior if the user clicks "Stop the demo, I'm ready!"
 // just in case the "Get started" button is missed on the start page.

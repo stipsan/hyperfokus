@@ -1,7 +1,7 @@
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
-import { useSessionValue } from 'components/SessionProvider'
+import { useSessionValue } from 'hooks/session'
 
 const title = 'Completed Todos'
 

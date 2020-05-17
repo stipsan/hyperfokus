@@ -1,4 +1,3 @@
-import '@reach/dialog/styles.css'
 import HeadTitle from 'components/HeadTitle'
 import type { AppProps } from 'next/app'
 import { Suspense, useEffect } from 'react'

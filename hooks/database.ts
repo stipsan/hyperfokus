@@ -5,7 +5,6 @@ const loading = new Map()
 const loaded = new Map<SessionState, any>()
 
 const loadDatabase = async (provider) => {
-  console.count(`loadDatabase: ${provider}`)
   switch (provider) {
     case 'localstorage':
       return import('database/localstorage')
@@ -33,10 +32,14 @@ export const useDatabase = () => {
   if (!loading.has(session)) {
     loading.set(
       session,
-      loadDatabase(session).then(
-        (database) => loaded.set(session, database.default),
-        (reason) => console.error(reason)
-      )
+      loadDatabase(session)
+        .then(
+          (database) => loaded.set(session, database.default),
+          (reason) => console.error(reason)
+        )
+        .then(
+          (db) => new Promise((resolve) => setTimeout(() => resolve(db), 3000))
+        )
     )
   }
 

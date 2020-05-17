@@ -5,6 +5,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@reach/dialog": "^0.10.2",
     "@reach/menu-button": "^0.10.2",
     "classnames": "^2.2.6",
     "next": "^9.4.0",

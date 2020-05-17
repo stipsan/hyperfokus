@@ -8,9 +8,8 @@ import { forwardRef, useEffect, useRef, useState } from 'react'
 import styles from './Header.module.css'
 
 type Props = {
-  left?: React.ReactNode
+  createLink?: string
   title?: React.ReactNode
-  right?: React.ReactNode
 }
 
 const NavLink: React.FC<{ href: string }> = forwardRef(
@@ -44,7 +43,7 @@ const TopLink: React.FC<{
     <Link href={href}>
       <a
         className={cx(
-          'py-1 px-4 focus:outline-none ',
+          'py-1 px-4 focus:outline-none focus:shadow-outline',
           {
             'bg-blue-500 hover:bg-blue-500 active:bg-blue-500 text-white': active,
             'bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900': !active,
@@ -58,24 +57,27 @@ const TopLink: React.FC<{
   )
 }
 
-export default ({
-  left = (
-    <Menu>
-      <MenuButton className={className({ variant: 'primary' })}>
-        Menu
-      </MenuButton>
-      <MenuList>
-        {[...topLinks, ...moreLinks].map(([text, href]) => (
-          <MenuLink key={href} as={NavLink} href={href}>
-            {text}
-          </MenuLink>
-        ))}
-      </MenuList>
-    </Menu>
-  ),
-  title,
-  right,
-}: Props) => {
+const CreateLink = ({ label }: { label: string }) => (
+  <Link href="?create=true" shallow>
+    <a
+      className="py-2 px-3 focus:outline-none focus:shadow-outline bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900 rounded"
+      aria-label={label}
+    >
+      <svg
+        aria-hidden
+        className="fill-current"
+        xmlns="http://www.w3.org/2000/svg"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+      >
+        <path d="M24 8h-8v-8h-8v8h-8v8h8v8h8v-8h8z" />
+      </svg>
+    </a>
+  </Link>
+)
+
+export default ({ createLink, title }: Props) => {
   const navSideClassNames = 'flex items-center w-full'
 
   const router = useRouter()
@@ -109,11 +111,26 @@ export default ({
             'sm:hidden': larger === null,
           })}
         >
-          <div className={cx(navSideClassNames, 'justify-start')}>{left}</div>
+          <div className={cx(navSideClassNames, 'justify-start')}>
+            <Menu>
+              <MenuButton className={className({ variant: 'primary' })}>
+                Menu
+              </MenuButton>
+              <MenuList>
+                {[...topLinks, ...moreLinks].map(([text, href]) => (
+                  <MenuLink key={href} as={NavLink} href={href}>
+                    {text}
+                  </MenuLink>
+                ))}
+              </MenuList>
+            </Menu>
+          </div>
           <div className="flex items-center flex-shrink-0 h-inherit">
             <Logo />
           </div>
-          <div className={cx(navSideClassNames, 'justify-end')}>{right}</div>
+          <div className={cx(navSideClassNames, 'justify-end')}>
+            {createLink && <CreateLink label={createLink} />}
+          </div>
         </header>
       )}
       {(larger === true || larger === null) && (
@@ -152,7 +169,9 @@ export default ({
               </TopLink>
             </nav>
           </div>
-          <div className={cx(navSideClassNames, 'justify-end')}>{right}</div>
+          <div className={cx(navSideClassNames, 'justify-end')}>
+            {createLink && <CreateLink label={createLink} />}
+          </div>
         </header>
       )}
     </>

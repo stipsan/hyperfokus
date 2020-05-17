@@ -8,12 +8,13 @@ import { Suspense } from 'react'
 type Props = {
   children: React.ReactNode
   title?: string
+  createLink?: string
 }
 
-export default ({ children, title }: Props) => {
+export default ({ children, title, createLink }: Props) => {
   return (
     <>
-      <Header title={title} />
+      <Header title={title} createLink={createLink} />
       <Suspense
         fallback={
           <div className="flex h-screen items-center justify-center text-gray-700 text-xl w-screen loading">

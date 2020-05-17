@@ -1,5 +1,4 @@
 import HeadTitle from 'components/HeadTitle'
-import SessionProvider from 'components/SessionProvider'
 import type { AppProps } from 'next/app'
 import { Suspense, useEffect } from 'react'
 import { RecoilRoot } from 'recoil'
@@ -23,9 +22,7 @@ export default ({ Component, pageProps }: AppProps) => {
     >
       <HeadTitle />
       <RecoilRoot>
-        <SessionProvider>
-          <Component {...pageProps} />
-        </SessionProvider>
+        <Component {...pageProps} />
       </RecoilRoot>
     </Suspense>
   )

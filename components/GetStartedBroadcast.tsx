@@ -1,5 +1,10 @@
 import { useSessionSetState, useSessionValue } from './SessionProvider'
 
+// @TODO change behavior if the user clicks "Stop the demo, I'm ready!"
+// just in case the "Get started" button is missed on the start page.
+// One solution is to use an atom to track if the button has been pressed multiple times, and if so just
+// trigger the "Get started" flow anyway.
+
 export default () => {
   const session = useSessionValue()
   const setSession = useSessionSetState()

@@ -1,18 +1,7 @@
-import {
-  createContext,
-  useState,
-  useContext,
-  useCallback,
-  useEffect,
-} from 'react'
-import type { Dispatch, SetStateAction } from 'react'
+import { useCallback } from 'react'
+import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
 
 type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
-
-const SessionValueContext = createContext<SessionState>(undefined)
-const SessionSetStateContext = createContext<
-  Dispatch<SetStateAction<SessionState>>
->(undefined)
 
 const sanitize = (unsafeState: SessionState): SessionState => {
   switch (unsafeState) {
@@ -25,27 +14,13 @@ const sanitize = (unsafeState: SessionState): SessionState => {
   }
 }
 
-const Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [session, setSession] = useState<SessionState>(
+const sessionProviderState = atom({
+  key: 'SessionProvider',
+  default:
     typeof window === 'undefined'
-      ? ''
-      : () =>
-          sanitize(localStorage.getItem('hyperfokus.storage') as SessionState)
-  )
-
-  useEffect(() => localStorage.setItem('hyperfokus.storage', session), [
-    session,
-  ])
-
-  return (
-    <SessionSetStateContext.Provider value={setSession}>
-      <SessionValueContext.Provider value={session}>
-        {children}
-      </SessionValueContext.Provider>
-    </SessionSetStateContext.Provider>
-  )
-}
-export default Provider
+      ? ('' as SessionState)
+      : sanitize(localStorage.getItem('hyperfokus.storage') as SessionState),
+})
 
 export const useSessionValue = () => {
   // Suspend on the server only as we're reading the provider initial state from localStorage
@@ -54,26 +29,20 @@ export const useSessionValue = () => {
     throw new Promise((resolve) => setTimeout(() => resolve()))
   }
 
-  const session = useContext(SessionValueContext)
+  const session = useRecoilValue(sessionProviderState)
 
-  // It's critical that this hook is never used outside a Provider, or it'll definitely cause bugs.
-  // The state setter ensures that the value is only ever null if the provider is missing.
-  if (session === undefined) {
-    throw new TypeError(`useSessionValue requires a SessionProvider wrapper`)
-  }
-
-  return session
+  return session as SessionState
 }
 
 export const useSessionSetState = () => {
-  const setState = useContext(SessionSetStateContext)
+  const setState = useSetRecoilState(sessionProviderState)
 
-  // It's critical that this hook is never used outside a Provider, or it'll definitely cause bugs.
-  if (setState === undefined) {
-    throw new TypeError(`useSessionSetState requires a SessionProvider wrapper`)
-  }
-
-  return useCallback((session: SessionState) => setState(sanitize(session)), [
-    setState,
-  ])
+  return useCallback(
+    (unsafeSession: SessionState) => {
+      const session = sanitize(unsafeSession)
+      setState(session)
+      localStorage.setItem('hyperfokus.storage', session)
+    },
+    [setState]
+  )
 }

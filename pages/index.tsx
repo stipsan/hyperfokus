@@ -7,14 +7,15 @@ import Welcome from 'components/screens/Welcome'
 import { useDatabase } from 'hooks/database'
 import { useSessionValue } from 'hooks/session'
 import { useRouter } from 'next/router'
+import { memo } from 'react'
 
-const LogDatabaseProvider = () => {
+const LogDatabaseProvider = memo(() => {
   const database = useDatabase()
 
   console.log('database useDatabase', database)
 
   return null
-}
+})
 
 const CreateDialog = () => {
   const router = useRouter()

@@ -32,14 +32,10 @@ export const useDatabase = () => {
   if (!loading.has(session)) {
     loading.set(
       session,
-      loadDatabase(session)
-        .then(
-          (database) => loaded.set(session, database.default),
-          (reason) => console.error(reason)
-        )
-        .then(
-          (db) => new Promise((resolve) => setTimeout(() => resolve(db), 3000))
-        )
+      loadDatabase(session).then(
+        (database) => loaded.set(session, database.default),
+        (reason) => console.error(reason)
+      )
     )
   }
 

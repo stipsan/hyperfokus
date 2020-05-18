@@ -4,6 +4,7 @@ import { forwardRef } from 'react'
 type Props = {
   className?: string
   variant?: 'default' | 'primary' | 'danger'
+  type?: 'button' | 'submit'
 } & React.HTMLAttributes<HTMLButtonElement>
 
 export const className = ({ className, variant = 'default' }: Props) =>
@@ -30,6 +31,7 @@ export default forwardRef(
   ) => (
     <button
       className={className({ className: forwardClassName, variant })}
+      type="button"
       {...props}
       ref={forwardedRef}
     />

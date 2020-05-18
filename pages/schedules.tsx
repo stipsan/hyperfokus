@@ -131,18 +131,10 @@ const Field: FC<{
   htmlFor?: string
 }> = ({ label, htmlFor, children }) => {
   return (
-    <div className="field is-horizontal">
-      <div className="field-label is-normal">
-        <label className="label" htmlFor={htmlFor}>
-          {label}
-        </label>
-      </div>
-      <div className="field-body">
-        <div className="field">
-          <div className="control">{children}</div>
-        </div>
-      </div>
-    </div>
+    <label className="block" htmlFor={htmlFor}>
+      <span className="text-gray-700">{label}</span>
+      {children}
+    </label>
   )
 }
 
@@ -155,11 +147,10 @@ const StartTime = ({
 }) => (
   <input
     required
-    className="w-auto tnum"
+    className="tnum form-input mt-1 block"
     type="time"
     autoComplete="off"
     id="start"
-    //className="input"
     pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
     placeholder="09:00"
     name="start"
@@ -182,40 +173,38 @@ const Duration = ({
     duration: number
   }
 }) => (
-  <div className="field has-addons">
-    <p className="control">
-      <input
-        /*
+  <div className="mt-1 flex">
+    <input
+      /*
         css={`
           font-variant-numeric: tabular-nums;
           font-feature-settings: 'tnum';
           width: 8ch;
         `}
         // */
-        required
-        autoComplete="off"
-        className="input"
-        type="number"
-        min="1"
-        max="1439"
-        step="1"
-        placeholder="60"
-        id="duration"
-        name="duration"
-        // @TODO spread out value, onChange and the other events instead of needing to know about dispatch and state
-        value={state.duration > 0 ? state.duration : ''}
-        onChange={({ target: { name, value } }) =>
-          dispatch({
-            type: 'change',
-            payload: { name, value: parseInt(value, 10) },
-          })
-        }
-        onBlur={() => dispatch({ type: 'blur:duration' })}
-      />
-    </p>
-    <p className="control">
-      <a className="button is-static">minutes</a>
-    </p>
+      required
+      autoComplete="off"
+      className="form-input rounded-r-none z-10 tnum"
+      type="number"
+      min="1"
+      max="1439"
+      step="1"
+      placeholder="60"
+      id="duration"
+      name="duration"
+      // @TODO spread out value, onChange and the other events instead of needing to know about dispatch and state
+      value={state.duration > 0 ? state.duration : ''}
+      onChange={({ target: { name, value } }) =>
+        dispatch({
+          type: 'change',
+          payload: { name, value: parseInt(value, 10) },
+        })
+      }
+      onBlur={() => dispatch({ type: 'blur:duration' })}
+    />
+    <span className="form-input border-l-0 rounded-l-none bg-gray-100 text-gray-800">
+      minutes
+    </span>
   </div>
 )
 
@@ -240,7 +229,7 @@ const EndTime = ({
     autoComplete="off"
     id="end"
     type="time"
-    className="input"
+    className="tnum form-input block mt-1"
     pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
     placeholder="10:00"
     name="end"
@@ -326,18 +315,26 @@ const ScheduleForm = ({
   const [state, dispatch] = useReducer(reducer, initialState)
 
   return (
-    <form>
-      <Field label="Start" htmlFor="start">
-        <StartTime dispatch={dispatch} state={state} />
-      </Field>
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
 
-      <Field label="Duration" htmlFor="duration">
-        <Duration dispatch={dispatch} state={state} />
-      </Field>
+        console.log('@TODO handle submit!', state)
+      }}
+    >
+      <div className="flex gap-4">
+        <Field label="Start" htmlFor="start">
+          <StartTime dispatch={dispatch} state={state} />
+        </Field>
 
-      <Field label="End" htmlFor="end">
-        <EndTime dispatch={dispatch} state={state} />
-      </Field>
+        <Field label="Duration" htmlFor="duration">
+          <Duration dispatch={dispatch} state={state} />
+        </Field>
+
+        <Field label="End" htmlFor="end">
+          <EndTime dispatch={dispatch} state={state} />
+        </Field>
+      </div>
 
       <Field label="Repeat">
         <Repeat dispatch={dispatch} state={state} />
@@ -375,7 +372,7 @@ const ScheduleForm = ({
             <Button variant="default" onClick={onDismiss}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={onDismiss}>
+            <Button variant="primary" onClick={onDismiss} type="submit">
               Save
             </Button>
           </>

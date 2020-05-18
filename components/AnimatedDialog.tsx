@@ -18,9 +18,10 @@ export default ({
   const AnimatedDialogContent = animated(DialogContent)
 
   const transitions = useTransition(isOpen, {
+    config: { duration: 150 },
     from: { opacity: 0, scale: 0.94 },
     enter: { opacity: 1, scale: 1 },
-    leave: { opacity: 0, scale: 0.94 },
+    leave: { opacity: 0, scale: 0.86 },
   })
 
   return transitions(

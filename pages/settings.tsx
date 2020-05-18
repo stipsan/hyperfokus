@@ -2,6 +2,7 @@ import Button from 'components/Button'
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
+import UnderConstruction from 'components/UnderConstruction'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
 
 const title = 'Settings'
@@ -53,6 +54,19 @@ const ResetButton = () => {
   return session !== '' && <Button onClick={() => setSession('')}>Reset</Button>
 }
 
+const LocalDebug = () => (
+  <>
+    <br />
+    <EnableDemo />
+    <br />
+    <ResetButton />
+    <br />
+    <EnableLocalStorage />
+    <br />
+    <EnableFirebase />
+  </>
+)
+
 export default () => {
   return (
     <>
@@ -60,14 +74,8 @@ export default () => {
       <AppLayout title={title}>
         <GetStartedBroadcast />
         <MoreContainer>
-          <br />
-          <EnableDemo />
-          <br />
-          <ResetButton />
-          <br />
-          <EnableLocalStorage />
-          <br />
-          <EnableFirebase />
+          <UnderConstruction />
+          {process.env.NODE_ENV === 'development' && <LocalDebug />}
         </MoreContainer>
       </AppLayout>
     </>

@@ -34,6 +34,10 @@ const CreateDialog = () => {
   )
 }
 
+const SchedulesList = () => {
+  return <div></div>
+}
+
 export default () => {
   const session = useSessionValue()
 

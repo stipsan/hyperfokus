@@ -157,7 +157,7 @@ const StartTime = ({
     pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
     placeholder="09:00"
     name="start"
-    style={{ minWidth: '8ch', height: '42px' }}
+    style={{ minWidth: '7ch', height: '42px' }}
     //min="00:00"
     //max={state.end}
     value={state.start}
@@ -179,7 +179,7 @@ const Duration = ({
 }) => (
   <div className="mt-1 flex">
     <input
-      style={{ width: '8ch' }}
+      style={{ width: '7ch' }}
       required
       autoComplete="off"
       className="form-input rounded-r-none z-10 tnum"
@@ -232,7 +232,7 @@ const EndTime = ({
     className="tnum form-input block mt-1"
     pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
     placeholder="10:00"
-    style={{ minWidth: '8ch', height: '42px' }}
+    style={{ minWidth: '7ch', height: '42px' }}
     name="end"
     value={state.end}
     onChange={({ target: { name, value } }) =>
@@ -336,7 +336,14 @@ const ScheduleForm = ({
         onSubmit(state)
       }}
     >
-      <div className="flex flex-wrap col-gap-4">
+      <div
+        className="flex flex-wrap col-gap-4"
+        style={
+          {
+            // grid-template-columns: repeat(3, max-content);
+          }
+        }
+      >
         <Field className="mb-4" label="Start" htmlFor="start">
           <StartTime dispatch={dispatch} state={state} />
         </Field>

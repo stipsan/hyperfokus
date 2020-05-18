@@ -1,6 +1,8 @@
 import HeadTitle from 'components/HeadTitle'
+import { useReduceMotion } from 'hooks/motion'
 import type { AppProps } from 'next/app'
 import { Suspense, useEffect } from 'react'
+import { Globals } from 'react-spring'
 import { RecoilRoot } from 'recoil'
 import 'styles/_app.css'
 
@@ -12,10 +14,18 @@ export default ({ Component, pageProps }: AppProps) => {
   // the app is fully loaded and the user navigates somewhere
   useEffect(() => document.body.classList.add('loaded'), [])
 
+  // Globally disable animations when the user don't want them
+  const prefersReducedMotion = useReduceMotion()
+  useEffect(() => {
+    Globals.assign({
+      skipAnimation: prefersReducedMotion,
+    })
+  }, [prefersReducedMotion])
+
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen items-center justify-center text-gray-700 text-xl w-screen loading">
+        <div className="my-40 text-xl text-blue-900 text-center loading">
           Loading...
         </div>
       }

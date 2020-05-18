@@ -1,4 +1,4 @@
-import { Dialog } from '@reach/dialog'
+import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
@@ -22,16 +22,17 @@ const LogDatabaseProvider = memo(() => {
 
 const CreateDialog = () => {
   const router = useRouter()
+
   const close = () => {
     router.push(router.pathname)
   }
 
-  if (!router.query.create) {
-    return null
-  }
-
   return (
-    <Dialog onDismiss={close} aria-label="Create new todo">
+    <AnimatedDialog
+      isOpen={!!router.query.create}
+      onDismiss={close}
+      aria-label="Create new todo"
+    >
       <p className="py-16">The ability to create todos is on its way!</p>
       <DialogToolbar
         right={
@@ -40,7 +41,7 @@ const CreateDialog = () => {
           </Button>
         }
       />
-    </Dialog>
+    </AnimatedDialog>
   )
 }
 

@@ -37,8 +37,6 @@ const TopLink: React.FC<{
   href: string
   active: boolean
 }> = ({ active, href, children, className }) => {
-  const router = useRouter()
-
   return (
     <Link href={href}>
       <a
@@ -58,7 +56,7 @@ const TopLink: React.FC<{
 }
 
 const CreateLink = ({ label }: { label: string }) => (
-  <Link href="?create=true" shallow>
+  <Link href="?create=true" shallow scroll={false}>
     <a
       className="py-2 px-3 focus:outline-none focus:shadow-outline bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900 rounded"
       aria-label={label}
@@ -107,7 +105,7 @@ export default ({ createLink, title }: Props) => {
         <header
           key="small"
           ref={domRef}
-          className={cx(styles.navbar, 'flex px-2', {
+          className={cx(styles.navbar, 'flex', {
             'sm:hidden': larger === null,
           })}
         >
@@ -137,7 +135,7 @@ export default ({ createLink, title }: Props) => {
         <header
           key="larger"
           ref={domRef}
-          className={cx(styles.navbar, 'px-4', {
+          className={cx(styles.navbar, {
             'hidden sm:flex': larger === null,
             flex: larger !== null,
           })}

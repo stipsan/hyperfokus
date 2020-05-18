@@ -12,7 +12,7 @@ export default ({ children }: Props) => {
   return (
     <Suspense
       fallback={
-        <main className="flex h-screen items-center justify-center text-gray-700 text-xl w-screen loading">
+        <main className="my-40 text-xl text-blue-900 text-center loading">
           Loading...
         </main>
       }

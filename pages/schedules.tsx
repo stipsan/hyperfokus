@@ -32,16 +32,7 @@ const CreateDialog = ({
       onDismiss={close}
       aria-label="Create new schedule"
     >
-      <p className="py-16 text-center">
-        The ability to create schedules is coming soon!
-      </p>
-      <DialogToolbar
-        right={
-          <Button variant="primary" onClick={close}>
-            Okay
-          </Button>
-        }
-      />
+      <ScheduleForm onDismiss={close} onSubmit={() => void 0} />
     </AnimatedDialog>
   )
 }
@@ -154,6 +145,7 @@ const StartTime = ({
     pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
     placeholder="09:00"
     name="start"
+    style={{ height: '42px' }}
     //min="00:00"
     //max={state.end}
     value={state.start}
@@ -232,6 +224,7 @@ const EndTime = ({
     className="tnum form-input block mt-1"
     pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
     placeholder="10:00"
+    style={{ height: '42px' }}
     name="end"
     value={state.end}
     onChange={({ target: { name, value } }) =>
@@ -270,7 +263,7 @@ const Repeat = ({
     {WEEKDAYS.map((weekday) => (
       <label
         key={weekday}
-        className="checkbox tag"
+        className="inline-flex items-center gap-2 rounded bg-gray-100 px-2"
         /*
         css={`
           margin: 0.6em 0.5em 0.6em 0;
@@ -278,6 +271,7 @@ const Repeat = ({
         // */
       >
         <input
+          className="form-checkbox"
           type="checkbox"
           name="repeat"
           checked={state.repeat[weekday]}
@@ -294,19 +288,30 @@ const Repeat = ({
             })
           }
         />
-        &nbsp;{weekday}
+        <span>{weekday}</span>
       </label>
     ))}
   </>
 )
 
 const ScheduleForm = ({
-  initialState,
+  initialState = {
+    id: '',
+    start: '',
+    duration: 0,
+    end: '',
+    repeat: WEEKDAYS.reduce(
+      (prev, next) => ({ ...prev, [next]: false }),
+      {}
+    ) as TimeState['repeat'],
+    after: new Date(),
+    enabled: true,
+  },
   onDismiss,
   editing,
   onDelete,
 }: {
-  initialState: Schedule
+  initialState?: Schedule
   editing?: boolean
   onDismiss: () => void
   onSubmit: (state: any) => void
@@ -322,7 +327,7 @@ const ScheduleForm = ({
         console.log('@TODO handle submit!', state)
       }}
     >
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         <Field label="Start" htmlFor="start">
           <StartTime dispatch={dispatch} state={state} />
         </Field>
@@ -336,29 +341,59 @@ const ScheduleForm = ({
         </Field>
       </div>
 
-      <Field label="Repeat">
-        <Repeat dispatch={dispatch} state={state} />
-      </Field>
+      <div className="block mt-4">
+        <span className="text-gray-700">Repeat</span>
+        <div className="mt-1 flex flex-wrap gap-2">
+          <Repeat dispatch={dispatch} state={state} />
+        </div>
+      </div>
 
       {editing && (
-        <Field label="Enabled" htmlFor="enabled">
-          <input
-            id="enabled"
-            name="enabled"
-            type="checkbox"
-            checked={state.enabled}
-            onChange={(event) =>
-              dispatch({
-                type: 'change',
-                payload: {
-                  name: event.target.name,
-                  value: event.target.checked,
-                },
-              })
-            }
-          />
-        </Field>
+        <div className="block mt-4">
+          <span className="text-gray-700">Enabled</span>
+          <div className="mt-1 flex gap-4">
+            <label className="inline-flex gap-2 items-center">
+              <input
+                type="radio"
+                className="form-radio"
+                name="enabled"
+                value="yes"
+                checked={state.enabled}
+                onChange={(event) =>
+                  dispatch({
+                    type: 'change',
+                    payload: {
+                      name: event.target.name,
+                      value: true,
+                    },
+                  })
+                }
+              />
+              <span>Yes</span>
+            </label>
+            <label className="inline-flex gap-2 items-center">
+              <input
+                type="radio"
+                className="form-radio"
+                name="enabled"
+                value="no"
+                checked={!state.enabled}
+                onChange={(event) =>
+                  dispatch({
+                    type: 'change',
+                    payload: {
+                      name: event.target.name,
+                      value: false,
+                    },
+                  })
+                }
+              />
+              No
+            </label>
+          </div>
+        </div>
       )}
+      <div className="py-4" />
       <DialogToolbar
         left={
           onDelete ? (

@@ -1,9 +1,9 @@
-import { forwardRef } from 'react'
 import cx from 'classnames'
+import { forwardRef } from 'react'
 
 type Props = {
   className?: string
-  variant?: 'default' | 'primary'
+  variant?: 'default' | 'primary' | 'danger'
 } & React.HTMLAttributes<HTMLButtonElement>
 
 export const className = ({ className, variant = 'default' }: Props) =>
@@ -14,6 +14,7 @@ export const className = ({ className, variant = 'default' }: Props) =>
         variant === 'default',
       'bg-blue-500 hover:bg-blue-700 text-white font-bold ':
         variant === 'primary',
+      'bg-red-600 hover:bg-red-700 text-white font-bold ': variant === 'danger',
     },
     className
   )

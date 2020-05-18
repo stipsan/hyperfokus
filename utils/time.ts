@@ -1,3 +1,5 @@
+import type { Repeat } from 'database/types'
+
 export const sortByHoursMinutesString = (a: string, b: string) => {
   console.group('sortByHoursMinutesString')
   console.count('sortByHoursMinutesString')
@@ -22,4 +24,67 @@ export const sortByHoursMinutesString = (a: string, b: string) => {
   }
 
   return 0
+}
+
+export const getRepeatMessage = (repeat: Repeat) => {
+  const {
+    monday,
+    tuesday,
+    wednesday,
+    thursday,
+    friday,
+    saturday,
+    sunday,
+  } = repeat
+  if (
+    monday &&
+    tuesday &&
+    wednesday &&
+    thursday &&
+    friday &&
+    saturday &&
+    sunday
+  ) {
+    return 'every day'
+  }
+
+  if (
+    saturday &&
+    sunday &&
+    !monday &&
+    !tuesday &&
+    !wednesday &&
+    !thursday &&
+    !friday
+  ) {
+    return 'every weekend'
+  }
+
+  if (
+    !saturday &&
+    !sunday &&
+    monday &&
+    tuesday &&
+    wednesday &&
+    thursday &&
+    friday
+  ) {
+    return 'every weekday'
+  }
+
+  const keys = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ]
+  if (keys.some((key) => repeat[key])) {
+    const repeated = keys.filter((key) => repeat[key])
+    return `every ${repeated.join(', ')}`
+  }
+
+  return ''
 }

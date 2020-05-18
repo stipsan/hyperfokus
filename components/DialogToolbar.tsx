@@ -14,7 +14,7 @@ export default ({ left, right, sticky }: Props) => (
       'flex items-center justify-between py-3 sm:py-6'
     )}
   >
-    <div>{left}</div>
-    <div>{right}</div>
+    <div className="gap-2 inline-flex">{left}</div>
+    <div className="gap-2 inline-flex">{right}</div>
   </div>
 )

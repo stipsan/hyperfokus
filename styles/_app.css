@@ -57,3 +57,8 @@ body.loaded .loading {
     opacity: 1;
   }
 }
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}

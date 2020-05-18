@@ -27,6 +27,11 @@ const CreateDialog = () => {
       onDismiss={close}
       aria-label="Create new schedule"
     >
+      <input />
+      <p className="py-16">The ability to create schedules is coming soon!</p>
+      <p className="py-16">The ability to create schedules is coming soon!</p>
+      <p className="py-16">The ability to create schedules is coming soon!</p>
+      <p className="py-16">The ability to create schedules is coming soon!</p>
       <p className="py-16">The ability to create schedules is coming soon!</p>
       <p className="py-16 text-center">
         The ability to create schedules is coming soon!

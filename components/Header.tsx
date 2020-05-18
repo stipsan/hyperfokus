@@ -143,7 +143,7 @@ export default ({ createLink, title }: Props) => {
             <Logo />
           </div>
           <div className="flex items-center flex-shrink-0 h-inherit">
-            <nav className="gap-px grid grid-flow-col text-xs">
+            <nav className="col-gap-px grid grid-flow-col text-xs">
               {topLinks.map(([text, href], key) => (
                 <TopLink
                   active={router.pathname === href}

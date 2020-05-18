@@ -11,9 +11,9 @@ export const useReduceMotion = () => {
     const handleChange = () => {
       setMatch(mq.matches)
     }
-    mq.addEventListener('change', handleChange)
+    mq.addListener(handleChange)
     return () => {
-      mq.removeEventListener('change', handleChange)
+      mq.removeListener(handleChange)
     }
   }, [])
   return matches

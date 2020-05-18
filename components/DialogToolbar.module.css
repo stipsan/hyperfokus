@@ -1,0 +1,5 @@
+.safarifix {
+  /* Workaround the fact that safari jumps the sticky positioned element while animating the scale of the dialog contents */
+  position: var(--position-sticky);
+  transform-style: preserve-3d;
+}

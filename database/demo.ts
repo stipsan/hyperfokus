@@ -46,50 +46,45 @@ const Memory = (initialState: {
   schedules: Schedule[]
   activities: Todo[]
 }): DatabaseType => {
-  let opportunitiesMap = initialState.schedules
+  let schedulesMap = initialState.schedules
 
   let activitiesMap = initialState.activities
 
-  const opportunitiesUpdated = new EventEmitter<Schedule[]>()
+  const schedulesUpdated = new EventEmitter<Schedule[]>()
   const activitiesUpdated = new EventEmitter<Todo[]>()
 
   return {
     getSchedules() {
-      return Promise.resolve(opportunitiesMap || [])
+      return Promise.resolve(schedulesMap || [])
     },
-    setSchedules(nextOpportunities) {
-      const opportunities = opportunitiesMap || []
-      nextOpportunities.forEach(
-        ({ added, edited, deleted, ...nextOpportunity }) => {
-          if (added) {
-            opportunities.push({
-              ...nextOpportunity,
-            })
-          } else if (edited) {
-            const existing = opportunities.findIndex(
-              (opportunity) => opportunity.id === nextOpportunity.id
-            )
-            if (existing !== -1)
-              Object.assign(opportunities[existing], nextOpportunity)
-          } else if (deleted) {
-            const existing = opportunities.findIndex(
-              (opportunity) => opportunity.id === nextOpportunity.id
-            )
+    setSchedules(nextSchedules) {
+      const schedules = schedulesMap || []
+      nextSchedules.forEach(({ added, edited, deleted, ...nextSchedule }) => {
+        if (added) {
+          schedules.push({
+            ...nextSchedule,
+          })
+        } else if (edited) {
+          const existing = schedules.findIndex(
+            (schedule) => schedule.id === nextSchedule.id
+          )
+          if (existing !== -1) Object.assign(schedules[existing], nextSchedule)
+        } else if (deleted) {
+          const existing = schedules.findIndex(
+            (schedule) => schedule.id === nextSchedule.id
+          )
 
-            if (existing !== -1) opportunities.splice(existing, 1)
-          }
+          if (existing !== -1) schedules.splice(existing, 1)
         }
-      )
-      opportunitiesMap = opportunities
-      opportunitiesUpdated.dispatch(opportunities)
+      })
+      schedulesMap = schedules
+      schedulesUpdated.dispatch(schedules)
 
       return Promise.resolve()
     },
     observeSchedules(success) {
-      success(opportunitiesMap || [])
-      return opportunitiesUpdated.subscribe((opportunities) =>
-        success(opportunities)
-      )
+      success(schedulesMap || [])
+      return schedulesUpdated.subscribe((schedules) => success(schedules))
     },
     observeActivities(success) {
       const filterActivities = (activity: Todo) => !activity.done
@@ -391,8 +386,8 @@ const initialState: {
       repeat: { ...repeatNone, sunday: true },
     },
     // */
-  ].map((opportunity: ScheduleDelta, i) => ({
-    id: `opportunity-${i}`,
+  ].map((schedule: ScheduleDelta, i) => ({
+    id: `schedule-${i}`,
     after: new Date(),
     duration: 0,
     start: '00:00',
@@ -407,7 +402,7 @@ const initialState: {
       saturday: false,
       sunday: false,
     },
-    ...opportunity,
+    ...schedule,
   })),
   activities: [
     { description: 'Add ability to edit activities.', duration: 30 },

@@ -25,14 +25,14 @@ export default ({
   })
 
   return transitions(
-    ({ opacity, scale }, item) =>
+    ({ opacity, ...style }, item) =>
       item && (
         <AnimatedDialogOverlay
           style={{ opacity }}
           onDismiss={onDismiss}
           allowPinchZoom
         >
-          <AnimatedDialogContent style={{ scale }} aria-label={ariaLabel}>
+          <AnimatedDialogContent style={style} aria-label={ariaLabel}>
             {children}
           </AnimatedDialogContent>
         </AnimatedDialogOverlay>

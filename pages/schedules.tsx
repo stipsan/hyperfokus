@@ -5,12 +5,13 @@ import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MainContainer } from 'components/layouts'
 import Welcome from 'components/screens/Welcome'
-import type { Repeat } from 'database/types'
+import type { Repeat, Schedule } from 'database/types'
 import { useGetSchedules } from 'hooks/schedules'
 import { useSessionValue } from 'hooks/session'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import { sortByHoursMinutesString } from 'utils/time'
 
 const title = 'Schedules'
@@ -40,20 +41,56 @@ const CreateDialog = () => {
     </AnimatedDialog>
   )
 }
-const EditDialog = () => {
+
+const SchedulesForm = ({ initialState }: { initialState: Schedule }) => {
+  return <>Testing that it persists {initialState.id}</>
+}
+
+const EditDialog = ({
+  schedules,
+  setSchedules,
+}: {
+  schedules: Schedule[]
+  setSchedules: Dispatch<SetStateAction<Schedule[]>>
+}) => {
   const router = useRouter()
+  const [initialState, setInitialState] = useState(() =>
+    schedules.find((schedule) => schedule.id === router.query.edit)
+  )
+  const initialStateS = useMemo(
+    () => schedules.find((schedule) => schedule.id === router.query.edit),
+    [router.query.edit]
+  )
+
+  useEffect(() => {
+    console.log('id changed', router.query.edit)
+    if (router.query.edit) {
+      const nextInitialState = schedules.find(
+        (schedule) => schedule.id === router.query.edit
+      )
+      if (nextInitialState) {
+        setInitialState(nextInitialState)
+      }
+    }
+  }, [router.query.edit])
+
+  useEffect(() => {
+    console.log('memo changed', router.query.edit, initialState)
+  }, [initialState])
+
   const close = () => {
     router.push(router.pathname)
   }
 
   return (
     <AnimatedDialog
-      isOpen={!!router.query.edit}
+      isOpen={!!router.query.edit && !!initialState}
       onDismiss={close}
       aria-label="Edit schedule"
     >
       <p className="py-16 text-center">
-        The ability to edit schedules is coming soon!
+        The ability to edit schedules is coming {initialState?.id}!
+        <SchedulesForm initialState={initialState} />
       </p>
       <DialogToolbar
         right={
@@ -159,8 +196,8 @@ const SchedulesList = () => {
           </Link>
         )
       })}
-      <EditDialog />
-      <CreateDialog />
+      <EditDialog schedules={schedules} setSchedules={setSchedules} />
+      <CreateDialog setSchedules={setSchedules} />
     </>
   )
 }

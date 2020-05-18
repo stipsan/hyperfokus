@@ -1,6 +1,5 @@
 import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
 import cx from 'classnames'
-import { className } from 'components/Button'
 import Logo from 'components/Logo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -105,13 +104,13 @@ export default ({ createLink, title }: Props) => {
         <header
           key="small"
           ref={domRef}
-          className={cx(styles.navbar, 'flex', {
+          className={cx(styles.navbar, 'flex px-inset', {
             'sm:hidden': larger === null,
           })}
         >
           <div className={cx(navSideClassNames, 'justify-start')}>
             <Menu>
-              <MenuButton className={className({ variant: 'primary' })}>
+              <MenuButton className="py-1 px-4 focus:outline-none focus:shadow-outline bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900 rounded text-xs">
                 Menu
               </MenuButton>
               <MenuList>
@@ -123,7 +122,7 @@ export default ({ createLink, title }: Props) => {
               </MenuList>
             </Menu>
           </div>
-          <div className="flex items-center flex-shrink-0 h-inherit">
+          <div className="flex items-center flex-shrink-0 h-inherit px-1">
             <Logo />
           </div>
           <div className={cx(navSideClassNames, 'justify-end')}>
@@ -135,7 +134,7 @@ export default ({ createLink, title }: Props) => {
         <header
           key="larger"
           ref={domRef}
-          className={cx(styles.navbar, {
+          className={cx(styles.navbar, 'px-inset', {
             'hidden sm:flex': larger === null,
             flex: larger !== null,
           })}

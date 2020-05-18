@@ -33,7 +33,9 @@ const CreateDialog = () => {
       onDismiss={close}
       aria-label="Create new todo"
     >
-      <p className="py-16">The ability to create todos is on its way!</p>
+      <p className="py-16 text-center">
+        The ability to create todos is on its way!
+      </p>
       <DialogToolbar
         right={
           <Button variant="primary" onClick={close}>

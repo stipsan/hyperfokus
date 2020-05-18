@@ -1,6 +1,6 @@
-import HeadTitle from 'components/HeadTitle'
 import { useReduceMotion } from 'hooks/motion'
 import type { AppProps } from 'next/app'
+import Head from 'next/head'
 import { Suspense, useEffect } from 'react'
 import { Globals } from 'react-spring'
 import { RecoilRoot } from 'recoil'
@@ -30,7 +30,10 @@ export default ({ Component, pageProps }: AppProps) => {
         </div>
       }
     >
-      <HeadTitle />
+      <Head>
+        <title>HyperFokus</title>
+        <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
+      </Head>
       <RecoilRoot>
         <Component {...pageProps} />
       </RecoilRoot>

@@ -1,13 +1,11 @@
 import Head from 'next/head'
 
 type Props = {
-  children?: string
+  children: string
 }
-
-const baseTitle = 'HyperFokus'
 
 export default ({ children }: Props) => (
   <Head>
-    <title>{children ? `${children} | ${baseTitle}` : baseTitle}</title>
+    <title>{children} | HyperFokus</title>
   </Head>
 )

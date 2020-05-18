@@ -28,6 +28,9 @@ const CreateDialog = () => {
       aria-label="Create new schedule"
     >
       <p className="py-16">The ability to create schedules is coming soon!</p>
+      <p className="py-16 text-center">
+        The ability to create schedules is coming soon!
+      </p>
       <DialogToolbar
         right={
           <Button variant="primary" onClick={close}>
@@ -50,7 +53,9 @@ const EditDialog = () => {
       onDismiss={close}
       aria-label="Edit schedule"
     >
-      <p className="py-16">The ability to edit schedules is coming soon!</p>
+      <p className="py-16 text-center">
+        The ability to edit schedules is coming soon!
+      </p>
       <DialogToolbar
         right={
           <Button variant="primary" onClick={close}>
@@ -144,7 +149,7 @@ const SchedulesList = () => {
           >
             <a
               className={cx(
-                'block px-4 py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none',
+                'block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none',
                 {
                   'border-t-2': i !== 0,
                 }

@@ -11,6 +11,21 @@ body {
   scroll-padding-top: var(--navbar-height);
 }
 
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+// Handle display cutouts
+.px-inset {
+  @apply py-4;
+}
+@supports (padding: max(0px)) {
+  .px-inset {
+    padding-left: max(theme('padding.4'), env(safe-area-inset-left));
+    padding-right: max(theme('padding.4'), env(safe-area-inset-right));
+  }
+}
+
 @media screen and (prefers-reduced-motion: no-preference) {
   html,
   body {

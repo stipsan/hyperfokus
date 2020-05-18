@@ -3,17 +3,24 @@
 }
 
 [data-reach-dialog-overlay] {
-  @apply fixed inset-0 flex items-end justify-center z-50 overflow-auto bg-black flex-wrap;
+  @apply fixed inset-0 flex items-end justify-center z-50 bg-black flex-wrap;
   --bg-opacity: 0.33;
   padding-bottom: env(safe-area-inset-bottom);
   will-change: opacity;
 }
 
 [data-reach-dialog-content] {
-  @apply outline-none rounded-lg bg-white p-4 max-w-lg m-2;
+  @apply outline-none rounded-lg bg-white p-4 max-w-lg m-2 scrolling-touch overflow-auto;
+  max-height: calc(100vh - theme('margin.2') - theme('margin.2'));
   box-shadow: theme('boxShadow.2xl'), theme('boxShadow.xl'),
     theme('boxShadow.xs'), theme('boxShadow.xs');
   will-change: transform;
+}
+
+@supports (padding: max(0px)) {
+  [data-reach-dialog-content] {
+    max-height: max(calc(100vh - 200px), 50vh);
+  }
 }
 
 @screen sm {
@@ -24,5 +31,6 @@
 
   [data-reach-dialog-content] {
     @apply p-8;
+    max-height: calc(100vh - theme('margin.2') - theme('margin.2'));
   }
 }

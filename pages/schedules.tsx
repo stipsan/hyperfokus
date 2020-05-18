@@ -11,7 +11,7 @@ import { useSessionValue } from 'hooks/session'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useReducer, useState } from 'react'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, FC, SetStateAction } from 'react'
 import { getRepeatMessage, sortByHoursMinutesString } from 'utils/time'
 
 const title = 'Schedules'
@@ -81,11 +81,11 @@ const getEnd = (state: TimeState) => {
 
 type FormActions =
   | { type: 'reset'; payload: TimeState }
-  | { type: 'change'; payload: { name: string; value: string } }
+  | { type: 'change'; payload: { name: string; value: unknown } }
   | { type: 'blur:start' }
   | { type: 'blur:duration' }
   | { type: 'blur:end' }
-  | { type: 'change:enabled'; payload: { value: string } }
+  | { type: 'change:enabled'; payload: { value: boolean } }
   | { type: 'change:snapshot'; payload: TimeState }
 function reducer(state: TimeState, action: FormActions) {
   switch (action.type) {
@@ -126,7 +126,192 @@ type TimeState = {
   after: Date
 }
 
-const SchedulesForm = ({
+const Field: FC<{
+  label: string
+  htmlFor?: string
+}> = ({ label, htmlFor, children }) => {
+  return (
+    <div className="field is-horizontal">
+      <div className="field-label is-normal">
+        <label className="label" htmlFor={htmlFor}>
+          {label}
+        </label>
+      </div>
+      <div className="field-body">
+        <div className="field">
+          <div className="control">{children}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const StartTime = ({
+  dispatch,
+  state,
+}: {
+  dispatch: Function
+  state: TimeState
+}) => (
+  <input
+    required
+    className="w-auto tnum"
+    type="time"
+    autoComplete="off"
+    id="start"
+    //className="input"
+    pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
+    placeholder="09:00"
+    name="start"
+    //min="00:00"
+    //max={state.end}
+    value={state.start}
+    onChange={({ target: { name, value } }) =>
+      dispatch({ type: 'change', payload: { name, value } })
+    }
+    onBlur={() => dispatch({ type: 'blur:start' })}
+  />
+)
+
+const Duration = ({
+  dispatch,
+  state,
+}: {
+  dispatch: Function
+  state: {
+    duration: number
+  }
+}) => (
+  <div className="field has-addons">
+    <p className="control">
+      <input
+        /*
+        css={`
+          font-variant-numeric: tabular-nums;
+          font-feature-settings: 'tnum';
+          width: 8ch;
+        `}
+        // */
+        required
+        autoComplete="off"
+        className="input"
+        type="number"
+        min="1"
+        max="1439"
+        step="1"
+        placeholder="60"
+        id="duration"
+        name="duration"
+        // @TODO spread out value, onChange and the other events instead of needing to know about dispatch and state
+        value={state.duration > 0 ? state.duration : ''}
+        onChange={({ target: { name, value } }) =>
+          dispatch({
+            type: 'change',
+            payload: { name, value: parseInt(value, 10) },
+          })
+        }
+        onBlur={() => dispatch({ type: 'blur:duration' })}
+      />
+    </p>
+    <p className="control">
+      <a className="button is-static">minutes</a>
+    </p>
+  </div>
+)
+
+const EndTime = ({
+  dispatch,
+  state,
+}: {
+  dispatch: Function
+  state: {
+    end: string
+  }
+}) => (
+  <input
+    required
+    /*
+    css={`
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum';
+      width: auto;
+    `}
+    // */
+    autoComplete="off"
+    id="end"
+    type="time"
+    className="input"
+    pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
+    placeholder="10:00"
+    name="end"
+    value={state.end}
+    onChange={({ target: { name, value } }) =>
+      dispatch({ type: 'change', payload: { name, value } })
+    }
+    onBlur={() => dispatch({ type: 'blur:end' })}
+  />
+)
+
+type Weekday =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday'
+const WEEKDAYS: Weekday[] = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+]
+
+const Repeat = ({
+  dispatch,
+  state,
+}: {
+  dispatch: Function
+  state: { repeat: { [key: string]: boolean } }
+}) => (
+  <>
+    {WEEKDAYS.map((weekday) => (
+      <label
+        key={weekday}
+        className="checkbox tag"
+        /*
+        css={`
+          margin: 0.6em 0.5em 0.6em 0;
+        `}
+        // */
+      >
+        <input
+          type="checkbox"
+          name="repeat"
+          checked={state.repeat[weekday]}
+          onChange={({ target: { checked } }) =>
+            dispatch({
+              type: 'change',
+              payload: {
+                name: 'repeat',
+                value: {
+                  ...state.repeat,
+                  [weekday]: checked,
+                },
+              },
+            })
+          }
+        />
+        &nbsp;{weekday}
+      </label>
+    ))}
+  </>
+)
+
+const ScheduleForm = ({
   initialState,
   onDismiss,
   editing,
@@ -141,8 +326,42 @@ const SchedulesForm = ({
   const [state, dispatch] = useReducer(reducer, initialState)
 
   return (
-    <>
-      <form>Test!</form>
+    <form>
+      <Field label="Start" htmlFor="start">
+        <StartTime dispatch={dispatch} state={state} />
+      </Field>
+
+      <Field label="Duration" htmlFor="duration">
+        <Duration dispatch={dispatch} state={state} />
+      </Field>
+
+      <Field label="End" htmlFor="end">
+        <EndTime dispatch={dispatch} state={state} />
+      </Field>
+
+      <Field label="Repeat">
+        <Repeat dispatch={dispatch} state={state} />
+      </Field>
+
+      {editing && (
+        <Field label="Enabled" htmlFor="enabled">
+          <input
+            id="enabled"
+            name="enabled"
+            type="checkbox"
+            checked={state.enabled}
+            onChange={(event) =>
+              dispatch({
+                type: 'change',
+                payload: {
+                  name: event.target.name,
+                  value: event.target.checked,
+                },
+              })
+            }
+          />
+        </Field>
+      )}
       <DialogToolbar
         left={
           onDelete ? (
@@ -162,7 +381,7 @@ const SchedulesForm = ({
           </>
         }
       />
-    </>
+    </form>
   )
 }
 
@@ -203,10 +422,8 @@ const EditDialog = ({
       onDismiss={close}
       aria-label="Edit schedule"
     >
-      <p className="py-16 text-center">
-        The ability to edit schedules is coming {initialState?.id}!
-      </p>
-      <SchedulesForm
+      <ScheduleForm
+        editing
         initialState={initialState}
         onDismiss={close}
         onSubmit={() => void 0}

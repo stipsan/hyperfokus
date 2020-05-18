@@ -1,11 +1,6 @@
 import type { Repeat } from 'database/types'
 
 export const sortByHoursMinutesString = (a: string, b: string) => {
-  console.group('sortByHoursMinutesString')
-  console.count('sortByHoursMinutesString')
-  console.log(a, b)
-  console.groupEnd()
-
   const [aStartHours, aStartMinutes] = a.split(':')
   const [bStartHours, bStartMinutes] = b.split(':')
 

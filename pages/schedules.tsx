@@ -16,7 +16,11 @@ import { sortByHoursMinutesString } from 'utils/time'
 
 const title = 'Schedules'
 
-const CreateDialog = () => {
+const CreateDialog = ({
+  setSchedules,
+}: {
+  setSchedules: Dispatch<SetStateAction<Schedule[]>>
+}) => {
   const router = useRouter()
   const close = () => {
     router.push(router.pathname)

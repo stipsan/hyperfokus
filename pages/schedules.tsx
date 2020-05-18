@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
@@ -128,11 +129,12 @@ type TimeState = {
 }
 
 const Field: FC<{
+  className?: string
   label: string
   htmlFor?: string
-}> = ({ label, htmlFor, children }) => {
+}> = ({ className, label, htmlFor, children }) => {
   return (
-    <label className="block" htmlFor={htmlFor}>
+    <label className={cx('block', className)} htmlFor={htmlFor}>
       <span className="text-gray-700">{label}</span>
       {children}
     </label>
@@ -269,7 +271,7 @@ const Repeat = ({
     {WEEKDAYS.map((weekday) => (
       <label
         key={weekday}
-        className="inline-flex items-center gap-2 rounded bg-gray-100 px-2"
+        className="inline-flex items-center col-gap-2 mb-2 rounded bg-gray-100 px-2"
         /*
         css={`
           margin: 0.6em 0.5em 0.6em 0;
@@ -334,32 +336,32 @@ const ScheduleForm = ({
         onSubmit(state)
       }}
     >
-      <div className="flex flex-wrap gap-4">
-        <Field label="Start" htmlFor="start">
+      <div className="flex flex-wrap col-gap-4">
+        <Field className="mb-4" label="Start" htmlFor="start">
           <StartTime dispatch={dispatch} state={state} />
         </Field>
 
-        <Field label="Duration" htmlFor="duration">
+        <Field className="mb-4" label="Duration" htmlFor="duration">
           <Duration dispatch={dispatch} state={state} />
         </Field>
 
-        <Field label="End" htmlFor="end">
+        <Field className="mb-4" label="End" htmlFor="end">
           <EndTime dispatch={dispatch} state={state} />
         </Field>
       </div>
 
-      <div className="block mt-4">
+      <div className="block">
         <span className="text-gray-700">Repeat</span>
-        <div className="mt-1 flex flex-wrap gap-2">
+        <div className="mt-1 flex flex-wrap col-gap-2">
           <Repeat dispatch={dispatch} state={state} />
         </div>
       </div>
 
       {editing && (
-        <div className="block mt-4">
+        <div className="block mt-2">
           <span className="text-gray-700">Enabled</span>
-          <div className="mt-1 flex gap-4">
-            <label className="inline-flex gap-2 items-center">
+          <div className="mt-1 flex col-gap-4">
+            <label className="inline-flex col-gap-2 items-center">
               <input
                 type="radio"
                 className="form-radio"
@@ -378,7 +380,7 @@ const ScheduleForm = ({
               />
               <span>Yes</span>
             </label>
-            <label className="inline-flex gap-2 items-center">
+            <label className="inline-flex col-gap-2 items-center">
               <input
                 type="radio"
                 className="form-radio"

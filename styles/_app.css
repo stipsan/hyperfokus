@@ -6,6 +6,10 @@
 @import url('./dialog.css');
 @import url('./menu-button.css');
 
+html {
+  scroll-padding-top: var(--navbar-height);
+}
+
 .h-inherit {
   height: inherit;
 }

@@ -1,9 +1,3 @@
-export interface Area {
-  id: string
-  name: string
-  lastReset?: Date
-}
-
 export interface Repeat {
   monday: boolean
   tuesday: boolean
@@ -15,7 +9,7 @@ export interface Repeat {
   [key: string]: boolean
 }
 
-export interface Opportunity {
+export interface Schedule {
   id: string
   after: Date
   duration: number
@@ -30,13 +24,13 @@ export interface Opportunity {
   deleted?: boolean
 }
 
-export type OpportunityInput = Opportunity & {
+export type ScheduleInput = Schedule & {
   added: boolean
   edited: boolean
   deleted: boolean
 }
 
-export interface OpportunityDelta {
+export interface ScheduleDelta {
   id?: string
   after?: Date
   duration?: number
@@ -46,7 +40,7 @@ export interface OpportunityDelta {
   repeat?: Repeat
 }
 
-export interface ActivityDelta {
+export interface TodoDelta {
   id?: string
   description: string
   duration: number
@@ -57,7 +51,7 @@ export interface ActivityDelta {
   completed?: Date
 }
 
-export interface Activity {
+export interface Todo {
   id: string
   description: string
   duration: number
@@ -78,52 +72,26 @@ export type ComputedTime = {}
 export type ComputedTask = {}
 
 export interface DatabaseType {
-  observeAreas(
-    success: (areas: Area[]) => void,
-    failure: (reason: Error) => void
-  ): () => void
-  addArea(name: string): Promise<Area>
-  editArea(areaId: string, name: string): Promise<void>
-  deleteArea(areaId: string): Promise<void>
-  setOpportunities(
-    areaId: string | null,
-    opportunities: OpportunityInput[]
-  ): Promise<void>
-  getOpportunities(areaId: string): Promise<Opportunity[]>
-  observeOpportunities(
-    areaId: string,
-    success: (opportunities: Opportunity[]) => void,
+  setSchedules(schedules: ScheduleInput[]): Promise<void>
+  getSchedules(): Promise<Schedule[]>
+  observeSchedules(
+    success: (schedules: Schedule[]) => void,
     failure: (reason: Error) => void
   ): () => void
   observeActivities(
-    areaId: string,
-    success: (activities: Activity[]) => void,
+    success: (activities: Todo[]) => void,
     failure: (reason: Error) => void
   ): () => void
-  addActivity(areaId: string, activity: ActivityDelta): Promise<Activity>
-  editActivity(
-    areaId: string,
-    activityId: string,
-    activity: ActivityDelta
-  ): Promise<void>
+  addActivity(activity: TodoDelta): Promise<Todo>
+  editActivity(activityId: string, activity: TodoDelta): Promise<void>
   /** toggle an activity as completed */
-  completeActivity(areaId: string, activityId: string): Promise<void>
+  completeActivity(activityId: string): Promise<void>
   /** untoggle an activity as completed, puts it back on the board */
-  incompleteActivity(areaId: string, activityId: string): Promise<void>
+  incompleteActivity(activityId: string): Promise<void>
   /** Fetches truly finished activities */
-  getCompletedActivities(areaId: string): Promise<Activity[]>
+  getCompletedActivities(): Promise<Todo[]>
   /** Fetches all activities that are completed and archives them so the schedule can be recreated */
-  archiveCompletedActivities(areaId: string): Promise<void>
+  archiveCompletedActivities(): Promise<void>
   /** Reorder all activities, and make the selected activity either top 1 or bottom -1 */
-  reorderActivities(
-    areaId: string,
-    activityId: string,
-    ordering: number
-  ): Promise<void>
-  /** Observes current area last reset timestamp */
-  observeLastAreaReset(
-    areaId: string,
-    success: (lastReset: Date) => void,
-    failure: (reason: Error) => void
-  ): () => void
+  reorderActivities(activityId: string, ordering: number): Promise<void>
 }

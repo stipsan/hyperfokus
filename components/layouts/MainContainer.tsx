@@ -17,7 +17,7 @@ export default ({ children }: Props) => {
         </main>
       }
     >
-      <main className="container mx-auto">{children}</main>
+      <main className="">{children}</main>
     </Suspense>
   )
 }

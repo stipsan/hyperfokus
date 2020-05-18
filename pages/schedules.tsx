@@ -167,13 +167,7 @@ const Duration = ({
 }) => (
   <div className="mt-1 flex">
     <input
-      /*
-        css={`
-          font-variant-numeric: tabular-nums;
-          font-feature-settings: 'tnum';
-          width: 8ch;
-        `}
-        // */
+      style={{ width: '8ch' }}
       required
       autoComplete="off"
       className="form-input rounded-r-none z-10 tnum"

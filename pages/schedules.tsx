@@ -1,4 +1,3 @@
-import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
@@ -27,7 +26,6 @@ const CreateDialog = () => {
       onDismiss={close}
       aria-label="Create new schedule"
     >
-      <input />
       <p className="py-16">The ability to create schedules is coming soon!</p>
       <p className="py-16">The ability to create schedules is coming soon!</p>
       <p className="py-16">The ability to create schedules is coming soon!</p>
@@ -152,14 +150,7 @@ const SchedulesList = () => {
             shallow
             scroll={false}
           >
-            <a
-              className={cx(
-                'block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none',
-                {
-                  'border-t-2': i !== 0,
-                }
-              )}
-            >
+            <a className="block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2">
               <div className="text-3xl">{`${schedule.start} – ${schedule.end}`}</div>
               <div>{metaInformation.join(', ')}</div>
               {!schedule.enabled && <div>Disabled</div>}

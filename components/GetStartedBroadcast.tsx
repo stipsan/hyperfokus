@@ -16,7 +16,7 @@ export default () => {
 
   return (
     <div
-      className="bg-yellow-100 border-b border-t-4 border-yellow-500 px-inset py-3 shadow-inner shadow-inset text-yellow-900"
+      className="bg-yellow-100 border-t-4 border-yellow-500 px-inset py-3 shadow-inner shadow-inset text-yellow-900"
       role="alert"
     >
       <p className="font-bold">Demo mode</p>

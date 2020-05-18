@@ -58,25 +58,8 @@ const Memory = (initialState: {
       return Promise.resolve(schedulesMap || [])
     },
     setSchedules(nextSchedules) {
-      const schedules = schedulesMap || []
-      nextSchedules.forEach(({ added, edited, deleted, ...nextSchedule }) => {
-        if (added) {
-          schedules.push({
-            ...nextSchedule,
-          })
-        } else if (edited) {
-          const existing = schedules.findIndex(
-            (schedule) => schedule.id === nextSchedule.id
-          )
-          if (existing !== -1) Object.assign(schedules[existing], nextSchedule)
-        } else if (deleted) {
-          const existing = schedules.findIndex(
-            (schedule) => schedule.id === nextSchedule.id
-          )
+      const schedules = [...nextSchedules]
 
-          if (existing !== -1) schedules.splice(existing, 1)
-        }
-      })
       schedulesMap = schedules
       schedulesUpdated.dispatch(schedules)
 

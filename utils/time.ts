@@ -32,13 +32,20 @@ export const getRepeatMessage = (repeat: Repeat) => {
     sunday,
   } = repeat
   if (
-    monday &&
-    tuesday &&
-    wednesday &&
-    thursday &&
-    friday &&
-    saturday &&
-    sunday
+    (monday &&
+      tuesday &&
+      wednesday &&
+      thursday &&
+      friday &&
+      saturday &&
+      sunday) ||
+    (!monday &&
+      !tuesday &&
+      !wednesday &&
+      !thursday &&
+      !friday &&
+      !saturday &&
+      !sunday)
   ) {
     return 'every day'
   }

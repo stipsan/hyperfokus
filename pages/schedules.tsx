@@ -6,6 +6,7 @@ import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MainContainer } from 'components/layouts'
 import Welcome from 'components/screens/Welcome'
 import type { Schedule } from 'database/types'
+import { useDatabase } from 'hooks/database'
 import { useGetSchedules } from 'hooks/schedules'
 import { useSessionValue } from 'hooks/session'
 import Link from 'next/link'
@@ -16,6 +17,7 @@ import { getRepeatMessage, sortByHoursMinutesString } from 'utils/time'
 
 const title = 'Schedules'
 
+let id = 0
 const CreateDialog = ({
   setSchedules,
 }: {
@@ -32,7 +34,15 @@ const CreateDialog = ({
       onDismiss={close}
       aria-label="Create new schedule"
     >
-      <ScheduleForm onDismiss={close} onSubmit={() => void 0} />
+      <ScheduleForm
+        onDismiss={close}
+        onSubmit={(state) => {
+          setSchedules((schedules) => {
+            return [...schedules, { ...state, id: `new-schedule-${++id}` }]
+          })
+          close()
+        }}
+      />
     </AnimatedDialog>
   )
 }
@@ -145,7 +155,7 @@ const StartTime = ({
     pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
     placeholder="09:00"
     name="start"
-    style={{ height: '42px' }}
+    style={{ minWidth: '8ch', height: '42px' }}
     //min="00:00"
     //max={state.end}
     value={state.start}
@@ -220,7 +230,7 @@ const EndTime = ({
     className="tnum form-input block mt-1"
     pattern="(0?[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])"
     placeholder="10:00"
-    style={{ height: '42px' }}
+    style={{ minWidth: '8ch', height: '42px' }}
     name="end"
     value={state.end}
     onChange={({ target: { name, value } }) =>
@@ -304,14 +314,15 @@ const ScheduleForm = ({
     enabled: true,
   },
   onDismiss,
+  onSubmit,
   editing,
   onDelete,
 }: {
   initialState?: Schedule
   editing?: boolean
   onDismiss: () => void
-  onSubmit: (state: any) => void
-  onDelete?: (state: any) => void
+  onSubmit: (state: TimeState) => void
+  onDelete?: () => void
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -320,7 +331,7 @@ const ScheduleForm = ({
       onSubmit={(event) => {
         event.preventDefault()
 
-        console.log('@TODO handle submit!', state)
+        onSubmit(state)
       }}
     >
       <div className="flex flex-wrap gap-4">
@@ -454,7 +465,25 @@ const EditDialog = ({
         editing
         initialState={initialState}
         onDismiss={close}
-        onSubmit={() => void 0}
+        onSubmit={(state) => {
+          setSchedules((schedules) => {
+            const index = schedules.findIndex(
+              (schedule) => schedule.id === initialState.id
+            )
+
+            const newSchedules = replaceItemAtIndex(schedules, index, {
+              ...schedules[index],
+              start: state.start,
+              duration: state.duration,
+              end: state.end,
+              repeat: state.repeat,
+              enabled: state.enabled,
+            })
+            return newSchedules
+          })
+          setInitialState(state)
+          close()
+        }}
         onDelete={() => {
           if (
             confirm(
@@ -463,6 +492,13 @@ const EditDialog = ({
               }, ${getRepeatMessage(initialState.repeat)}"?`
             )
           ) {
+            setSchedules((schedules) => {
+              const index = schedules.findIndex(
+                (schedule) => schedule.id === initialState.id
+              )
+              const newSchedules = removeItemAtIndex(schedules, index)
+              return newSchedules
+            })
             close()
           }
         }}
@@ -471,12 +507,30 @@ const EditDialog = ({
   )
 }
 
+function replaceItemAtIndex(
+  arr: Schedule[],
+  index: number,
+  newValue: Schedule
+) {
+  return [...arr.slice(0, index), newValue, ...arr.slice(index + 1)]
+}
+
+function removeItemAtIndex(arr: Schedule[], index: number) {
+  return [...arr.slice(0, index), ...arr.slice(index + 1)]
+}
+
 const SchedulesList = () => {
+  const database = useDatabase()
   const [schedules, setSchedules] = useState(useGetSchedules())
   const sortedSchedules = useMemo(() => {
     return [...schedules].sort((a, b) =>
       sortByHoursMinutesString(a.start, b.start)
     )
+  }, [schedules])
+
+  // Sync with db
+  useEffect(() => {
+    database.setSchedules(schedules)
   }, [schedules])
 
   return (

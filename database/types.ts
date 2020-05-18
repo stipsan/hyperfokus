@@ -72,7 +72,7 @@ export type ComputedTime = {}
 export type ComputedTask = {}
 
 export interface DatabaseType {
-  setSchedules(schedules: ScheduleInput[]): Promise<void>
+  setSchedules(schedules: Schedule[]): Promise<void>
   getSchedules(): Promise<Schedule[]>
   observeSchedules(
     success: (schedules: Schedule[]) => void,

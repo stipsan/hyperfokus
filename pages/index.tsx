@@ -13,7 +13,9 @@ import { memo } from 'react'
 const LogDatabaseProvider = memo(() => {
   const database = useDatabase()
 
-  console.log('database useDatabase', database)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('database useDatabase', database)
+  }
 
   return null
 })

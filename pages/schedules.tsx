@@ -10,7 +10,8 @@ import { useGetSchedules } from 'hooks/schedules'
 import { useSessionValue } from 'hooks/session'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { sortByHoursMinutesString } from 'utils/time'
 
 const title = 'Schedules'
 
@@ -26,11 +27,6 @@ const CreateDialog = () => {
       onDismiss={close}
       aria-label="Create new schedule"
     >
-      <p className="py-16">The ability to create schedules is coming soon!</p>
-      <p className="py-16">The ability to create schedules is coming soon!</p>
-      <p className="py-16">The ability to create schedules is coming soon!</p>
-      <p className="py-16">The ability to create schedules is coming soon!</p>
-      <p className="py-16">The ability to create schedules is coming soon!</p>
       <p className="py-16 text-center">
         The ability to create schedules is coming soon!
       </p>
@@ -135,10 +131,15 @@ const getRepeatMessage = (repeat: Repeat) => {
 
 const SchedulesList = () => {
   const [schedules, setSchedules] = useState(useGetSchedules())
+  const sortedSchedules = useMemo(() => {
+    return [...schedules].sort((a, b) =>
+      sortByHoursMinutesString(a.start, b.start)
+    )
+  }, [schedules])
 
   return (
     <>
-      {schedules.map((schedule, i) => {
+      {sortedSchedules.map((schedule) => {
         const metaInformation = [`${schedule.duration} minutes`]
         const repeatMessage = getRepeatMessage(schedule.repeat)
         if (repeatMessage) metaInformation.push(repeatMessage)

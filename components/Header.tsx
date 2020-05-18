@@ -26,8 +26,8 @@ const topLinks = [
   ['Schedules', '/schedules'],
 ]
 export const moreLinks = [
-  ['Settings', '/settings'],
   ['Completed Todos', '/done'],
+  ['Settings', '/settings'],
   ['Help', '/help'],
 ]
 

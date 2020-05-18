@@ -13,7 +13,7 @@ export default () => {
       <HeadTitle>{title}</HeadTitle>
       <HeaderLogo />
       <main className="text-gray-700">
-        <div className="container mx-auto flex px-4 py-24 md:flex-row flex-col items-center">
+        <div className="container mx-auto flex px-4 py-8 md:flex-row flex-col items-center">
           <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
             <img
               className="object-cover object-center rounded"

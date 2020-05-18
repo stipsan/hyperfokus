@@ -26,8 +26,8 @@ export default () => {
       <button
         className="inline-block text-sm font-bold rounded-full text-yellow-100 bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800 py-1 px-2 mt-1 focus:outline-none focus:shadow-outline"
         onClick={() => {
-          setSession('')
           Router.push('/')
+          setSession('localstorage')
         }}
       >
         Stop the demo, I'm ready!

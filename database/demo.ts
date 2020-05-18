@@ -347,13 +347,13 @@ const initialState: {
     { start: '07:20', duration: 60, end: '08:20', repeat: repeatWeekdays },
     { start: '11:00', duration: 120, end: '13:00', repeat: repeatWeekends },
     { start: '18:00', duration: 60, end: '19:00', repeat: repeatAll },
-    ///*
     {
-      start: '17:00',
-      duration: 30,
-      end: '17:30',
+      start: '16:00',
+      duration: 150,
+      end: '18:30',
       repeat: { ...repeatNone, monday: true },
     },
+    /*
     {
       start: '18:00',
       duration: 30,

@@ -2,8 +2,8 @@ import Button from 'components/Button'
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
-import UnderConstruction from 'components/UnderConstruction'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
+import Router from 'next/router'
 
 const title = 'Settings'
 
@@ -48,18 +48,26 @@ const EnableDemo = () => {
 }
 
 const ResetButton = () => {
-  const session = useSessionValue()
   const setSession = useSessionSetState()
 
-  return session !== '' && <Button onClick={() => setSession('')}>Reset</Button>
+  return (
+    <Button
+      className="mt-6"
+      onClick={() => {
+        Router.push('/')
+        setSession('')
+      }}
+    >
+      Reset
+    </Button>
+  )
 }
 
 const LocalDebug = () => (
   <>
     <br />
     <EnableDemo />
-    <br />
-    <ResetButton />
+
     <br />
     <EnableLocalStorage />
     <br />
@@ -74,8 +82,10 @@ export default () => {
       <AppLayout title={title}>
         <GetStartedBroadcast />
         <MoreContainer>
-          <UnderConstruction />
-          {process.env.NODE_ENV === 'development' && <LocalDebug />}
+          <div className="px-inset">
+            <ResetButton />
+            {process.env.NODE_ENV === 'development' && <LocalDebug />}
+          </div>
         </MoreContainer>
       </AppLayout>
     </>

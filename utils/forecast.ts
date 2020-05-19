@@ -57,7 +57,7 @@ const DAY_IN_MS = 86400000
 // Provide times and tasks and get a complete schedule in return
 // @TODO make it possible to specify the starting point, currently it's hardcoded to `today`
 // @TODO filter out opportunities that are for today, if they have an endtime that is too late
-export function getSchedule(
+export function getForecast(
   schedules: Schedule[],
   todos: Todo[],
   lastReset: Date

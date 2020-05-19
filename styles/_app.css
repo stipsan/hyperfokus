@@ -9,7 +9,7 @@
 
 html,
 body {
-  scroll-padding-top: var(--navbar-height);
+  scroll-padding-top: calc(var(--navbar-height) + theme('height.4'));
   scroll-padding-bottom: 60px;
 }
 
@@ -33,11 +33,27 @@ body {
 
 // Handle display cutouts
 .px-inset {
-  @apply py-4;
+  @apply px-4;
 }
 @supports (padding: max(0px)) {
   .px-inset {
     padding-left: max(theme('padding.4'), env(safe-area-inset-left));
+    padding-right: max(theme('padding.4'), env(safe-area-inset-right));
+  }
+}
+.px-inset-l {
+  @apply pl-4;
+}
+@supports (padding: max(0px)) {
+  .px-inset-l {
+    padding-left: max(theme('padding.4'), env(safe-area-inset-left));
+  }
+}
+.px-inset-r {
+  @apply pr-4;
+}
+@supports (padding: max(0px)) {
+  .px-inset-r {
     padding-right: max(theme('padding.4'), env(safe-area-inset-right));
   }
 }

@@ -399,25 +399,46 @@ const initialState: {
     ...schedule,
   })),
   activities: [
-    { description: 'Add ability to edit activities.', duration: 30 },
+    { description: 'Ability to create todos.', duration: 30 },
+    { description: 'Ability to edit todos.', duration: 30 },
+    { description: 'Ability to delete todos.', duration: 30 },
+    { description: 'Settings screen.', duration: 60 },
     {
-      description: 'List tasks that are too long to fit the schedule',
+      description: 'Notify the user of todos that lack duration.',
+      duration: 60,
+    },
+    {
+      description: 'Notify of todos that is missing from the forecast.',
+      duration: 60,
+    },
+
+    {
+      description:
+        'Implement daily reset for when todos are moved into the "Completed Todos" log and out of the planner.',
+      duration: 30,
+    },
+    {
+      description: 'About page with link to GitHub and other info.',
+      duration: 30,
+    },
+    { description: 'Ability view completed todos.', duration: 30 },
+    {
+      description: 'Ability to toggle completed status on todos.',
       duration: 30,
     },
     {
       description:
-        'Implement daily reset for when tasks are moved into the "Completed Activites" log and out of the planner.',
+        'Help page should explain how todos and schedules are interconnected',
       duration: 30,
     },
-    {
-      description: 'Only render the first line of text for each activity.',
-      duration: 30,
-    },
-    { description: 'Ability to delete activities.', duration: 30 },
-    { description: 'Ability to delete opportunities.', duration: 30 },
     {
       description:
-        'Help page should explain what the difference is between opportunities and activities',
+        '"More" page should have a sidebar over links to its subpages.',
+      duration: 30,
+    },
+    {
+      description:
+        'On mobile the "More" page should have a topbar over links to its subpages.',
       duration: 30,
     },
     {

@@ -1,0 +1,52 @@
+.section {
+  @apply bg-white;
+}
+:global(.is-today).section {
+  min-height: calc(
+    100vh - var(--navbar-height) - 120px - var(--demo-notification)
+  );
+}
+
+.section :focus {
+  scroll-margin-top: calc(var(--navbar-height) + theme('height.8'));
+}
+
+.description {
+  @apply overflow-hidden;
+  padding: 6px 0;
+  flex: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.items {
+  @apply pb-6;
+}
+
+:global(.is-today) .items {
+  position: sticky;
+  top: calc(var(--navbar-height) + theme('height.8'));
+}
+
+.header {
+  @apply flex items-center h-8 bg-white z-10 uppercase sticky text-gray-600;
+  --bg-opacity: 0.95;
+  top: var(--navbar-height);
+}
+
+:global(.is-today) .header {
+  @apply text-blue-500;
+}
+
+.time {
+  float: right;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 8px;
+  font-weight: 600;
+  font-size: 0.8em;
+}
+
+.checkboxLabel {
+  align-self: stretch;
+  padding: 2px 8px;
+}

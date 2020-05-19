@@ -1,17 +1,17 @@
 .navbar {
   /* Used to hide the header that isn't currently in use, it's a perf optimization */
   --header-breakpoint: theme('screens.sm');
-  @apply top-0 sticky z-10 bg-white items-center flex-shrink-0;
+  @apply top-0 sticky z-20 bg-white items-center flex-shrink-0;
   height: var(--navbar-height);
 }
 
 .navbar :focus {
   /* Ensures tabbing to elements don't cause a scroll on the main page */
-  scroll-margin-top: calc(var(--navbar-height) * -1);
+  scroll-margin-top: calc(calc(var(--navbar-height) + theme('height.4')) * -1);
 }
 
 .tabbar {
-  @apply fixed left-0 right-0 bottom-0 bg-white grid grid-flow-col;
+  @apply fixed left-0 right-0 bottom-0 bg-white grid grid-flow-col z-40;
   grid-auto-columns: 1fr;
   box-shadow: theme('boxShadow.2xl'), theme('boxShadow.xs');
 }

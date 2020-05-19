@@ -1,48 +1,23 @@
+import type { Schedule, Todo } from 'database/types'
 import { isSameDay, setHours, setMinutes } from 'date-fns'
 import { getTime } from './time'
 
-interface Time {
-  id: string
-  after: Date
-  duration: number
-  enabled: boolean
-  start: string
-  end: string
-  repeat: {
-    monday: boolean
-    tuesday: boolean
-    wednesday: boolean
-    thursday: boolean
-    friday: boolean
-    saturday: boolean
-    sunday: boolean
-  }
-}
-
-interface Task {
-  id: string
-  description: string
-  duration: number
-  done: boolean
-  completed?: Date
-}
-
-export type DayTask = Task & {
+export type ForecastTodo = Todo & {
   start: string
   end: string
 }
 
-type DaySchedule = Time & {
-  tasks: DayTask[]
+type ForecastSchedule = Schedule & {
+  tasks: ForecastTodo[]
 }
 
 interface Day {
   date: Date
   day: string
-  schedule: DaySchedule[]
+  schedule: ForecastSchedule[]
 }
 
-export type Schedule = {
+export type Forecast = {
   // Max allowed task duration by the schedule
   maxTaskDuration: number
   days: Day[]
@@ -83,10 +58,10 @@ const DAY_IN_MS = 86400000
 // @TODO make it possible to specify the starting point, currently it's hardcoded to `today`
 // @TODO filter out opportunities that are for today, if they have an endtime that is too late
 export function getSchedule(
-  times: Time[],
-  tasks: Task[],
+  times: Schedule[],
+  tasks: Todo[],
   lastReset: Date
-): Schedule {
+): Forecast {
   let days: Day[] = []
   let now = getTime()
   let today = new Date(
@@ -174,7 +149,7 @@ export function getSchedule(
       if (MAX_SCHEDULE_DAYS_LENGTH > lastIndex) {
         const date = new Date(today.getTime() + DAY_IN_MS * lastIndex)
         const weekday = getWeekday(date)
-        const schedule: DaySchedule[] = []
+        const schedule: ForecastSchedule[] = []
         const shouldFilterOpportunitiesToday =
           shouldFilterToday && isSameDay(date, today)
 
@@ -248,7 +223,7 @@ export function getSchedule(
 // Takes a list over times and returns a normalized list that can be looped
 // Filters out enabled: false, as well as checking if something without any repeat value is "enabled"
 // or: if it's "disabled" because the after value is more than 24 hours ago from current time
-export function normalizeTimes(times: Time[]) {
+export function normalizeTimes(times: Schedule[]) {
   const sortedTimes = [...times].sort((a, b) => {
     const [aStartHours, aStartMinutes] = a.start.split(':')
     const [bStartHours, bStartMinutes] = b.start.split(':')

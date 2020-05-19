@@ -39,14 +39,14 @@
 }
 
 .time {
+  @apply py-1 pl-2;
   float: right;
   font-variant-numeric: tabular-nums;
-  padding: 2px 8px;
   font-weight: 600;
   font-size: 0.8em;
 }
 
 .checkboxLabel {
+  @apply py-1 pr-2;
   align-self: stretch;
-  padding: 2px 8px;
 }

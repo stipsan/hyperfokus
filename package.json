@@ -8,6 +8,7 @@
     "@reach/dialog": "^0.10.2",
     "@reach/menu-button": "^0.10.2",
     "classnames": "^2.2.6",
+    "localforage": "^1.7.3",
     "next": "^9.4.1",
     "react": "0.0.0-experimental-33c3af284",
     "react-dom": "0.0.0-experimental-33c3af284",

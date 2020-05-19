@@ -10,6 +10,21 @@
 html,
 body {
   scroll-padding-top: var(--navbar-height);
+  scroll-padding-bottom: 60px;
+}
+
+html {
+  /* Position fixed TabBar component in Header.tsx */
+  padding-bottom: 60px;
+}
+@screen sm {
+  html,
+  body {
+    scroll-padding-bottom: 0;
+  }
+  html {
+    @apply pb-0;
+  }
 }
 
 body {

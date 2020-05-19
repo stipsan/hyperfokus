@@ -1,9 +1,12 @@
 import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
 import cx from 'classnames'
+import MoreIcon from 'components/icons/more'
+import SchedulesIcon from 'components/icons/schedules'
+import TodosIcon from 'components/icons/todos'
 import Logo from 'components/Logo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, Fragment, useEffect, useRef, useState } from 'react'
 import styles from './Header.module.css'
 
 type Props = {
@@ -24,6 +27,7 @@ const NavLink: React.FC<{ href: string }> = forwardRef(
 const topLinks = [
   ['Todos', '/'],
   ['Schedules', '/schedules'],
+  ['More', '/more'],
 ]
 export const moreLinks = [
   ['Completed Todos', '/done'],
@@ -54,6 +58,35 @@ const TopLink: React.FC<{
   )
 }
 
+const iconsMap = new Map([
+  ['/', TodosIcon],
+  ['/schedules', SchedulesIcon],
+  ['/more', MoreIcon],
+])
+const TabLink: React.FC<{
+  href: string
+  active: boolean
+}> = ({ active, href, children }) => {
+  const Icon = iconsMap.has(href) ? iconsMap.get(href) : Fragment
+  return (
+    <Link href={href}>
+      <a
+        className={cx(
+          styles.tablink,
+          'hover:bg-gray-100 focus:outline-none focus:text-blue-500',
+          {
+            'text-blue-500': active,
+            'text-gray-500': !active,
+          }
+        )}
+      >
+        <Icon />
+        <span className="text-xs pt-1 pb-1">{children}</span>
+      </a>
+    </Link>
+  )
+}
+
 const CreateLink = ({ label }: { label: string }) => (
   <Link href="?create=true" shallow scroll={false}>
     <a
@@ -73,6 +106,17 @@ const CreateLink = ({ label }: { label: string }) => (
     </a>
   </Link>
 )
+
+const isActive = ({ href, pathname }: { href: string; pathname: string }) => {
+  switch (href) {
+    case '/more':
+      return (
+        moreLinks.some(([, href]) => pathname === href) || pathname === '/more'
+      )
+    default:
+      return pathname === href
+  }
+}
 
 export default ({ createLink, title }: Props) => {
   const navSideClassNames = 'flex items-center w-full'
@@ -101,34 +145,50 @@ export default ({ createLink, title }: Props) => {
   return (
     <>
       {(larger === false || larger === null) && (
-        <header
-          key="small"
-          ref={domRef}
-          className={cx(styles.navbar, 'flex px-inset', {
-            'sm:hidden': larger === null,
-          })}
-        >
-          <div className={cx(navSideClassNames, 'justify-start')}>
-            <Menu>
-              <MenuButton className="py-1 px-4 focus:outline-none focus:shadow-outline bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900 rounded text-xs">
-                Menu
-              </MenuButton>
-              <MenuList>
-                {[...topLinks, ...moreLinks].map(([text, href]) => (
-                  <MenuLink key={href} as={NavLink} href={href}>
-                    {text}
-                  </MenuLink>
-                ))}
-              </MenuList>
-            </Menu>
-          </div>
-          <div className="flex items-center flex-shrink-0 h-inherit px-1">
-            <Logo />
-          </div>
-          <div className={cx(navSideClassNames, 'justify-end')}>
-            {createLink && <CreateLink label={createLink} />}
-          </div>
-        </header>
+        <Fragment key="small">
+          <header
+            ref={domRef}
+            className={cx(styles.navbar, 'flex px-inset', {
+              'sm:hidden': larger === null,
+            })}
+          >
+            <div className={cx(navSideClassNames, 'justify-start')}>
+              <Menu>
+                <MenuButton className="py-1 px-4 focus:outline-none focus:shadow-outline bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900 rounded text-xs">
+                  Menu
+                </MenuButton>
+                <MenuList>
+                  {[...topLinks, ...moreLinks].map(([text, href]) => (
+                    <MenuLink key={href} as={NavLink} href={href}>
+                      {text}
+                    </MenuLink>
+                  ))}
+                </MenuList>
+              </Menu>
+            </div>
+            <div className="flex items-center flex-shrink-0 h-inherit px-1">
+              <Logo />
+            </div>
+            <div className={cx(navSideClassNames, 'justify-end')}>
+              {createLink && <CreateLink label={createLink} />}
+            </div>
+          </header>
+          <nav
+            className={cx(styles.tabbar, {
+              'sm:hidden': larger === null,
+            })}
+          >
+            {topLinks.map(([text, href]) => (
+              <TabLink
+                active={isActive({ href, pathname: router.pathname })}
+                key={href}
+                href={href}
+              >
+                {text}
+              </TabLink>
+            ))}
+          </nav>
+        </Fragment>
       )}
       {(larger === true || larger === null) && (
         <header
@@ -146,24 +206,17 @@ export default ({ createLink, title }: Props) => {
             <nav className="col-gap-px grid grid-flow-col text-xs">
               {topLinks.map(([text, href], key) => (
                 <TopLink
-                  active={router.pathname === href}
-                  className={cx({ 'rounded-l-lg': key === 0 })}
+                  active={isActive({ href, pathname: router.pathname })}
+                  className={cx({
+                    'rounded-l-lg': key === 0,
+                    'rounded-r-lg': key === topLinks.length - 1,
+                  })}
                   key={href}
                   href={href}
                 >
                   {text}
                 </TopLink>
               ))}
-              <TopLink
-                active={
-                  moreLinks.some(([, href]) => router.pathname === href) ||
-                  router.pathname === '/more'
-                }
-                className="rounded-r-lg"
-                href="/more"
-              >
-                More
-              </TopLink>
             </nav>
           </div>
           <div className={cx(navSideClassNames, 'justify-end')}>

@@ -5,6 +5,7 @@ import DialogToolbar from 'components/DialogToolbar'
 import type { Schedule } from 'database/types'
 import { useDatabase } from 'hooks/database'
 import { useGetSchedules } from 'hooks/schedules'
+import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useReducer, useState } from 'react'
@@ -12,7 +13,6 @@ import type { Dispatch, FC, SetStateAction } from 'react'
 import { getRepeatMessage, sortByHoursMinutesString } from 'utils/time'
 import styles from './Schedules.module.css'
 
-let id = 0
 const CreateDialog = ({
   setSchedules,
 }: {
@@ -33,7 +33,7 @@ const CreateDialog = ({
         onDismiss={close}
         onSubmit={(state) => {
           setSchedules((schedules) => {
-            return [...schedules, { ...state, id: `new-schedule-${++id}` }]
+            return [...schedules, { ...state, id: nanoid() }]
           })
           close()
         }}
@@ -538,9 +538,17 @@ export default () => {
             scroll={false}
           >
             <a className="block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2">
-              <div className="text-3xl tnum">{`${schedule.start} – ${schedule.end}`}</div>
-              <div>{metaInformation.join(', ')}</div>
-              {!schedule.enabled && <div>Disabled</div>}
+              <div
+                className={cx('text-3xl tnum', {
+                  'text-gray-600': !schedule.enabled,
+                })}
+              >{`${schedule.start} – ${schedule.end}`}</div>
+              <div className={cx({ 'text-gray-600': !schedule.enabled })}>
+                {metaInformation.join(', ')}
+              </div>
+              {!schedule.enabled && (
+                <div className="font-bold text-gray-600">Disabled</div>
+              )}
             </a>
           </Link>
         )

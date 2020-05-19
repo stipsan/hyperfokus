@@ -85,7 +85,7 @@ export interface DatabaseType {
   addTodo(todo: TodoDelta): Promise<Todo>
   editTodo(todoId: string, todo: TodoDelta): Promise<void>
   /** toggle an todo as completed */
-  completTodo(todoId: string): Promise<void>
+  completeTodo(todoId: string): Promise<void>
   /** untoggle an todo as completed, puts it back on the board */
   incompleteTodo(todoId: string): Promise<void>
   /** Fetches truly finished todos */

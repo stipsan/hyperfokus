@@ -125,7 +125,7 @@ const Memory = (initialState: {
         }
       })
     },
-    completTodo(activityId) {
+    completeTodo(activityId) {
       const activities = activitiesMap || []
 
       return new Promise((resolve, reject) => {

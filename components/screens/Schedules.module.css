@@ -1,3 +1,7 @@
+.schedule {
+  scroll-snap-align: start;
+}
+
 .repeatGrid {
   @apply grid-flow-col inline-grid row-gap-2 col-gap-4;
   grid-template-columns: min-content;

@@ -9,7 +9,8 @@
 
 html,
 body {
-  scroll-padding-top: calc(var(--navbar-height) + theme('height.4'));
+  scroll-snap-type: y proximity;
+  scroll-padding-top: var(--navbar-height);
   scroll-padding-bottom: 60px;
 }
 

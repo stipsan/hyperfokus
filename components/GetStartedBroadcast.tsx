@@ -1,6 +1,8 @@
+import cx from 'classnames'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
 import Router from 'next/router'
 import { useEffect, useRef } from 'react'
+import styles from './GetStartedBroadcast.module.css'
 
 // @TODO change behavior if the user clicks "Stop the demo, I'm ready!"
 // just in case the "Get started" button is missed on the start page.
@@ -28,7 +30,10 @@ export default () => {
 
   return (
     <div
-      className="bg-yellow-100 border-t-4 border-yellow-500 px-inset py-3 shadow-inner shadow-inset text-yellow-900"
+      className={cx(
+        styles.broadcast,
+        'bg-yellow-100 border-t-4 border-yellow-500 px-inset py-3 shadow-inner shadow-inset text-yellow-900'
+      )}
       role="alert"
       ref={containerRef}
     >

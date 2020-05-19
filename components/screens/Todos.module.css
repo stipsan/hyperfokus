@@ -1,5 +1,6 @@
 .section {
   @apply bg-white;
+  scroll-snap-align: start;
 }
 :global(.is-today).section {
   min-height: calc(

@@ -537,7 +537,12 @@ export default () => {
             shallow
             scroll={false}
           >
-            <a className="block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2">
+            <a
+              className={cx(
+                styles.schedule,
+                'block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2'
+              )}
+            >
               <div
                 className={cx('text-3xl tnum', {
                   'text-gray-600': !schedule.enabled,

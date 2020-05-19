@@ -21,7 +21,7 @@ export const useGetTodos = () => {
     if (promise === null) {
       promise = database
         .getTodos()
-        ///*
+        /*
         .then(
           (result) =>
             new Promise<typeof result>((resolve) =>

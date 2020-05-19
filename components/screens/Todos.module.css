@@ -3,8 +3,15 @@
 }
 :global(.is-today).section {
   min-height: calc(
-    100vh - var(--navbar-height) - 120px - var(--demo-notification)
+    100vh - var(--navbar-height) - 180px - var(--demo-notification)
   );
+}
+@screen sm {
+  :global(.is-today).section {
+    min-height: calc(
+      100vh - var(--navbar-height) - 120px - var(--demo-notification)
+    );
+  }
 }
 
 .section :focus {

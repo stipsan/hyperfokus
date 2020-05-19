@@ -3,7 +3,7 @@
 }
 :global(.is-today).section {
   min-height: calc(
-    100vh - var(--navbar-height) - 180px - var(--demo-notification)
+    100vh - var(--navbar-height) - 210px - var(--demo-notification)
   );
 }
 @screen sm {

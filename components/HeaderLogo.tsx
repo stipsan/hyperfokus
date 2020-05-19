@@ -6,10 +6,7 @@ import styles from './HeaderLogo.module.css'
 
 export default () => (
   <div
-    className={cx(
-      styles.wrapper,
-      'flex items-center px-inset justify-center sm:justify-start'
-    )}
+    className={cx(styles.wrapper, 'flex items-center px-inset justify-start')}
   >
     <Logo />
   </div>

@@ -1,4 +1,3 @@
-import { Menu, MenuButton, MenuLink, MenuList } from '@reach/menu-button'
 import cx from 'classnames'
 import MoreIcon from 'components/icons/more'
 import SchedulesIcon from 'components/icons/schedules'
@@ -153,22 +152,9 @@ export default ({ createLink, title }: Props) => {
             })}
           >
             <div className={cx(navSideClassNames, 'justify-start')}>
-              <Menu>
-                <MenuButton className="py-1 px-4 focus:outline-none focus:shadow-outline bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900 rounded text-xs">
-                  Menu
-                </MenuButton>
-                <MenuList>
-                  {[...topLinks, ...moreLinks].map(([text, href]) => (
-                    <MenuLink key={href} as={NavLink} href={href}>
-                      {text}
-                    </MenuLink>
-                  ))}
-                </MenuList>
-              </Menu>
-            </div>
-            <div className="flex items-center flex-shrink-0 h-inherit px-1">
               <Logo />
             </div>
+
             <div className={cx(navSideClassNames, 'justify-end')}>
               {createLink && <CreateLink label={createLink} />}
             </div>

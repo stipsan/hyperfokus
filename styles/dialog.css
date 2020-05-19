@@ -34,3 +34,13 @@
     max-height: calc(100vh - theme('margin.2') - theme('margin.2'));
   }
 }
+
+@media (hover: none) {
+  [data-reach-dialog-overlay] {
+    @apply items-center;
+  }
+
+  [data-reach-dialog-content] {
+    @apply origin-center;
+  }
+}

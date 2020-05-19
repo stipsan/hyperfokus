@@ -23,6 +23,11 @@
   padding-right: env(safe-area-inset-right);
 }
 
+.navbar a,
+.tablink {
+  touch-action: manipulation;
+}
+
 .tablink {
   @apply flex flex-row flex-col justify-center items-center pt-2;
   padding-bottom: env(safe-area-inset-bottom);

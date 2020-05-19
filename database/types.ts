@@ -62,15 +62,6 @@ export interface Todo {
   completed?: Date
 }
 
-// Base types
-// @TODO rename to Slot? TimeSlot? TimePocket?
-export type Time = {}
-export type Task = {}
-
-// Computed types (gone through the algorithm)
-export type ComputedTime = {}
-export type ComputedTask = {}
-
 export interface DatabaseType {
   setSchedules(schedules: Schedule[]): Promise<void>
   getSchedules(): Promise<Schedule[]>

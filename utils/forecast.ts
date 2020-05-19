@@ -8,7 +8,7 @@ export type ForecastTodo = Todo & {
 }
 
 type ForecastSchedule = Schedule & {
-  tasks: ForecastTodo[]
+  todos: ForecastTodo[]
 }
 
 interface Day {
@@ -58,8 +58,8 @@ const DAY_IN_MS = 86400000
 // @TODO make it possible to specify the starting point, currently it's hardcoded to `today`
 // @TODO filter out opportunities that are for today, if they have an endtime that is too late
 export function getSchedule(
-  times: Schedule[],
-  tasks: Todo[],
+  schedules: Schedule[],
+  todos: Todo[],
   lastReset: Date
 ): Forecast {
   let days: Day[] = []
@@ -69,7 +69,7 @@ export function getSchedule(
   )
   const shouldFilterToday = isSameDay(today, lastReset)
 
-  const normalizedTimes = normalizeTimes(times)
+  const normalizedTimes = normalizeTimes(schedules)
 
   // When looping and filling out tasks, make sure that maxTaskDuration is modified when needed
   // Rewrite to have one shared index for repeatable times, and separate map values for non-repeatable times
@@ -79,7 +79,7 @@ export function getSchedule(
   )
 
   // Filter out tasks that are too large for the current schedule
-  const reasonableTasks = tasks.filter(
+  const reasonableTasks = todos.filter(
     (task) => !task.done && task.duration <= maxTaskDuration
   )
 
@@ -139,7 +139,7 @@ export function getSchedule(
             .toString()
             .padStart(2, '0')}`
 
-          schedule.tasks.push({ ...task, end, start })
+          schedule.todos.push({ ...task, end, start })
 
           search = false
         }
@@ -163,7 +163,7 @@ export function getSchedule(
 
           if (time.repeat[weekday]) {
             if (!shouldFilterOpportunitiesToday || startTime > lastReset) {
-              schedule.push({ ...time, tasks: [] })
+              schedule.push({ ...time, todos: [] })
               availableDurationsPerTime.get(date).set(time.id, time.duration)
             }
           }
@@ -201,7 +201,7 @@ export function getSchedule(
 
             if (yes) {
               availableDurationsPerTime.get(date).set(time.id, time.duration)
-              schedule.push({ ...time, tasks: [] })
+              schedule.push({ ...time, todos: [] })
             }
           }
         })

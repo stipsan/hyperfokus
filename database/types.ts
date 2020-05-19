@@ -78,20 +78,20 @@ export interface DatabaseType {
     success: (schedules: Schedule[]) => void,
     failure: (reason: Error) => void
   ): () => void
-  observeActivities(
-    success: (activities: Todo[]) => void,
+  observeTodos(
+    success: (todos: Todo[]) => void,
     failure: (reason: Error) => void
   ): () => void
-  addActivity(activity: TodoDelta): Promise<Todo>
-  editActivity(activityId: string, activity: TodoDelta): Promise<void>
-  /** toggle an activity as completed */
-  completeActivity(activityId: string): Promise<void>
-  /** untoggle an activity as completed, puts it back on the board */
-  incompleteActivity(activityId: string): Promise<void>
-  /** Fetches truly finished activities */
-  getCompletedActivities(): Promise<Todo[]>
-  /** Fetches all activities that are completed and archives them so the schedule can be recreated */
-  archiveCompletedActivities(): Promise<void>
-  /** Reorder all activities, and make the selected activity either top 1 or bottom -1 */
-  reorderActivities(activityId: string, ordering: number): Promise<void>
+  addTodo(todo: TodoDelta): Promise<Todo>
+  editTodo(todoId: string, todo: TodoDelta): Promise<void>
+  /** toggle an todo as completed */
+  completTodo(todoId: string): Promise<void>
+  /** untoggle an todo as completed, puts it back on the board */
+  incompleteTodo(todoId: string): Promise<void>
+  /** Fetches truly finished todos */
+  getCompletedTodos(): Promise<Todo[]>
+  /** Fetches all todos that are completed and archives them so the schedule can be recreated */
+  archiveCompletedTodos(): Promise<void>
+  /** Reorder all todos, and make the selected todo either top 1 or bottom -1 */
+  reorderTodos(todoId: string, ordering: number): Promise<void>
 }

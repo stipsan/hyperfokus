@@ -80,7 +80,7 @@ const Memory = (initialState: {
       success(schedulesMap || [])
       return schedulesUpdated.subscribe((schedules) => success(schedules))
     },
-    observeActivities(success) {
+    observeTodos(success) {
       const filterActivities = (activity: Todo) => !activity.done
       /* ||
         const now = new Date()
@@ -95,7 +95,7 @@ const Memory = (initialState: {
         success(activities.filter(filterActivities))
       )
     },
-    addActivity(activityDelta) {
+    addTodo(activityDelta) {
       let activities = activitiesMap || []
       const activity: Todo = {
         id: `activity-${activities.length + 1}`,
@@ -111,7 +111,7 @@ const Memory = (initialState: {
 
       return Promise.resolve(activity)
     },
-    editActivity(activityId, activityDelta) {
+    editTodo(activityId, activityDelta) {
       const activities = activitiesMap || []
 
       return new Promise((resolve, reject) => {
@@ -136,7 +136,7 @@ const Memory = (initialState: {
         }
       })
     },
-    completeActivity(activityId) {
+    completTodo(activityId) {
       const activities = activitiesMap || []
 
       return new Promise((resolve, reject) => {
@@ -158,7 +158,7 @@ const Memory = (initialState: {
         }
       })
     },
-    incompleteActivity(activityId) {
+    incompleteTodo(activityId) {
       const activities = activitiesMap || []
 
       return new Promise((resolve, reject) => {
@@ -181,7 +181,7 @@ const Memory = (initialState: {
         }
       })
     },
-    getCompletedActivities() {
+    getCompletedTodos() {
       const activities = activitiesMap || []
 
       return Promise.resolve(
@@ -203,7 +203,7 @@ const Memory = (initialState: {
           })
       )
     },
-    archiveCompletedActivities() {
+    archiveCompletedTodos() {
       const activities = activitiesMap || []
 
       return new Promise((resolve, reject) => {
@@ -228,7 +228,7 @@ const Memory = (initialState: {
         }
       })
     },
-    reorderActivities(activityId, order) {
+    reorderTodos(activityId, order) {
       const activities = activitiesMap || []
 
       return new Promise((resolve, reject) => {

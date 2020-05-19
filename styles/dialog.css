@@ -10,7 +10,7 @@
 }
 
 [data-reach-dialog-content] {
-  @apply outline-none rounded-lg bg-white pt-4 pr-4 pl-4 max-w-lg m-2 scrolling-touch overflow-auto;
+  @apply outline-none rounded-lg bg-white pt-4 pr-4 pl-4 max-w-lg m-2 scrolling-touch overflow-auto origin-bottom;
   max-height: calc(100vh - theme('margin.2') - theme('margin.2'));
   box-shadow: theme('boxShadow.2xl'), theme('boxShadow.xl'),
     theme('boxShadow.xs'), theme('boxShadow.xs');
@@ -30,7 +30,7 @@
   }
 
   [data-reach-dialog-content] {
-    @apply pt-8 pr-8 pl-8;
+    @apply pt-8 pr-8 pl-8 origin-top;
     max-height: calc(100vh - theme('margin.2') - theme('margin.2'));
   }
 }

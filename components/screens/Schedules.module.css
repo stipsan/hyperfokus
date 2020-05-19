@@ -1,0 +1,10 @@
+.repeatGrid {
+  @apply grid-flow-col inline-grid row-gap-2 col-gap-4;
+  grid-template-columns: min-content;
+  grid-template-areas:
+    'weekday weekend'
+    'weekday weekend'
+    'weekday .'
+    'weekday .'
+    'weekday .';
+}

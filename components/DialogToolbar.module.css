@@ -1,5 +1,10 @@
-.safarifix {
+.safarifix.safarifix {
   /* Workaround the fact that safari jumps the sticky positioned element while animating the scale of the dialog contents */
   position: var(--position-sticky);
-  transform-style: preserve-3d;
+  /* transform: translateY(var(--sticky-y)); */
+}
+
+.stickyshadowfix {
+  box-shadow: theme('backgroundColor.white') theme('padding.2') 0 0,
+    theme('backgroundColor.white') calc(theme('padding.2') * -1) 0 0;
 }

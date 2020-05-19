@@ -1,0 +1,10 @@
+@supports (position: -webkit-sticky) and (not (position: sticky)) {
+  :root {
+    --position-sticky: -webkit-sticky;
+  }
+}
+@supports (position: sticky) {
+  :root {
+    --position-sticky: sticky;
+  }
+}

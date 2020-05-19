@@ -5,6 +5,7 @@
 @import url('./_config.css');
 @import url('./dialog.css');
 @import url('./menu-button.css');
+@import url('./safarifix.css');
 
 html,
 body {

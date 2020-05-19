@@ -5,7 +5,7 @@ if (typeof window === 'undefined') {
 }
 
 import localforage from 'localforage'
-import { DatabaseType, Schedule } from './types'
+import { DatabaseType, Schedule, Todo } from './types'
 
 localforage.config({
   name: 'hyperfokus',
@@ -27,16 +27,23 @@ const database: DatabaseType = {
   observeTodos() {
     throw new TypeError('Not implemented!')
   },
-  addTodo(activityDelta) {
+  async getTodos() {
+    const todos = (await localforage.getItem('todos')) as Todo[]
+    return todos || []
+  },
+  async setTodos(nextTodos) {
+    await localforage.setItem('todos', nextTodos)
+  },
+  addTodo() {
     throw new TypeError('Not implemented!')
   },
-  editTodo(activityId, activityDelta) {
+  editTodo() {
     throw new TypeError('Not implemented!')
   },
-  completeTodo(activityId) {
+  completeTodo() {
     throw new TypeError('Not implemented!')
   },
-  incompleteTodo(activityId) {
+  incompleteTodo() {
     throw new TypeError('Not implemented!')
   },
   getCompletedTodos() {

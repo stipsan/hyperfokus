@@ -82,6 +82,8 @@ export interface DatabaseType {
     success: (todos: Todo[]) => void,
     failure: (reason: Error) => void
   ): () => void
+  setTodos(todos: Todo[]): Promise<void>
+  getTodos(): Promise<Todo[]>
   addTodo(todo: TodoDelta): Promise<Todo>
   editTodo(todoId: string, todo: TodoDelta): Promise<void>
   /** toggle an todo as completed */

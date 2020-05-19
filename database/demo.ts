@@ -48,17 +48,17 @@ const Memory = (initialState: {
 }): DatabaseType => {
   let schedulesMap = initialState.schedules
 
-  let activitiesMap = initialState.activities
+  let todosMap = initialState.activities
 
   const schedulesUpdated = new EventEmitter<Schedule[]>()
-  const activitiesUpdated = new EventEmitter<Todo[]>()
+  const todosUpdated = new EventEmitter<Todo[]>()
 
   return {
     getSchedules() {
       return Promise.resolve(schedulesMap || [])
     },
     setSchedules(nextSchedules) {
-      const schedules = [...nextSchedules]
+      const schedules = JSON.parse(JSON.stringify(nextSchedules))
 
       schedulesMap = schedules
       schedulesUpdated.dispatch(schedules)
@@ -78,14 +78,25 @@ const Memory = (initialState: {
             differenceInHours(activity.completed, now) <= 24)
             // */
 
-      const activities = activitiesMap || []
+      const activities = todosMap || []
       success(activities.filter(filterActivities))
-      return activitiesUpdated.subscribe((activities) =>
+      return todosUpdated.subscribe((activities) =>
         success(activities.filter(filterActivities))
       )
     },
+    getTodos() {
+      return Promise.resolve(todosMap || [])
+    },
+    setTodos(nextTodos) {
+      const todos = JSON.parse(JSON.stringify(nextTodos))
+
+      todosMap = todos
+      todosUpdated.dispatch(todos)
+
+      return Promise.resolve()
+    },
     addTodo(activityDelta) {
-      let activities = activitiesMap || []
+      let activities = todosMap || []
       const activity: Todo = {
         id: `activity-${activities.length + 1}`,
         order: activities.length + 1,
@@ -95,13 +106,13 @@ const Memory = (initialState: {
         ...activityDelta,
       }
       activities = [...activities, activity]
-      activitiesUpdated.dispatch(activities)
-      activitiesMap = activities
+      todosUpdated.dispatch(activities)
+      todosMap = activities
 
       return Promise.resolve(activity)
     },
     editTodo(activityId, activityDelta) {
-      const activities = activitiesMap || []
+      const activities = todosMap || []
 
       return new Promise((resolve, reject) => {
         try {
@@ -116,8 +127,8 @@ const Memory = (initialState: {
             modified: new Date(),
           }
 
-          activitiesUpdated.dispatch(activities)
-          activitiesMap = activities
+          todosUpdated.dispatch(activities)
+          todosMap = activities
 
           resolve()
         } catch (err) {
@@ -126,7 +137,7 @@ const Memory = (initialState: {
       })
     },
     completeTodo(activityId) {
-      const activities = activitiesMap || []
+      const activities = todosMap || []
 
       return new Promise((resolve, reject) => {
         try {
@@ -138,8 +149,8 @@ const Memory = (initialState: {
             completed: new Date(),
           }
 
-          activitiesUpdated.dispatch(activities)
-          activitiesMap = activities
+          todosUpdated.dispatch(activities)
+          todosMap = activities
 
           resolve()
         } catch (err) {
@@ -148,7 +159,7 @@ const Memory = (initialState: {
       })
     },
     incompleteTodo(activityId) {
-      const activities = activitiesMap || []
+      const activities = todosMap || []
 
       return new Promise((resolve, reject) => {
         try {
@@ -161,8 +172,8 @@ const Memory = (initialState: {
             done: false,
           }
 
-          activitiesUpdated.dispatch(activities)
-          activitiesMap = activities
+          todosUpdated.dispatch(activities)
+          todosMap = activities
 
           resolve()
         } catch (err) {
@@ -171,7 +182,7 @@ const Memory = (initialState: {
       })
     },
     getCompletedTodos() {
-      const activities = activitiesMap || []
+      const activities = todosMap || []
 
       return Promise.resolve(
         activities
@@ -193,7 +204,7 @@ const Memory = (initialState: {
       )
     },
     archiveCompletedTodos() {
-      const activities = activitiesMap || []
+      const activities = todosMap || []
 
       return new Promise((resolve, reject) => {
         try {
@@ -208,8 +219,8 @@ const Memory = (initialState: {
             activities[index] = { ...activities[index], done: true }
           })
 
-          activitiesUpdated.dispatch(activities)
-          activitiesMap = activities
+          todosUpdated.dispatch(activities)
+          todosMap = activities
 
           resolve()
         } catch (err) {
@@ -218,7 +229,7 @@ const Memory = (initialState: {
       })
     },
     reorderTodos(activityId, order) {
-      const activities = activitiesMap || []
+      const activities = todosMap || []
 
       return new Promise((resolve, reject) => {
         try {
@@ -268,8 +279,8 @@ const Memory = (initialState: {
               activity.modified = new Date()
             })
 
-          activitiesUpdated.dispatch(activities)
-          activitiesMap = activities
+          todosUpdated.dispatch(activities)
+          todosMap = activities
 
           resolve()
         } catch (err) {

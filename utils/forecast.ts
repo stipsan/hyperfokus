@@ -156,13 +156,16 @@ export function getForecast(
         availableDurationsPerTime.set(date, new Map())
 
         normalizedTimes.forEach((time) => {
-          let [hours, minutes] = time.start.split(':')
-          const startHours = parseInt(hours, 10)
-          const startMinutes = parseInt(minutes, 10)
-          const startTime = setMinutes(setHours(date, startHours), startMinutes)
+          const [startHours, startMinutes] = time.start
+            .split(':')
+            .map((_) => parseInt(_, 10))
+          const [endHours, endMinutes] = time.end
+            .split(':')
+            .map((_) => parseInt(_, 10))
+          const endTime = setMinutes(setHours(date, endHours), endMinutes)
 
           if (time.repeat[weekday]) {
-            if (!shouldFilterOpportunitiesToday || startTime > lastReset) {
+            if (!shouldFilterOpportunitiesToday || endTime > lastReset) {
               schedule.push({ ...time, todos: [] })
               availableDurationsPerTime.get(date).set(time.id, time.duration)
             }

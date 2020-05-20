@@ -483,17 +483,15 @@ const EditDialog = ({
   )
 }
 
-// @TODO temporary workaround, go grab useLastAreaReset from v2
-const lastReset = undefined /*new Date(
-  'Mon May 18 2020 23:26:30 GMT+0200 (Central European Summer Time)'
-)*/
-
 export default () => {
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
   const database = useDatabase()
   const schedules = useGetSchedules()
   const [todos, setTodos] = useState(useGetTodos())
+  const [lastReset, setLastReset] = useState<Date>(() =>
+    setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
+  )
   const [forecast, setForecast] = useState<Forecast>(() =>
     getForecast(
       schedules.filter((opportunity) => opportunity.enabled),
@@ -516,7 +514,7 @@ export default () => {
   // Sync with db
   useEffect(() => {
     database.setTodos(todos)
-  }, [todos])
+  }, [todos, database])
 
   // Regen forecast when necessary
   useEffect(() => {
@@ -658,14 +656,15 @@ export default () => {
         <Button
           variant="primary"
           className="block mx-auto my-4"
-          onClick={() =>
+          onClick={() => {
+            setLastReset(new Date())
             setTodos((todos) =>
               todos.map((todo) => ({
                 ...todo,
                 done: todo.done || !!todo.completed,
               }))
             )
-          }
+          }}
         >
           Archive Completed Todos
         </Button>

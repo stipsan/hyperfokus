@@ -522,7 +522,7 @@ export default () => {
   // Sync with db
   useEffect(() => {
     database.setSchedules(schedules)
-  }, [schedules])
+  }, [schedules, database])
 
   return (
     <div className="border-b-2">

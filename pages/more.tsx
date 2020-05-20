@@ -10,7 +10,7 @@ export default () => (
     <HeadTitle>{title}</HeadTitle>
     <AppLayout title={title}>
       <MoreContainer>
-        <nav className="flex flex-wrap lg:w-4/5 sm:mx-auto sm:mb-2 my-16">
+        <nav className="flex flex-wrap lg:w-4/5 sm:mx-auto sm:mb-2 my-16 px-inset">
           {moreLinks.map(([text, href]) => (
             <div key={href} className="p-2 sm:w-1/2 w-full">
               <Link href={href}>

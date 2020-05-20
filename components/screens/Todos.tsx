@@ -2,14 +2,23 @@ import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
-import { isSameDay } from 'date-fns'
+import type { Todo } from 'database/types'
+import {
+  isAfter,
+  isBefore,
+  isSameDay,
+  setHours,
+  setMinutes,
+  setSeconds,
+} from 'date-fns'
 import { useDatabase } from 'hooks/database'
 import { useGetSchedules } from 'hooks/schedules'
 import { useGetTodos } from 'hooks/todos'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useEffect, useState } from 'react'
-import type { FC, ReactNode } from 'react'
+import type { Dispatch, FC, ReactNode, SetStateAction } from 'react'
+import { replaceItemAtIndex } from 'utils/array'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './Todos.module.css'
@@ -44,19 +53,45 @@ const StyledCheckbox: React.FC<{
   )
 }
 
-const Item: FC<{ onClick: () => void }> = ({ children, onClick }) => (
-  <li className={styles.todo} onClick={onClick}>
-    {children}
-  </li>
-)
-
 const TodoItem: React.FC<{
   todo: ForecastTodo
-}> = ({ todo }) => {
-  const [open, setOpen] = useState(false)
+  isToday: boolean
+  now: Date
+  setTodos: Dispatch<SetStateAction<Todo[]>>
+}> = ({ todo, isToday, now, setTodos }) => {
+  let isOverdue = false
+  let isCurrent = false
+  if (isToday) {
+    let [endHours, endMinutes] = todo.end.split(':').map((_) => parseInt(_, 10))
+    const endTime = setSeconds(
+      setMinutes(setHours(now, endHours), endMinutes),
+      0
+    )
+
+    let [startHours, startMinutes] = todo.start
+      .split(':')
+      .map((_) => parseInt(_, 10))
+    const startTime = setSeconds(
+      setMinutes(setHours(now, startHours), startMinutes),
+      0
+    )
+
+    isOverdue = isBefore(endTime, now)
+
+    //console.log('isToday', { todo, now, startTime, endTime })
+    isCurrent = isBefore(startTime, now) && isAfter(endTime, now)
+    if (isCurrent) {
+      console.warn('is current', { todo, startTime, endTime, now })
+    }
+  }
 
   return (
-    <Item onClick={() => setOpen(true)}>
+    <li
+      className={cx(styles.todo, {
+        'is-current': isCurrent,
+        'is-overdue': isOverdue,
+      })}
+    >
       <Link key="time" href={`?edit=${todo.id}`} shallow scroll={false}>
         <Time title={`Duration: ${todo.duration}m`}>
           {todo.start} – {todo.end}
@@ -68,21 +103,23 @@ const TodoItem: React.FC<{
         </a>
       </Link>
       <StyledCheckbox
-        //checked={!!todo.completed}
+        checked={!!todo.completed}
         onClick={(event) => event.stopPropagation()}
         onChange={(event) => {
-          console.log('Not implemented!')
-          /*
-            event.target.checked
-              ? database.completeTodo(todo.id)
-              : database.incompleteTodo(todo.id)
-              // */
+          setTodos((todos) => {
+            const index = todos.findIndex((search) => search.id === todo.id)
+
+            const newTodos = replaceItemAtIndex(todos, index, {
+              ...todos[index],
+              completed: todos[index].completed ? undefined : new Date(),
+            })
+            return newTodos
+          })
         }}
       />
-    </Item>
+    </li>
   )
 }
-// */
 
 const Items: FC = ({ children }) => <ul className={styles.items}>{children}</ul>
 
@@ -153,6 +190,7 @@ const lastReset = undefined /*new Date(
 )*/
 
 export default () => {
+  const [hyperfocusing, setHyperfocus] = useState(false)
   const database = useDatabase()
   const schedules = useGetSchedules()
   const [todos, setTodos] = useState(useGetTodos())
@@ -205,7 +243,10 @@ export default () => {
         return (
           <Section
             key={day.date.toString()}
-            className={cx({ 'is-today': isToday })}
+            className={cx({
+              'is-today': isToday,
+              'is-hyperfocus': hyperfocusing,
+            })}
           >
             <Header>
               <span className="font-bold mr-1">{dayText}</span> {dateText}
@@ -213,13 +254,27 @@ export default () => {
             <Items>
               {day.schedule.map((pocket) =>
                 pocket.todos?.map((task) => (
-                  <TodoItem key={task.id} todo={task} />
+                  <TodoItem
+                    key={task.id}
+                    todo={task}
+                    isToday={isToday}
+                    now={now}
+                    setTodos={setTodos}
+                  />
                 ))
               )}
             </Items>
           </Section>
         )
       })}
+      {process.env.NODE_ENV === 'development' && (
+        <Button
+          className="block mx-auto my-4"
+          onClick={() => setHyperfocus(!hyperfocusing)}
+        >
+          {hyperfocusing ? 'Disable Hyperfocusing' : 'Enable Hyperfocusing'}
+        </Button>
+      )}
       <CreateDialog />
       <EditDialog />
     </>

@@ -10,16 +10,17 @@
 }
 
 [data-reach-dialog-content] {
-  @apply outline-none rounded-lg bg-white pt-4 pr-4 pl-4 max-w-lg m-2 scrolling-touch overflow-auto origin-bottom;
+  @apply outline-none rounded-t-lg bg-white pt-4 pr-4 pl-4 scrolling-touch overflow-auto origin-bottom w-full;
   max-height: calc(100vh - theme('margin.2') - theme('margin.2'));
   box-shadow: theme('boxShadow.2xl'), theme('boxShadow.xl'),
     theme('boxShadow.xs'), theme('boxShadow.xs');
   will-change: transform;
+  transform: var(--dialog-content-transform);
 }
 
 @supports (padding: max(0px)) {
   [data-reach-dialog-content] {
-    max-height: max(calc(100vh - 200px), 50vh);
+    max-height: max(calc(100vh - 200px), 60vh);
   }
 }
 
@@ -30,8 +31,9 @@
   }
 
   [data-reach-dialog-content] {
-    @apply pt-8 pr-8 pl-8 origin-top;
+    @apply pt-8 pr-8 pl-8 origin-top w-auto max-w-lg m-2 rounded-b-lg;
     max-height: calc(100vh - theme('margin.2') - theme('margin.2'));
+    transform: var(--dialog-content-sm-transform);
   }
 
   @media (hover: none) {
@@ -41,6 +43,7 @@
 
     [data-reach-dialog-content] {
       @apply origin-center;
+      transform: var(--dialog-content-sm-transform);
     }
   }
 }

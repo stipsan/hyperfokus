@@ -70,10 +70,16 @@ button {
   }
 }
 
-@media screen and (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) {
   html,
   body {
     scroll-behavior: smooth;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-snap-type: none;
   }
 }
 

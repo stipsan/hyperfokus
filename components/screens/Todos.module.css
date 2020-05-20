@@ -1,18 +1,5 @@
 .section {
   @apply bg-white;
-  scroll-snap-align: start;
-}
-:global(.is-today).section {
-  min-height: calc(
-    100vh - var(--navbar-height) - 210px - var(--demo-notification)
-  );
-}
-@screen sm {
-  :global(.is-today).section {
-    min-height: calc(
-      100vh - var(--navbar-height) - 120px - var(--demo-notification)
-    );
-  }
 }
 
 .section :focus {
@@ -20,6 +7,7 @@
 }
 
 .description {
+  @apply text-black;
   grid-area: description;
 
   @apply overflow-hidden;
@@ -39,21 +27,22 @@
     -webkit-line-clamp: 3;
   }
 }
+:global(.is-overdue) .description {
+  --text-opacity: 0.66;
+}
 
 .items {
   @apply pb-6;
-}
-:global(.is-today) .items {
-  position: sticky;
-  top: calc(var(--navbar-height) + theme('height.8'));
 }
 
 .todo {
   @apply grid rounded-lg relative w-full pb-1;
   grid-template-columns: min-content 1fr;
   grid-template-areas:
-    '. time'
+    'checkbox time'
     'checkbox description';
+  scroll-snap-align: start;
+  scroll-margin-top: theme('height.8');
 }
 @media (hover: hover) {
   .todo:focus-within,
@@ -68,7 +57,8 @@
   top: var(--navbar-height);
 }
 
-:global(.is-today) .header {
+:global(.is-today) .header,
+:global(.is-current) .time {
   @apply text-blue-500;
 }
 
@@ -83,8 +73,49 @@
 .time:hover {
   @apply cursor-pointer;
 }
+:global(.is-overdue) .time {
+  @apply text-gray-500;
+}
 
 .checkboxLabel {
-  @apply pr-2 flex items-start pt-1;
+  @apply pr-2 pt-6 relative;
   grid-area: checkbox;
+}
+.checkboxLabel input {
+  @apply -mt-1;
+}
+
+:global(.is-overdue) .checkboxLabel input {
+  @apply text-blue-500 text-opacity-50;
+}
+
+:global(.is-current) .checkboxLabel:before {
+  @apply bg-blue-500 mr-2 right-0 top-0 h-2 mt-3 mb-1 absolute rounded-full w-2;
+  content: '';
+  transform: translate(-50%, -33%);
+}
+
+:global(.is-today.is-hyperfocus) .items {
+  position: sticky;
+  top: calc(var(--navbar-height) + theme('height.8'));
+}
+
+:global(.is-today.is-hyperfocus).section {
+  min-height: calc(
+    100vh - var(--navbar-height) - 210px - var(--demo-notification)
+  );
+}
+@screen sm {
+  :global(.is-today.is-hyperfocus).section {
+    min-height: calc(
+      100vh - var(--navbar-height) - 120px - var(--demo-notification)
+    );
+  }
+}
+:global(.is-today.is-hyperfocus) .todo {
+  scroll-snap-align: unset;
+  scroll-margin-top: unset;
+}
+:global(.is-today.is-hyperfocus) .header {
+  scroll-snap-align: start;
 }

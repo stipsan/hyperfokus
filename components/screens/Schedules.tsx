@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useReducer, useState } from 'react'
 import type { Dispatch, FC, SetStateAction } from 'react'
+import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import { getRepeatMessage, sortByHoursMinutesString } from 'utils/time'
 import styles from './Schedules.module.css'
 
@@ -495,18 +496,6 @@ const EditDialog = ({
       />
     </AnimatedDialog>
   )
-}
-
-function replaceItemAtIndex(
-  arr: Schedule[],
-  index: number,
-  newValue: Schedule
-) {
-  return [...arr.slice(0, index), newValue, ...arr.slice(index + 1)]
-}
-
-function removeItemAtIndex(arr: Schedule[], index: number) {
-  return [...arr.slice(0, index), ...arr.slice(index + 1)]
 }
 
 export default () => {

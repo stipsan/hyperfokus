@@ -49,8 +49,10 @@
 .todo:hover {
   @apply bg-gray-100;
 }
+.todo:focus-within {
+  box-shadow: inset theme('boxShadow.outline');
+}
 @media (hover: hover) {
-  .todo:focus-within,
   .todo:active {
     box-shadow: inset theme('boxShadow.outline');
   }

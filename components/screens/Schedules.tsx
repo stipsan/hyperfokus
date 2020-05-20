@@ -435,6 +435,18 @@ const EditDialog = ({
       if (nextInitialState) {
         setInitialState(nextInitialState)
       }
+
+      // Handle focus on blur
+      const scheduleId = router.query.edit
+      return () => {
+        setTimeout(() => {
+          const focusNode = document.querySelector(
+            `a[data-focus="${scheduleId}"]`
+          ) as HTMLElement
+          focusNode?.scrollIntoView({ block: 'center' })
+          focusNode?.focus()
+        }, 300)
+      }
     }
   }, [router.query.edit])
 
@@ -527,6 +539,7 @@ export default () => {
             scroll={false}
           >
             <a
+              data-focus={schedule.id}
               className={cx(
                 styles.schedule,
                 'block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2'

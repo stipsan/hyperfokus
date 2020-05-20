@@ -15,9 +15,17 @@ import {
 import { useDatabase } from 'hooks/database'
 import { useGetSchedules } from 'hooks/schedules'
 import { useGetTodos } from 'hooks/todos'
+import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { forwardRef, useEffect, useReducer, useState } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import type { Dispatch, FC, ReactNode, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import { getForecast } from 'utils/forecast'
@@ -107,7 +115,7 @@ const TodoForm = ({
     duration: 0,
     done: false,
     description: '',
-    order: 0,
+    order: 1,
   },
   onDismiss,
   onSubmit,
@@ -130,54 +138,73 @@ const TodoForm = ({
         onSubmit(state)
       }}
     >
-      <Field className={styles.duration} label="Duration" htmlFor="duration">
+      <Field className="block w-full" label="Description" htmlFor="description">
+        <textarea
+          rows={4}
+          className="form-textarea mt-1 block w-full min-w-full max-w-full sm:w-64"
+          id="description"
+          value={state.description}
+          onChange={(event) =>
+            dispatch({
+              type: 'change',
+              payload: {
+                name: 'description',
+                value: event.target.value,
+              },
+            })
+          }
+        />
+      </Field>
+
+      <Field className="mt-4" label="Duration" htmlFor="duration">
         <Duration dispatch={dispatch} state={state} />
       </Field>
 
-      {editing && (
-        <div className="block mt-4">
-          <span className="block text-gray-700">Enabled</span>
-          <div className="mt-1 inline-grid grid-flow-col gap-4">
-            <label className="inline-grid grid-flow-col gap-2 items-center">
-              <input
-                type="radio"
-                className="form-radio"
-                name="enabled"
-                value="yes"
-                checked={state.done}
-                onChange={(event) =>
-                  dispatch({
-                    type: 'change',
-                    payload: {
-                      name: event.target.name,
-                      value: true,
-                    },
-                  })
-                }
-              />
-              <span>Yes</span>
-            </label>
-            <label className="inline-grid grid-flow-col gap-2 items-center">
-              <input
-                type="radio"
-                className="form-radio"
-                name="enabled"
-                value="no"
-                checked={!state.done}
-                onChange={(event) =>
-                  dispatch({
-                    type: 'change',
-                    payload: {
-                      name: event.target.name,
-                      value: false,
-                    },
-                  })
-                }
-              />
-              No
-            </label>
-          </div>
-        </div>
+      {editing ? (
+        <Field
+          className="mt-4 block"
+          label="Change ordering"
+          htmlFor="ordering"
+        >
+          <select
+            className="form-select block mt-1"
+            id="ordering"
+            value={state.order}
+            onChange={(event) =>
+              dispatch({
+                type: 'change',
+                payload: {
+                  name: 'order',
+                  value: parseInt(event.target.value, 10),
+                },
+              })
+            }
+          >
+            <option value={initialState.order}>Keep current ordering</option>
+            <option value={initialState.order - 1}>Move to the top</option>
+            <option value={initialState.order + 1}>Move to the bottom</option>
+          </select>
+        </Field>
+      ) : (
+        <Field className="mt-4 block" label="Ordering" htmlFor="ordering">
+          <select
+            className="form-select block mt-1"
+            id="ordering"
+            value={state.order}
+            onChange={(event) =>
+              dispatch({
+                type: 'change',
+                payload: {
+                  name: 'order',
+                  value: parseInt(event.target.value, 10),
+                },
+              })
+            }
+          >
+            <option value={-1}>Top</option>
+            <option value={1}>Bottom</option>
+          </select>
+        </Field>
       )}
       <div className="py-4" />
       <DialogToolbar
@@ -278,7 +305,10 @@ const TodoItem: React.FC<{
         </Time>
       </Link>
       <Link key="description" href={`?edit=${todo.id}`} shallow scroll={false}>
-        <a className={cx(styles.description, 'focus:outline-none px-inset-r')}>
+        <a
+          className={cx(styles.description, 'focus:outline-none px-inset-r')}
+          data-focus={todo.id}
+        >
           {todo.description}
         </a>
       </Link>
@@ -311,109 +341,149 @@ const Section: FC<{ className?: string }> = ({ children, className }) => (
   <section className={cx(styles.section, className)}>{children}</section>
 )
 
-const CreateDialog = () => {
-  const router = useRouter()
+const CreateDialog = ({
+  onDismiss,
+  setTodos,
+}: {
+  onDismiss: () => void
+  setTodos: Dispatch<SetStateAction<Todo[]>>
+}) => {
+  const idRef = useRef(null)
 
-  const close = () => {
-    router.push(router.pathname, undefined, { shallow: true, scroll: false })
-  }
+  useEffect(() => {
+    // Handle focus on close
+    return () => {
+      setTimeout(() => {
+        if (!idRef.current) {
+          return
+        }
+        const focusNode = document.querySelector(
+          `a[data-focus="${idRef.current}"]`
+        ) as HTMLElement
+        focusNode?.focus()
+      }, 300)
+    }
+  }, [])
 
   return (
-    <AnimatedDialog
-      isOpen={!!router.query.create}
-      onDismiss={close}
-      aria-label="Create new todo"
-    >
-      <p className="py-16 text-center">
-        The ability to create todos are on its way!
-      </p>
-      <DialogToolbar
-        right={
-          <Button variant="primary" onClick={close}>
-            Okay
-          </Button>
-        }
-      />
-    </AnimatedDialog>
+    <TodoForm
+      onDismiss={onDismiss}
+      onSubmit={(state) => {
+        setTodos((todos) => {
+          const newTodo = { ...state, id: nanoid() }
+          idRef.current = newTodo.id
+          const { top, bottom } = findTopAndBottom(todos)
+
+          return state.order > 0
+            ? [...todos, { ...newTodo, order: bottom }]
+            : [{ ...newTodo, order: top }, ...todos]
+        })
+        onDismiss()
+      }}
+    />
   )
+}
+
+function findTopAndBottom(todos: Todo[]): { top: number; bottom: number } {
+  const mappedOrders = todos.map((todo) => todo.order)
+  const top = mappedOrders.reduce((min, cur) => Math.min(min, cur), Infinity)
+  const bottom = mappedOrders.reduce(
+    (max, cur) => Math.max(max, cur),
+    -Infinity
+  )
+  return { top, bottom }
 }
 
 const EditDialog = ({
   todos,
   setTodos,
+  onDismiss,
+  id,
 }: {
   todos: Todo[]
   setTodos: Dispatch<SetStateAction<Todo[]>>
+  onDismiss: () => void
+  id: string
 }) => {
-  const router = useRouter()
   const [initialState, setInitialState] = useState(() =>
-    todos.find((todo) => todo.id === router.query.edit)
+    todos.find((todo) => todo.id === id)
   )
 
   useEffect(() => {
-    if (router.query.edit) {
-      const nextInitialState = todos.find(
-        (todo) => todo.id === router.query.edit
-      )
-      if (nextInitialState) {
-        setInitialState(nextInitialState)
-      }
+    const nextInitialState = todos.find((todo) => todo.id === id)
+    if (nextInitialState) {
+      setInitialState(nextInitialState)
     }
-  }, [router.query.edit])
 
-  const close = () => {
-    router.push(router.pathname, undefined, { shallow: true, scroll: false })
-  }
+    // Handle focus on close
+    return () => {
+      setTimeout(() => {
+        const focusNode = document.querySelector(
+          `a[data-focus="${id}"]`
+        ) as HTMLElement
+        focusNode?.focus()
+      }, 300)
+    }
+  }, [id])
 
   return (
-    <AnimatedDialog
-      isOpen={
-        !!router.query.edit &&
-        !!initialState &&
-        router.query.edit === initialState.id
-      }
-      onDismiss={close}
-      aria-label="Edit todo"
-    >
-      <TodoForm
-        editing
-        initialState={initialState}
-        onDismiss={close}
-        onSubmit={(state) => {
-          setTodos((todos) => {
-            const index = todos.findIndex(
-              (schedule) => schedule.id === initialState.id
-            )
+    <TodoForm
+      editing
+      initialState={initialState}
+      onDismiss={onDismiss}
+      onSubmit={(state) => {
+        setTodos((todos) => {
+          const index = todos.findIndex(
+            (schedule) => schedule.id === initialState.id
+          )
+          let { order } = todos[index]
+          let changedOrder = false
 
-            const newTodos = replaceItemAtIndex(todos, index, {
-              ...todos[index],
-              description: state.description,
-              duration: state.duration,
-              order: state.order,
+          if (order !== state.order) {
+            const { top, bottom } = findTopAndBottom(todos)
+            order = state.order > order ? bottom + 1 : top - 1
+            changedOrder = true
+          }
+
+          const newTodos = replaceItemAtIndex(todos, index, {
+            ...todos[index],
+            description: state.description,
+            duration: state.duration,
+            order,
+          })
+
+          if (changedOrder) {
+            newTodos.sort((a, b) => {
+              if (a.order < b.order) {
+                return -1
+              }
+              if (a.order > b.order) {
+                return 1
+              }
+              return 0
             })
+          }
+
+          return newTodos
+        })
+        setInitialState(state)
+        onDismiss()
+      }}
+      onDelete={() => {
+        if (
+          confirm(
+            `Are you sure you want to delete "${initialState.description}"?`
+          )
+        ) {
+          setTodos((todos) => {
+            const index = todos.findIndex((todo) => todo.id === initialState.id)
+            const newTodos = removeItemAtIndex(todos, index)
             return newTodos
           })
-          setInitialState(state)
-          close()
-        }}
-        onDelete={() => {
-          if (
-            confirm(
-              `Are you sure you want to delete "${initialState.description}"?`
-            )
-          ) {
-            setTodos((todos) => {
-              const index = todos.findIndex(
-                (todo) => todo.id === initialState.id
-              )
-              const newTodos = removeItemAtIndex(todos, index)
-              return newTodos
-            })
-            close()
-          }
-        }}
-      />
-    </AnimatedDialog>
+          onDismiss()
+        }
+      }}
+    />
   )
 }
 
@@ -423,6 +493,7 @@ const lastReset = undefined /*new Date(
 )*/
 
 export default () => {
+  const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
   const database = useDatabase()
   const schedules = useGetSchedules()
@@ -432,6 +503,11 @@ export default () => {
     maxTaskDuration: 0,
   })
   const [now, setNow] = useState(new Date())
+
+  const todoIds = useMemo(
+    () => todos.reduce((ids, todo) => ids.add(todo.id), new Set()),
+    [todos]
+  )
 
   // Update the now value every minute in case it changes the schedule
   useInterval(() => {
@@ -460,6 +536,18 @@ export default () => {
       })
     }
   }, [schedules, todos, lastReset])
+
+  /*
+  const uniqueIds = useMemo(() => {
+    const ids = todos.reduce((ids, todo) => ids.add(todo.id), new Set())
+    return ids.size
+  }, [todos])
+
+  console.log(uniqueIds, todos.length)
+// */
+  const onDismiss = () => {
+    router.push(router.pathname, undefined, { shallow: true, scroll: false })
+  }
 
   return (
     <>
@@ -512,8 +600,25 @@ export default () => {
           {hyperfocusing ? 'Disable Hyperfocusing' : 'Enable Hyperfocusing'}
         </Button>
       )}
-      <CreateDialog />
-      <EditDialog setTodos={setTodos} todos={todos} />
+      <AnimatedDialog
+        isOpen={!!router.query.create}
+        onDismiss={onDismiss}
+        aria-label="Create new todo"
+      >
+        <CreateDialog setTodos={setTodos} onDismiss={onDismiss} />
+      </AnimatedDialog>
+      <AnimatedDialog
+        isOpen={!router.query.create && todoIds.has(router.query.edit)}
+        onDismiss={onDismiss}
+        aria-label="Edit todo"
+      >
+        <EditDialog
+          onDismiss={onDismiss}
+          setTodos={setTodos}
+          todos={todos}
+          id={router.query.edit as string}
+        />
+      </AnimatedDialog>
     </>
   )
 }

@@ -405,7 +405,7 @@ const ScheduleForm = ({
             <Button variant="default" onClick={onDismiss}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={onDismiss} type="submit">
+            <Button variant="primary" type="submit">
               Save
             </Button>
           </>

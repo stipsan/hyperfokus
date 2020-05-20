@@ -399,9 +399,21 @@ const initialState: {
     ...schedule,
   })),
   activities: [
-    { description: 'Ability to create todos.', duration: 30 },
-    { description: 'Ability to edit todos.', duration: 30 },
-    { description: 'Ability to delete todos.', duration: 30 },
+    {
+      description: 'Ability to create todos.',
+      duration: 30,
+      completed: new Date(),
+    },
+    {
+      description: 'Ability to edit todos.',
+      duration: 30,
+      completed: new Date(),
+    },
+    {
+      description: 'Ability to delete todos.',
+      duration: 30,
+      completed: new Date(),
+    },
     { description: 'Settings screen.', duration: 60 },
     {
       description: 'Notify the user of todos that lack duration.',

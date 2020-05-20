@@ -141,6 +141,7 @@ const TodoForm = ({
       <Field className="block w-full" label="Description" htmlFor="description">
         <textarea
           rows={4}
+          required
           className="form-textarea mt-1 block w-full min-w-full max-w-full sm:w-64"
           id="description"
           value={state.description}
@@ -220,7 +221,7 @@ const TodoForm = ({
             <Button variant="default" onClick={onDismiss}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={onDismiss} type="submit">
+            <Button variant="primary" type="submit">
               Save
             </Button>
           </>
@@ -284,12 +285,7 @@ const TodoItem: React.FC<{
     )
 
     isOverdue = isBefore(endTime, now)
-
-    //console.log('isToday', { todo, now, startTime, endTime })
     isCurrent = isBefore(startTime, now) && isAfter(endTime, now)
-    if (isCurrent) {
-      console.warn('is current', { todo, startTime, endTime, now })
-    }
   }
 
   return (
@@ -300,7 +296,7 @@ const TodoItem: React.FC<{
       })}
     >
       <Link key="time" href={`?edit=${todo.id}`} shallow scroll={false}>
-        <Time title={`Duration: ${todo.duration}m`}>
+        <Time title={`Duration: ${todo.duration} minutes`}>
           {todo.start} – {todo.end}
         </Time>
       </Link>
@@ -309,7 +305,7 @@ const TodoItem: React.FC<{
           className={cx(styles.description, 'focus:outline-none px-inset-r')}
           data-focus={todo.id}
         >
-          {todo.description}
+          {todo.description.trim() ? todo.description : 'Untitled'}
         </a>
       </Link>
       <StyledCheckbox
@@ -333,8 +329,8 @@ const TodoItem: React.FC<{
 
 const Items: FC = ({ children }) => <ul className={styles.items}>{children}</ul>
 
-const Header: FC = ({ children }) => (
-  <h3 className={cx('px-inset', styles.header)}>{children}</h3>
+const Header: FC<{ className?: string }> = ({ className, children }) => (
+  <h3 className={cx('px-inset', styles.header, className)}>{children}</h3>
 )
 
 const Section: FC<{ className?: string }> = ({ children, className }) => (
@@ -498,10 +494,13 @@ export default () => {
   const database = useDatabase()
   const schedules = useGetSchedules()
   const [todos, setTodos] = useState(useGetTodos())
-  const [forecast, setForecast] = useState<Forecast>({
-    days: [],
-    maxTaskDuration: 0,
-  })
+  const [forecast, setForecast] = useState<Forecast>(() =>
+    getForecast(
+      schedules.filter((opportunity) => opportunity.enabled),
+      todos,
+      lastReset
+    )
+  )
   const [now, setNow] = useState(new Date())
 
   const todoIds = useMemo(
@@ -549,8 +548,71 @@ export default () => {
     router.push(router.pathname, undefined, { shallow: true, scroll: false })
   }
 
+  const somethingRecentlyCompleted = todos.some(
+    (todo) => !todo.done && !!todo.completed
+  )
+  const withoutDuration = todos.filter((task) => task.duration < 1)
+  const withoutSchedule = todos.filter(
+    (todo) => todo.duration > forecast.maxTaskDuration
+  )
+  /*
+  console.log({
+    somethingRecentlyCompleted,
+    withoutDuration,
+    withoutSchedule,
+    maxTaskDuration: forecast.maxTaskDuration,
+  })
+  // */
+
   return (
     <>
+      {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
+        <Section key="review fuckup">
+          <Header className="text-red-500 font-bold">Please review</Header>
+          {withoutSchedule.length > 0 && (
+            <div className={cx(styles.warning, 'px-inset')}>
+              Your current settings allow a max duration of{' '}
+              <strong>
+                {forecast.maxTaskDuration}{' '}
+                {forecast.maxTaskDuration === 1 ? 'minute' : 'minutes'}
+              </strong>
+              . The todos below have longer durations, either shorten them or
+              update your{' '}
+              <Link href="/schedules">
+                <a className="hover:text-red-900 underline">Schedules</a>
+              </Link>{' '}
+              to allow more time.
+            </div>
+          )}
+
+          <Items>
+            {withoutSchedule.map((activity) => (
+              <TodoItem
+                key={activity.id}
+                todo={{ ...activity, start: 'N/A', end: 'N/A' }}
+                now={now}
+                setTodos={setTodos}
+                isToday={false}
+              />
+            ))}
+          </Items>
+          {withoutDuration.length > 0 && (
+            <div className={cx(styles.warning, 'px-inset')}>
+              The following todos couldn't be scheduled because their{' '}
+              <strong>duration</strong> isn't specified.
+            </div>
+          )}
+          {withoutDuration.map((activity) => (
+            <TodoItem
+              key={activity.id}
+              todo={{ ...activity, start: 'N/A', end: 'N/A' }}
+              now={now}
+              setTodos={setTodos}
+              isToday={false}
+            />
+          ))}
+        </Section>
+      )}
       {forecast.days?.map((day) => {
         if (!day.schedule?.some((pocket) => !!pocket.todos?.length)) {
           return null
@@ -592,14 +654,30 @@ export default () => {
           </Section>
         )
       })}
-      {process.env.NODE_ENV === 'development' && (
+      {somethingRecentlyCompleted && (
+        <Button
+          variant="primary"
+          className="block mx-auto my-4"
+          onClick={() =>
+            setTodos((todos) =>
+              todos.map((todo) => ({
+                ...todo,
+                done: todo.done || !!todo.completed,
+              }))
+            )
+          }
+        >
+          Archive Completed Todos
+        </Button>
+      )}
+      {
         <Button
           className="block mx-auto my-4"
           onClick={() => setHyperfocus(!hyperfocusing)}
         >
           {hyperfocusing ? 'Disable Hyperfocusing' : 'Enable Hyperfocusing'}
         </Button>
-      )}
+      }
       <AnimatedDialog
         isOpen={!!router.query.create}
         onDismiss={onDismiss}

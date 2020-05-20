@@ -34,12 +34,19 @@ export const useSessionValue = () => {
 }
 
 export const useSessionSetState = () => {
+  const prevState = useRecoilValue(sessionProviderState)
   const setState = useSetRecoilState(sessionProviderState)
 
   return (unsafeSession: SessionState) => {
     const session = sanitize(unsafeSession)
 
-    setState(session)
     localStorage.setItem('hyperfokus.storage', session)
+    if (prevState !== '') {
+      // Page reload is necessary as there can be many unclean states in side effects that could accidentally write to
+      // the wrong database
+      window.location.reload()
+    } else {
+      setState(session)
+    }
   }
 }

@@ -333,9 +333,14 @@ const Header: FC<{ className?: string }> = ({ className, children }) => (
   <h3 className={cx('px-inset', styles.header, className)}>{children}</h3>
 )
 
-const Section: FC<{ className?: string }> = ({ children, className }) => (
-  <section className={cx(styles.section, className)}>{children}</section>
-)
+const Section = forwardRef<
+  HTMLElement,
+  { className?: string; children: ReactNode }
+>(({ children, className }, forwardedRef) => (
+  <section ref={forwardedRef} className={cx(styles.section, className)}>
+    {children}
+  </section>
+))
 
 const CreateDialog = ({
   onDismiss,
@@ -500,6 +505,7 @@ export default () => {
     )
   )
   const [now, setNow] = useState(new Date())
+  const todayRef = useRef<HTMLElement>(null)
 
   const todoIds = useMemo(
     () => todos.reduce((ids, todo) => ids.add(todo.id), new Set()),
@@ -562,6 +568,8 @@ export default () => {
   })
   // */
 
+  let isThereToday = false
+
   return (
     <>
       {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
@@ -618,6 +626,10 @@ export default () => {
 
         const isToday = isSameDay(day.date, now)
 
+        if (!isThereToday && isToday) {
+          isThereToday = true
+        }
+
         const dayText = isToday ? 'Today' : day.day
         const dateText = new Intl.DateTimeFormat(undefined, {
           year: '2-digit',
@@ -628,6 +640,7 @@ export default () => {
         return (
           <Section
             key={day.date.toString()}
+            ref={isToday ? todayRef : undefined}
             className={cx({
               'is-today': isToday,
               'is-hyperfocus': hyperfocusing,
@@ -669,14 +682,20 @@ export default () => {
           Archive Completed Todos
         </Button>
       )}
-      {
+      {isThereToday && (
         <Button
           className="block mx-auto my-4"
-          onClick={() => setHyperfocus(!hyperfocusing)}
+          onClick={() => {
+            setHyperfocus(!hyperfocusing)
+            requestAnimationFrame(() => {
+              ;(document.activeElement as HTMLElement)?.blur()
+              todayRef.current?.scrollIntoView({ block: 'start' })
+            })
+          }}
         >
           {hyperfocusing ? 'Disable Hyperfocusing' : 'Enable Hyperfocusing'}
         </Button>
-      }
+      )}
       <AnimatedDialog
         isOpen={!!router.query.create}
         onDismiss={onDismiss}

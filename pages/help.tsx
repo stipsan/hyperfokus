@@ -14,7 +14,7 @@ export default () => {
               className="rounded-lg px-4 md:px-5 xl:px-4 py-3 md:py-4 xl:py-3 bg-gray-500 hover:bg-gray-600 md:text-lg xl:text-base text-white font-semibold leading-tight shadow-md focus:shadow-outline"
               href="mailto:stipsan@gmail.com"
             >
-              Get help
+              Contact
             </a>
           </div>
         </MoreContainer>

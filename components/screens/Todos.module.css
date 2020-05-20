@@ -128,6 +128,12 @@
 :global(.is-today.is-hyperfocus) .header {
   scroll-snap-align: start;
 }
+:global(.is-today.is-hyperfocus) .todo:global(.is-overdue) {
+  opacity: 0.5;
+}
+:global(.is-today.is-hyperfocus) ~ .section {
+  opacity: 0.75;
+}
 
 .warning {
   @apply ml-6 bg-red-200 rounded-l py-1 mb-1;

@@ -1,5 +1,4 @@
 import Button from 'components/Button'
-import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
@@ -80,7 +79,6 @@ export default () => {
     <>
       <HeadTitle>{title}</HeadTitle>
       <AppLayout title={title}>
-        <GetStartedBroadcast />
         <MoreContainer>
           <div className="px-inset">
             <ResetButton />

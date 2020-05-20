@@ -1,4 +1,3 @@
-import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
 import UnderConstruction from 'components/UnderConstruction'
@@ -9,7 +8,6 @@ export default () => (
   <>
     <HeadTitle>{title}</HeadTitle>
     <AppLayout title={title}>
-      <GetStartedBroadcast />
       <MoreContainer>
         <UnderConstruction />
       </MoreContainer>

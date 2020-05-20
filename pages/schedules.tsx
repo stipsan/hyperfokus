@@ -20,7 +20,7 @@ export default () => {
       <AppLayout title={title} createLink="New schedule">
         <GetStartedBroadcast />
         <MainContainer>
-          <Schedules />
+          <Schedules key={session} />
         </MainContainer>
       </AppLayout>
     </>

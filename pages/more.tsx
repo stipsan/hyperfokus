@@ -1,4 +1,3 @@
-import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import { moreLinks } from 'components/Header'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
@@ -10,7 +9,6 @@ export default () => (
   <>
     <HeadTitle>{title}</HeadTitle>
     <AppLayout title={title}>
-      <GetStartedBroadcast />
       <MoreContainer>
         <nav className="flex flex-wrap lg:w-4/5 sm:mx-auto sm:mb-2 my-16">
           {moreLinks.map(([text, href]) => (

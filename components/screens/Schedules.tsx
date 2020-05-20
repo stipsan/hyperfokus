@@ -325,16 +325,16 @@ const ScheduleForm = ({
         onSubmit(state)
       }}
     >
-      <div className="grid sm:grid-flow-col grid-flow-row col-gap-2 row-gap-4">
-        <Field label="Start" htmlFor="start">
+      <div className={styles.topGrid}>
+        <Field className={styles.start} label="Start" htmlFor="start">
           <StartTime dispatch={dispatch} state={state} />
         </Field>
 
-        <Field label="Duration" htmlFor="duration">
+        <Field className={styles.duration} label="Duration" htmlFor="duration">
           <Duration dispatch={dispatch} state={state} />
         </Field>
 
-        <Field label="End" htmlFor="end">
+        <Field className={styles.end} label="End" htmlFor="end">
           <EndTime dispatch={dispatch} state={state} />
         </Field>
       </div>

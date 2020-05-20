@@ -5,7 +5,6 @@
 [data-reach-dialog-overlay] {
   @apply fixed inset-0 flex items-end justify-center z-50 bg-black flex-wrap;
   --bg-opacity: 0.33;
-  padding-bottom: env(safe-area-inset-bottom);
   will-change: opacity;
 }
 

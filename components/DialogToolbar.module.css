@@ -8,3 +8,6 @@
   box-shadow: theme('backgroundColor.white') theme('padding.2') 0 0,
     theme('backgroundColor.white') calc(theme('padding.2') * -1) 0 0;
 }
+.stickyshadowfix > * {
+  margin-bottom: env(safe-area-inset-bottom);
+}

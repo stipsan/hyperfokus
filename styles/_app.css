@@ -12,7 +12,7 @@ body {
   scroll-padding-top: var(--navbar-height);
   scroll-padding-bottom: 60px;
 }
-@supports (scroll-behavior: smooth) {
+@supports (scroll-behavior: smooth) and (scroll-margin-top: 4rem) {
   html,
   body {
     scroll-snap-type: y proximity;

@@ -2,6 +2,32 @@
   scroll-snap-align: start;
 }
 
+.topGrid {
+  @apply grid col-gap-2 row-gap-4;
+  grid-template-columns: max-content;
+  grid-template-areas:
+    'start end'
+    'duration duration';
+}
+@screen sm {
+  .topGrid {
+    grid-template-columns: min-content;
+    grid-template-areas: 'start duration end';
+  }
+}
+
+.start {
+  grid-area: start;
+}
+
+.duration {
+  grid-area: duration;
+}
+
+.end {
+  grid-area: end;
+}
+
 .repeatGrid {
   @apply grid-flow-col inline-grid row-gap-2 col-gap-4;
   grid-template-columns: min-content;

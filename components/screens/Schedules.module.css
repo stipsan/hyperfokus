@@ -3,7 +3,7 @@
 }
 
 .topGrid {
-  @apply grid col-gap-2 row-gap-4;
+  @apply grid gap-2;
   grid-template-columns: max-content;
   grid-template-areas:
     'start end'

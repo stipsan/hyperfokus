@@ -9,6 +9,7 @@
 .description {
   @apply text-black;
   grid-area: description;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
   @apply overflow-hidden;
   white-space: nowrap;
@@ -43,6 +44,10 @@
     'checkbox description';
   scroll-snap-align: start;
   scroll-margin-top: theme('height.8');
+  transition: background-color 100ms ease-out;
+}
+.todo:hover {
+  @apply bg-gray-100;
 }
 @media (hover: hover) {
   .todo:focus-within,
@@ -80,6 +85,8 @@
 .checkboxLabel {
   @apply pr-2 pt-6 relative;
   grid-area: checkbox;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 .checkboxLabel input {
   @apply -mt-1;

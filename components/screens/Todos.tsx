@@ -1,3 +1,4 @@
+import useInterval from '@use-it/interval'
 import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
@@ -198,6 +199,12 @@ export default () => {
     days: [],
     maxTaskDuration: 0,
   })
+  const [now, setNow] = useState(new Date())
+
+  // Update the now value every minute in case it changes the schedule
+  useInterval(() => {
+    setNow(new Date())
+  }, 1000 * 60)
 
   // Sync with db
   useEffect(() => {
@@ -221,8 +228,6 @@ export default () => {
       })
     }
   }, [schedules, todos, lastReset])
-
-  const now = new Date()
 
   return (
     <>

@@ -55,9 +55,11 @@
     '. time'
     'checkbox description';
 }
-.todo:focus-within,
-.todo:active {
-  box-shadow: inset theme('boxShadow.outline');
+@media (hover: hover) {
+  .todo:focus-within,
+  .todo:active {
+    box-shadow: inset theme('boxShadow.outline');
+  }
 }
 
 .header {

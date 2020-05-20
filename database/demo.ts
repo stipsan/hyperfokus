@@ -408,7 +408,7 @@ const initialState: {
       duration: 60,
     },
     {
-      description: 'Notify of todos that is missing from the forecast.',
+      description: 'Notify of todos that are missing from the forecast.',
       duration: 60,
     },
 

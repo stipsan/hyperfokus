@@ -20,20 +20,44 @@
 }
 
 .description {
+  grid-area: description;
+
   @apply overflow-hidden;
-  padding: 6px 0;
-  flex: 1;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+@supports (-webkit-line-clamp: 3) {
+  .description {
+    white-space: normal;
+    hyphens: auto;
+    word-wrap: break-word;
+    /* autoprefixer: ignore next */
+    display: -webkit-box;
+    /* autoprefixer: ignore next */
+    -webkit-box-orient: vertical;
+    /* autoprefixer: ignore next */
+    -webkit-line-clamp: 3;
+  }
 }
 
 .items {
   @apply pb-6;
 }
-
 :global(.is-today) .items {
   position: sticky;
   top: calc(var(--navbar-height) + theme('height.8'));
+}
+
+.todo {
+  @apply grid rounded-lg relative w-full pb-1;
+  grid-template-columns: min-content 1fr;
+  grid-template-areas:
+    '. time'
+    'checkbox description';
+}
+.todo:focus-within,
+.todo:active {
+  box-shadow: inset theme('boxShadow.outline');
 }
 
 .header {
@@ -47,14 +71,18 @@
 }
 
 .time {
-  @apply py-1 pl-2;
+  @apply pt-1 text-gray-600;
+  grid-area: time;
   float: right;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   font-size: 0.8em;
 }
+.time:hover {
+  @apply cursor-pointer;
+}
 
 .checkboxLabel {
-  @apply py-1 pr-2;
-  align-self: stretch;
+  @apply pr-2 flex items-start pt-1;
+  grid-area: checkbox;
 }

@@ -20,7 +20,7 @@ const CreateDialog = ({
 }) => {
   const router = useRouter()
   const close = () => {
-    router.push(router.pathname)
+    router.push(router.pathname, undefined, { shallow: true, scroll: false })
   }
 
   return (
@@ -438,7 +438,7 @@ const EditDialog = ({
   }, [router.query.edit])
 
   const close = () => {
-    router.push(router.pathname)
+    router.push(router.pathname, undefined, { shallow: true, scroll: false })
   }
 
   return (

@@ -8,8 +8,8 @@ import { useGetSchedules } from 'hooks/schedules'
 import { useGetTodos } from 'hooks/todos'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import type { FC } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
+import type { FC, ReactNode } from 'react'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './Todos.module.css'
@@ -18,19 +18,19 @@ const CheckboxLabel: FC<{ onClick: (event: any) => void }> = ({
   children,
   onClick,
 }) => (
-  <label
-    className={cx(styles.checkboxLabel, 'flex items-center px-inset-l')}
-    onClick={onClick}
-  >
+  <label className={cx(styles.checkboxLabel, 'px-inset-l')} onClick={onClick}>
     {children}
   </label>
 )
 
-const Time: FC<{ title?: string }> = ({ children, title }) => (
-  <span className={cx(styles.time, 'px-inset-r')} title={title}>
+const Time = forwardRef<
+  HTMLSpanElement,
+  { children: ReactNode; title?: string }
+>(({ children, title, ...props }, forwardedRef) => (
+  <span {...props} ref={forwardedRef} className={cx(styles.time)} title={title}>
     {children}
   </span>
-)
+))
 
 const StyledCheckbox: React.FC<{
   onChange: (event: any) => void
@@ -43,14 +43,9 @@ const StyledCheckbox: React.FC<{
     </CheckboxLabel>
   )
 }
-// */
-
-const Description: FC = ({ children }) => (
-  <div className={cx(styles.description, 'overflow-hidden')}>{children}</div>
-)
 
 const Item: FC<{ onClick: () => void }> = ({ children, onClick }) => (
-  <li className={cx('flex items-center relative w-full')} onClick={onClick}>
+  <li className={styles.todo} onClick={onClick}>
     {children}
   </li>
 )
@@ -62,11 +57,21 @@ const TodoItem: React.FC<{
 
   return (
     <Item onClick={() => setOpen(true)}>
+      <Link key="time" href={`?edit=${todo.id}`} shallow scroll={false}>
+        <Time title={`Duration: ${todo.duration}m`}>
+          {todo.start} – {todo.end}
+        </Time>
+      </Link>
+      <Link key="description" href={`?edit=${todo.id}`} shallow scroll={false}>
+        <a className={cx(styles.description, 'focus:outline-none px-inset-r')}>
+          {todo.description}
+        </a>
+      </Link>
       <StyledCheckbox
         //checked={!!todo.completed}
         onClick={(event) => event.stopPropagation()}
         onChange={(event) => {
-          alert('Not implemented!')
+          console.log('Not implemented!')
           /*
             event.target.checked
               ? database.completeTodo(todo.id)
@@ -74,19 +79,6 @@ const TodoItem: React.FC<{
               // */
         }}
       />
-      <Link href={`?edit=${todo.id}`} shallow scroll={false}>
-        <a
-          className={cx(
-            styles.description,
-            'focus:outline-none focus:shadow-outline rounded'
-          )}
-        >
-          {todo.description}
-        </a>
-      </Link>
-      <Time title={`Duration: ${todo.duration}m`}>
-        {todo.start} – {todo.end}
-      </Time>
     </Item>
   )
 }
@@ -106,7 +98,7 @@ const CreateDialog = () => {
   const router = useRouter()
 
   const close = () => {
-    router.push(router.pathname)
+    router.push(router.pathname, undefined, { shallow: true, scroll: false })
   }
 
   return (
@@ -132,7 +124,7 @@ const EditDialog = () => {
   const router = useRouter()
 
   const close = () => {
-    router.push(router.pathname)
+    router.push(router.pathname, undefined, { shallow: true, scroll: false })
   }
 
   return (

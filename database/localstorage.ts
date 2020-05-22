@@ -13,6 +13,8 @@ localforage.config({
   storeName: 'localstorage',
 })
 
+const schedulesKey = 'hyperfokus.schedules.modified'
+
 const database: DatabaseType = {
   async getSchedules() {
     const schedules = (await localforage.getItem('schedules')) as Schedule[]
@@ -20,9 +22,24 @@ const database: DatabaseType = {
   },
   async setSchedules(nextSchedules) {
     await localforage.setItem('schedules', nextSchedules)
+    // Always write to the modified timestamp in case another tab is listening to changes
+    localStorage.setItem(schedulesKey, JSON.stringify(new Date()))
   },
-  observeSchedules() {
-    throw new TypeError('Not implemented!')
+  observeSchedules(success, failure) {
+    // Fire an success event right away
+    this.getSchedules().then(success, failure)
+
+    // Cross-tab events
+    const handler = (event: StorageEvent) => {
+      if (event.key !== schedulesKey) {
+        return
+      }
+      this.getSchedules().then(success, failure)
+    }
+    window.addEventListener('storage', handler)
+    return () => {
+      window.removeEventListener('storage', handler)
+    }
   },
   observeTodos() {
     throw new TypeError('Not implemented!')

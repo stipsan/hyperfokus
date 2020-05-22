@@ -22,7 +22,7 @@ export default () => {
       <AppLayout createLink="New todo">
         <GetStartedBroadcast />
         <MainContainer>
-          <Todos key={session} />
+          <Todos />
         </MainContainer>
       </AppLayout>
     </>

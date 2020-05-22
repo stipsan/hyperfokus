@@ -13,7 +13,7 @@ import {
   setSeconds,
 } from 'date-fns'
 import { useDatabase } from 'hooks/database'
-import { useSchedules } from 'hooks/schedules'
+import { useSchedules, useSchedulesObserver } from 'hooks/schedules'
 import { useGetTodos } from 'hooks/todos'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
@@ -65,7 +65,6 @@ const Duration = ({
       step="1"
       inputMode="numeric"
       pattern="[0-9]*"
-      placeholder="60"
       id="duration"
       name="duration"
       // @TODO spread out value, onChange and the other events instead of needing to know about dispatch and state
@@ -489,6 +488,7 @@ const EditDialog = ({
 }
 
 export default () => {
+  useSchedulesObserver()
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
   const database = useDatabase()

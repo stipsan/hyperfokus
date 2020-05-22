@@ -1,12 +1,19 @@
 import { useReduceMotion } from 'hooks/motion'
+import { useObserveSession } from 'hooks/session'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-import { Suspense, useEffect } from 'react'
+import { memo, Suspense, useEffect } from 'react'
 import { Globals } from 'react-spring'
 import { RecoilRoot } from 'recoil'
 import 'styles/_app.css'
 
 // @TODO install @types/recoil when available
+
+const ObserveSession = memo(() => {
+  useObserveSession()
+
+  return null
+})
 
 export default ({ Component, pageProps }: AppProps) => {
   // Suspense fallbacks are invisible for a set delay to avoid spinner flash on first load
@@ -36,6 +43,7 @@ export default ({ Component, pageProps }: AppProps) => {
             </div>
           }
         >
+          <ObserveSession />
           <Component {...pageProps} />
         </Suspense>
       </RecoilRoot>

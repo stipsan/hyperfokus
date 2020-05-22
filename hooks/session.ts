@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   atom,
   useRecoilValue,
@@ -7,6 +8,7 @@ import {
 import { schedulesState } from './schedules'
 import { todosState } from './todos'
 
+const sessionKey = 'hyperfokus.storage'
 export type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
 
 const sanitize = (unsafeState: SessionState): SessionState => {
@@ -25,7 +27,7 @@ export const sessionProviderState = atom({
   default:
     typeof window === 'undefined'
       ? ('' as SessionState)
-      : sanitize(localStorage.getItem('hyperfokus.storage') as SessionState),
+      : sanitize(localStorage.getItem(sessionKey) as SessionState),
 })
 
 export const useSessionValue = () => {
@@ -40,12 +42,22 @@ export const useSessionValue = () => {
   return session as SessionState
 }
 
-export const useSessionSetState = () => {
-  const prevState = useRecoilValue(sessionProviderState)
+const useSetSession = () => {
   const setState = useSetRecoilState(sessionProviderState)
   // States that need to be reset when changing session
   const resetSchedules = useResetRecoilState(schedulesState)
   const resetTodos = useResetRecoilState(todosState)
+
+  return (session: SessionState) => {
+    setState(session)
+    resetSchedules()
+    resetTodos()
+  }
+}
+
+export const useSessionSetState = () => {
+  const prevState = useRecoilValue(sessionProviderState)
+  const setSession = useSetSession()
 
   return (unsafeSession: SessionState) => {
     const session = sanitize(unsafeSession)
@@ -59,9 +71,31 @@ export const useSessionSetState = () => {
       return
     }
 
-    setState(session)
-    resetSchedules()
-    resetTodos()
-    localStorage.setItem('hyperfokus.storage', session)
+    setSession(session)
+    localStorage.setItem(sessionKey, session)
   }
+}
+
+export const useObserveSession = () => {
+  const prevState = useRecoilValue(sessionProviderState)
+  const setSession = useSetSession()
+
+  useEffect(() => {
+    // Cross-tab events
+    const handler = (event: StorageEvent) => {
+      if (event.key !== sessionKey) {
+        return
+      }
+      const newValue = sanitize(event.newValue as SessionState)
+      if (newValue === prevState) {
+        return
+      }
+
+      setSession(newValue)
+    }
+    window.addEventListener('storage', handler)
+    return () => {
+      window.removeEventListener('storage', handler)
+    }
+  }, [prevState])
 }

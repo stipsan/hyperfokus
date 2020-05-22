@@ -3,7 +3,7 @@ import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import type { Schedule } from 'database/types'
-import { useSchedules } from 'hooks/schedules'
+import { useSchedules, useSchedulesObserver } from 'hooks/schedules'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -182,7 +182,6 @@ const Duration = ({
       step="1"
       inputMode="numeric"
       pattern="[0-9]*"
-      placeholder="60"
       id="duration"
       name="duration"
       // @TODO spread out value, onChange and the other events instead of needing to know about dispatch and state
@@ -510,6 +509,7 @@ const EditDialog = ({
 }
 
 export default () => {
+  useSchedulesObserver()
   const [schedules, setSchedules] = useSchedules()
 
   return (

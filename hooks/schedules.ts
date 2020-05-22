@@ -2,7 +2,13 @@ import type { Schedule } from 'database/types'
 import { getDatabase, useDatabase } from 'hooks/database'
 import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { atom, selector, useRecoilState, useSetRecoilState } from 'recoil'
+import {
+  atom,
+  selector,
+  useRecoilState,
+  useRecoilValue,
+  useSetRecoilState,
+} from 'recoil'
 import { sortByHoursMinutesString } from 'utils/time'
 
 export const schedulesState = atom({
@@ -14,17 +20,10 @@ const asyncSchedulesState = selector({
   get: async ({ get }) => {
     try {
       const cache = get(schedulesState)
-      console.log('const cache = get(schedulesState)', {
-        cache,
-        get,
-        schedulesState,
-      })
       const database = await getDatabase({ get })
       // It's only null when it should be fetched
       if (cache === null) {
-        console.log('before timeout')
-        await new Promise((resolve) => setTimeout(() => resolve(), 3000))
-        console.log('after timeout', await database.getSchedules())
+        //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
         return database.getSchedules()
       }
 
@@ -33,10 +32,7 @@ const asyncSchedulesState = selector({
       console.error('oh no wtf!', err)
     }
   },
-  set: ({ set }, newValue) => {
-    console.warn('calling set!!!', newValue)
-    set(schedulesState, newValue)
-  },
+  set: ({ set }, newValue) => set(schedulesState, newValue),
 })
 
 // State setter and getter, useful when managing the schedules
@@ -63,11 +59,10 @@ export const useSchedules = (): [
 // This hook ensures changes to the state after initial fetch is in sync
 export const useSchedulesObserver = () => {
   const database = useDatabase()
-  const setSchedules = useSetRecoilState()
+  const setSchedules = useSetRecoilState(schedulesState)
 
   // Sync the state in case it's been updated
   useEffect(() => {
-    console.log('Sync the state with observers and stuff', database)
     const unsubscribe = database.observeSchedules(
       (schedules) => setSchedules(schedules),
       (err) => console.error(err)
@@ -75,6 +70,18 @@ export const useSchedulesObserver = () => {
 
     return () => unsubscribe()
   }, [database])
+}
+
+const activeSchedules = selector({
+  key: 'activeSchedules',
+  get: ({ get }) =>
+    get(asyncSchedulesState).filter((schedule) => schedule.enabled),
+})
+
+export const useActiveSchedules = (): Schedule[] => {
+  const schedules = useRecoilValue(activeSchedules)
+
+  return schedules
 }
 
 const initialSchedulesState = selector({

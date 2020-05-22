@@ -65,9 +65,8 @@ const Memory = (initialState: {
 
       return Promise.resolve()
     },
-    observeSchedules(success) {
-      success(schedulesMap || [])
-      return schedulesUpdated.subscribe((schedules) => success(schedules))
+    observeSchedules() {
+      return () => {}
     },
     observeTodos(success) {
       const filterActivities = (activity: Todo) => !activity.done
@@ -335,13 +334,13 @@ const initialState: {
   schedules: [
     { start: '07:20', duration: 60, end: '08:20', repeat: repeatWeekdays },
     { start: '11:00', duration: 120, end: '13:00', repeat: repeatWeekends },
-    { start: '18:00', duration: 60, end: '19:00', repeat: repeatAll },
     {
       start: '16:00',
       duration: 150,
       end: '18:30',
       repeat: { ...repeatNone, monday: true },
     },
+    { start: '18:00', duration: 60, end: '19:00', repeat: repeatAll },
     /*
     {
       start: '18:00',

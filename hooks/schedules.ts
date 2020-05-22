@@ -46,7 +46,10 @@ export const useSchedules = (): [
     setSchedulesState((state) => {
       const schedules = typeof value === 'function' ? value(state) : value
       // Do the sorting on write instead of on read
-      schedules.sort((a, b) => sortByHoursMinutesString(a.start, b.start))
+      schedules.sort((a, b) => {
+        let result = sortByHoursMinutesString(a.start, b.start)
+        return result !== 0 ? result : sortByHoursMinutesString(a.end, b.end)
+      })
       // Sync the new schedules with the db
       database.setSchedules(schedules)
       return schedules

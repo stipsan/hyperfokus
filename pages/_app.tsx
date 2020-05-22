@@ -23,20 +23,22 @@ export default ({ Component, pageProps }: AppProps) => {
   }, [prefersReducedMotion])
 
   return (
-    <Suspense
-      fallback={
-        <div className="my-40 text-xl text-blue-900 text-center loading">
-          Loading...
-        </div>
-      }
-    >
+    <>
       <Head>
         <title>HyperFokus</title>
         <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
       </Head>
       <RecoilRoot>
-        <Component {...pageProps} />
+        <Suspense
+          fallback={
+            <div className="my-40 text-xl text-blue-900 text-center loading">
+              Loading...
+            </div>
+          }
+        >
+          <Component {...pageProps} />
+        </Suspense>
       </RecoilRoot>
-    </Suspense>
+    </>
   )
 }

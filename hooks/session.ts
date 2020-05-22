@@ -1,4 +1,11 @@
-import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
+import {
+  atom,
+  useRecoilValue,
+  useResetRecoilState,
+  useSetRecoilState,
+} from 'recoil'
+import { schedulesState } from './schedules'
+import { todosState } from './todos'
 
 export type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
 
@@ -36,17 +43,25 @@ export const useSessionValue = () => {
 export const useSessionSetState = () => {
   const prevState = useRecoilValue(sessionProviderState)
   const setState = useSetRecoilState(sessionProviderState)
+  // States that need to be reset when changing session
+  const resetSchedules = useResetRecoilState(schedulesState)
+  const resetTodos = useResetRecoilState(todosState)
 
   return (unsafeSession: SessionState) => {
     const session = sanitize(unsafeSession)
 
-    localStorage.setItem('hyperfokus.storage', session)
-    if (prevState !== '') {
-      // Page reload is necessary as there can be many unclean states in side effects that could accidentally write to
-      // the wrong database
-      window.location.reload()
-    } else {
-      setState(session)
+    if (prevState === session) {
+      console.warn('No-op for setSession:', {
+        unsafeSession,
+        session,
+        prevState,
+      })
+      return
     }
+
+    setState(session)
+    resetSchedules()
+    resetTodos()
+    localStorage.setItem('hyperfokus.storage', session)
   }
 }

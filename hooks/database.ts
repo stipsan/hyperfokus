@@ -1,5 +1,5 @@
 import type { DatabaseType } from 'database/types'
-import { useSessionValue } from 'hooks/session'
+import { sessionProviderState, useSessionValue } from 'hooks/session'
 import type { SessionState } from 'hooks/session'
 
 const loading = new Map()
@@ -16,9 +16,16 @@ const loadDatabase = async (provider) => {
   }
 }
 
+// For usage in selectors
+export const getDatabase = async ({ get }) => {
+  const { default: db } = await loadDatabase(get(sessionProviderState))
+  return db
+}
+
 export const useDatabase = () => {
   const session = useSessionValue()
 
+  // @TODO move to the selector
   // Ensure this hook is never called without a valid provider
   if (session !== 'localstorage' && session !== 'demo') {
     throw new TypeError(

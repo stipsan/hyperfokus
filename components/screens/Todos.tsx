@@ -13,7 +13,7 @@ import {
   setSeconds,
 } from 'date-fns'
 import { useDatabase } from 'hooks/database'
-import { useGetSchedules } from 'hooks/schedules'
+import { useSchedules } from 'hooks/schedules'
 import { useGetTodos } from 'hooks/todos'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
@@ -492,11 +492,19 @@ export default () => {
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
   const database = useDatabase()
-  const schedules = useGetSchedules()
-  const [todos, setTodos] = useState(useGetTodos())
+  const [schedules] = useSchedules()
+  const [todos, setTodosState] = useState(useGetTodos())
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
   )
+  const setTodos: Dispatch<SetStateAction<Todo[]>> = (value) => {
+    setTodosState((state) => {
+      const todos = typeof value === 'function' ? value(state) : value
+      // Sync the new todos with the db
+      database.setTodos(todos)
+      return todos
+    })
+  }
   const [forecast, setForecast] = useState<Forecast>(() =>
     getForecast(
       schedules.filter((opportunity) => opportunity.enabled),
@@ -516,11 +524,6 @@ export default () => {
   useInterval(() => {
     setNow(new Date())
   }, 1000 * 60)
-
-  // Sync with db
-  useEffect(() => {
-    database.setTodos(todos)
-  }, [todos, database])
 
   // Regen forecast when necessary
   useEffect(() => {

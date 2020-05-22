@@ -1,6 +1,12 @@
 import type { Todo } from 'database/types'
 import { useDatabase } from 'hooks/database'
 import { useEffect } from 'react'
+import { atom } from 'recoil'
+
+export const todosState = atom({
+  key: 'todos',
+  default: null,
+})
 
 // Get a todos list using suspense, useful to put in useState or similar
 let promise = null

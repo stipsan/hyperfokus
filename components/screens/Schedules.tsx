@@ -3,15 +3,14 @@ import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import type { Schedule } from 'database/types'
-import { useDatabase } from 'hooks/database'
-import { useGetSchedules } from 'hooks/schedules'
+import { useSchedules } from 'hooks/schedules'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import type { Dispatch, FC, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
-import { getRepeatMessage, sortByHoursMinutesString } from 'utils/time'
+import { getRepeatMessage } from 'utils/time'
 import styles from './Schedules.module.css'
 
 const CreateDialog = ({
@@ -511,22 +510,11 @@ const EditDialog = ({
 }
 
 export default () => {
-  const database = useDatabase()
-  const [schedules, setSchedules] = useState(useGetSchedules())
-  const sortedSchedules = useMemo(() => {
-    return [...schedules].sort((a, b) =>
-      sortByHoursMinutesString(a.start, b.start)
-    )
-  }, [schedules])
-
-  // Sync with db
-  useEffect(() => {
-    database.setSchedules(schedules)
-  }, [schedules, database])
+  const [schedules, setSchedules] = useSchedules()
 
   return (
-    <div className="border-b-2">
-      {sortedSchedules.map((schedule) => {
+    <div className={cx({ 'border-b-2': schedules.length > 0 })}>
+      {schedules.map((schedule) => {
         const metaInformation = [`${schedule.duration} minutes`]
         const repeatMessage = getRepeatMessage(schedule.repeat)
         if (repeatMessage) metaInformation.push(repeatMessage)

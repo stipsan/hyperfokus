@@ -63,6 +63,9 @@
   --bg-opacity: 0.95;
   top: var(--navbar-height);
 }
+:global(.is-warning) .header {
+  @apply text-red-500 font-bold;
+}
 
 :global(.is-today) .header,
 :global(.is-current) .time {

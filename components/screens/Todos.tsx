@@ -576,8 +576,8 @@ export default () => {
   return (
     <>
       {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
-        <Section key="review fuckup">
-          <Header className="text-red-500 font-bold">Please review</Header>
+        <Section key="review fuckup" className="is-warning">
+          <Header>Please review</Header>
           {withoutSchedule.length > 0 && (
             <div className={cx(styles.warning, 'px-inset')}>
               Your current settings allow a max duration of{' '}

@@ -524,14 +524,14 @@ const NoSchedulesPlaceholder = () => {
           )}
         >
           New schedule
-          <div
-            className={cx(
-              styles.noscheduleslinkBackdrop,
-              'fixed left-0 top-0 right-0 bottom-0 z-40 pointer-events-none'
-            )}
-          />
         </a>
       </Link>
+      <div
+        className={cx(
+          styles.noscheduleslinkBackdrop,
+          'fixed left-0 top-0 right-0 bottom-0 z-30 pointer-events-none'
+        )}
+      />
     </div>
   )
 }

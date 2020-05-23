@@ -48,6 +48,9 @@
     hsl(202deg 40% 96%) 170px
   );
 }
-.noscheduleslink:hover .noscheduleslinkBackdrop {
+.noscheduleslink {
+  @apply relative z-40;
+}
+.noscheduleslink:hover + .noscheduleslinkBackdrop {
   opacity: 1;
 }

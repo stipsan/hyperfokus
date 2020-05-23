@@ -108,12 +108,13 @@ function reducer(state: Todo, action: FormActions) {
 const TodoForm = ({
   initialState = {
     created: new Date(),
-    modified: undefined,
-    id: '',
-    duration: 0,
-    done: false,
     description: '',
-    order: 1,
+    done: false,
+    duration:
+      parseInt(localStorage.getItem('hyperfokus.new-todo.duration'), 10) || 0,
+    id: '',
+    modified: undefined,
+    order: parseInt(localStorage.getItem('hyperfokus.new-todo.order'), 10) || 1,
   },
   onDismiss,
   onSubmit,
@@ -132,6 +133,18 @@ const TodoForm = ({
     <form
       onSubmit={(event) => {
         event.preventDefault()
+
+        // Persist a few default values
+        if (!editing) {
+          localStorage.setItem(
+            'hyperfokus.new-todo.duration',
+            JSON.stringify(state.duration)
+          )
+          localStorage.setItem(
+            'hyperfokus.new-todo.order',
+            JSON.stringify(state.order)
+          )
+        }
 
         onSubmit(state)
       }}

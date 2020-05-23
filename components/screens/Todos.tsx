@@ -141,6 +141,7 @@ const TodoForm = ({
         <textarea
           rows={4}
           required
+          maxLength={2048}
           className="form-textarea mt-1 block w-full min-w-full max-w-full sm:w-64"
           id="description"
           value={state.description}
@@ -304,7 +305,9 @@ const TodoItem: React.FC<{
           className={cx(styles.description, 'focus:outline-none px-inset-r')}
           data-focus={todo.id}
         >
-          {todo.description.trim() ? todo.description : 'Untitled'}
+          {todo.description.trim()
+            ? todo.description.replace(/^\n|\n$/g, '')
+            : 'Untitled'}
         </a>
       </Link>
       <StyledCheckbox
@@ -370,7 +373,11 @@ const CreateDialog = ({
       onDismiss={onDismiss}
       onSubmit={(state) => {
         setTodos((todos) => {
-          const newTodo = { ...state, id: nanoid() }
+          const newTodo = {
+            ...state,
+            id: nanoid(),
+            description: state.description.substring(0, 2048),
+          }
           idRef.current = newTodo.id
           const { top, bottom } = findTopAndBottom(todos)
 
@@ -447,7 +454,7 @@ const EditDialog = ({
 
           const newTodos = replaceItemAtIndex(todos, index, {
             ...todos[index],
-            description: state.description,
+            description: state.description.substring(0, 2048),
             duration: state.duration,
             order,
           })

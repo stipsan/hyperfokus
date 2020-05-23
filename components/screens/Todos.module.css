@@ -17,7 +17,7 @@
 }
 @supports (-webkit-line-clamp: 3) {
   .description {
-    white-space: normal;
+    white-space: pre;
     hyphens: auto;
     word-wrap: break-word;
     /* autoprefixer: ignore next */

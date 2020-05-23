@@ -38,10 +38,12 @@ const TopLink: React.FC<{
   className?: string
   href: string
   active: boolean
-}> = ({ active, href, children, className }) => {
+  tabIndex?: number
+}> = ({ active, href, children, className, tabIndex }) => {
   return (
     <Link href={href}>
       <a
+        tabIndex={tabIndex}
         className={cx(
           'py-1 px-4 focus:outline-none focus:shadow-outline',
           {
@@ -86,9 +88,16 @@ const TabLink: React.FC<{
   )
 }
 
-const CreateLink = ({ label }: { label: string }) => (
+const CreateLink = ({
+  label,
+  tabIndex,
+}: {
+  label: string
+  tabIndex?: number
+}) => (
   <Link href="?create=true" shallow scroll={false}>
     <a
+      tabIndex={tabIndex}
       className="py-2 px-3 focus:outline-none focus:shadow-outline bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900 rounded"
       aria-label={label}
     >
@@ -192,6 +201,7 @@ export default ({ createLink, title }: Props) => {
             <nav className="col-gap-px grid grid-flow-col text-xs">
               {topLinks.map(([text, href], key) => (
                 <TopLink
+                  tabIndex={1}
                   active={isActive({ href, pathname: router.pathname })}
                   className={cx({
                     'rounded-l-lg': key === 0,
@@ -206,7 +216,7 @@ export default ({ createLink, title }: Props) => {
             </nav>
           </div>
           <div className={cx(navSideClassNames, 'justify-end')}>
-            {createLink && <CreateLink label={createLink} />}
+            {createLink && <CreateLink tabIndex={1} label={createLink} />}
           </div>
         </header>
       )}

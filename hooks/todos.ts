@@ -1,49 +1,62 @@
 import type { Todo } from 'database/types'
-import { useDatabase } from 'hooks/database'
+import { getDatabase, useDatabase } from 'hooks/database'
 import { useEffect } from 'react'
-import { atom } from 'recoil'
+import type { Dispatch, SetStateAction } from 'react'
+import { atom, selector, useRecoilState, useSetRecoilState } from 'recoil'
 
 export const todosState = atom({
   key: 'todos',
   default: null,
 })
+const asyncTodosState = selector({
+  key: 'asyncTodosState',
+  get: async ({ get }) => {
+    try {
+      const cache = get(todosState)
+      const database = await getDatabase({ get })
+      // It's only null when it should be fetched
+      if (cache === null) {
+        //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
+        return database.getTodos()
+      }
 
-// Get a todos list using suspense, useful to put in useState or similar
-let promise = null
-let todos: false | Todo[] = false
-export const useGetTodos = () => {
-  const database = useDatabase()
-
-  useEffect(
-    () => () => {
-      // Reset cache on unmount
-      promise = null
-      todos = false
-    },
-    []
-  )
-
-  if (todos === false) {
-    if (promise === null) {
-      promise = database
-        .getTodos()
-        /*
-        .then(
-          (result) =>
-            new Promise<typeof result>((resolve) =>
-              setTimeout(() => resolve(result), 3000)
-            )
-        )
-        // */
-        .then(
-          (result) => {
-            todos = result
-          },
-          (err) => console.error(err)
-        )
+      return cache
+    } catch (err) {
+      console.error('oh no wtf!', err)
     }
-    throw promise
+  },
+  set: ({ set }, newValue) => set(todosState, newValue),
+})
+
+// State setter and getter, useful when managing the todos
+export const useTodos = (): [Todo[], Dispatch<SetStateAction<Todo[]>>] => {
+  const database = useDatabase()
+  const [todos, setTodosState] = useRecoilState(asyncTodosState)
+  const setTodos: Dispatch<SetStateAction<Todo[]>> = (value) => {
+    setTodosState((state) => {
+      const todos = typeof value === 'function' ? value(state) : value
+
+      // Sync the new todos with the db
+      database.setTodos(todos)
+      return todos
+    })
   }
 
-  return todos
+  return [todos, setTodos]
+}
+
+// This hook ensures changes to the state after initial fetch is in sync
+export const useTodosObserver = () => {
+  const database = useDatabase()
+  const setTodos = useSetRecoilState(todosState)
+
+  // Sync the state in case it's been updated
+  useEffect(() => {
+    const unsubscribe = database.observeTodos(
+      (todos) => setTodos(todos),
+      (err) => console.error(err)
+    )
+
+    return () => unsubscribe()
+  }, [database])
 }

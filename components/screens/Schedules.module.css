@@ -38,3 +38,16 @@
     'weekday .'
     'weekday .';
 }
+
+.noscheduleslinkBackdrop {
+  transition: opacity 0.3s ease-out;
+  opacity: 0;
+  background-image: radial-gradient(
+    circle at calc(100% - 30px) calc(0% + 30px),
+    transparent 60px,
+    hsl(202deg 40% 96%) 170px
+  );
+}
+.noscheduleslink:hover .noscheduleslinkBackdrop {
+  opacity: 1;
+}

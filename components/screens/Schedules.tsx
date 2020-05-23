@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
-import Button from 'components/Button'
+import Button, { className } from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import type { Schedule } from 'database/types'
 import { useSchedules, useSchedulesObserver } from 'hooks/schedules'
@@ -508,12 +508,41 @@ const EditDialog = ({
   )
 }
 
+const NoSchedulesPlaceholder = () => {
+  return (
+    <div className="px-5 py-24 mx-auto flex flex-col items-center justify-center">
+      <h1 className="text-2xl font-medium title-font text-gray-900">
+        No schedules
+      </h1>
+
+      <Link href="?create=true" shallow scroll={false}>
+        <a
+          className={cx(
+            className({ variant: 'primary' }),
+            'mt-10',
+            styles.noscheduleslink
+          )}
+        >
+          New schedule
+          <div
+            className={cx(
+              styles.noscheduleslinkBackdrop,
+              'fixed left-0 top-0 right-0 bottom-0 z-40 pointer-events-none'
+            )}
+          />
+        </a>
+      </Link>
+    </div>
+  )
+}
+
 export default () => {
   useSchedulesObserver()
   const [schedules, setSchedules] = useSchedules()
 
   return (
     <div className={cx({ 'border-b-2': schedules.length > 0 })}>
+      {schedules.length < 1 && <NoSchedulesPlaceholder />}
       {schedules.map((schedule) => {
         const metaInformation = [`${schedule.duration} minutes`]
         const repeatMessage = getRepeatMessage(schedule.repeat)

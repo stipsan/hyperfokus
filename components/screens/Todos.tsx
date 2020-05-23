@@ -12,9 +12,8 @@ import {
   setMinutes,
   setSeconds,
 } from 'date-fns'
-import { useDatabase } from 'hooks/database'
-import { useSchedules, useSchedulesObserver } from 'hooks/schedules'
-import { useGetTodos } from 'hooks/todos'
+import { useActiveSchedules, useSchedulesObserver } from 'hooks/schedules'
+import { useTodos, useTodosObserver } from 'hooks/todos'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -496,28 +495,17 @@ const EditDialog = ({
 
 export default () => {
   useSchedulesObserver()
+  useTodosObserver()
+
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
-  const database = useDatabase()
-  const [schedules] = useSchedules()
-  const [todos, setTodosState] = useState(useGetTodos())
+  const schedules = useActiveSchedules()
+  const [todos, setTodos] = useTodos()
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
   )
-  const setTodos: Dispatch<SetStateAction<Todo[]>> = (value) => {
-    setTodosState((state) => {
-      const todos = typeof value === 'function' ? value(state) : value
-      // Sync the new todos with the db
-      database.setTodos(todos)
-      return todos
-    })
-  }
   const [forecast, setForecast] = useState<Forecast>(() =>
-    getForecast(
-      schedules.filter((opportunity) => opportunity.enabled),
-      todos,
-      lastReset
-    )
+    getForecast(schedules, todos, lastReset)
   )
   const [now, setNow] = useState(new Date())
   const todayRef = useRef<HTMLElement>(null)
@@ -535,13 +523,7 @@ export default () => {
   // Regen forecast when necessary
   useEffect(() => {
     if (schedules.length > 0 && todos.length > 0) {
-      setForecast(
-        getForecast(
-          schedules.filter((opportunity) => opportunity.enabled),
-          todos,
-          lastReset
-        )
-      )
+      setForecast(getForecast(schedules, todos, lastReset))
     } else {
       setForecast({
         days: [],

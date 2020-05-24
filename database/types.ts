@@ -63,7 +63,7 @@ export interface Todo {
 }
 
 export interface DatabaseType {
-  setSchedules(schedules: Schedule[]): Promise<void>
+  setSchedules(schedules: Schedule[]): Promise<unknown>
   getSchedules(): Promise<Schedule[]>
   observeSchedules(
     success: (schedules: Schedule[]) => void,
@@ -76,15 +76,15 @@ export interface DatabaseType {
   setTodos(todos: Todo[]): Promise<void>
   getTodos(): Promise<Todo[]>
   addTodo(todo: TodoDelta): Promise<Todo>
-  editTodo(todoId: string, todo: TodoDelta): Promise<void>
+  editTodo(todoId: string, todo: TodoDelta): Promise<unknown>
   /** toggle an todo as completed */
-  completeTodo(todoId: string): Promise<void>
+  completeTodo(todoId: string): Promise<unknown>
   /** untoggle an todo as completed, puts it back on the board */
-  incompleteTodo(todoId: string): Promise<void>
+  incompleteTodo(todoId: string): Promise<unknown>
   /** Fetches truly finished todos */
   getCompletedTodos(): Promise<Todo[]>
   /** Fetches all todos that are completed and archives them so the schedule can be recreated */
-  archiveCompletedTodos(): Promise<void>
+  archiveCompletedTodos(): Promise<unknown>
   /** Reorder all todos, and make the selected todo either top 1 or bottom -1 */
-  reorderTodos(todoId: string, ordering: number): Promise<void>
+  reorderTodos(todoId: string, ordering: number): Promise<unknown>
 }

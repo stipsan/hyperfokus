@@ -11,8 +11,7 @@
 [data-reach-dialog-content] {
   @apply outline-none rounded-t-lg bg-white pt-4 pr-4 pl-4 scrolling-touch overflow-auto origin-bottom w-full;
   max-height: calc(100vh - theme('margin.2') - theme('margin.2'));
-  box-shadow: theme('boxShadow.2xl'), theme('boxShadow.xl'),
-    theme('boxShadow.xs'), theme('boxShadow.xs');
+  box-shadow: theme('boxShadow.2xl'), theme('boxShadow.xs');
   will-change: transform;
   transform: var(--dialog-content-transform);
 }

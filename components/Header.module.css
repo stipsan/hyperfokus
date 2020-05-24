@@ -11,9 +11,8 @@
 }
 
 .tabbar {
-  @apply fixed left-0 right-0 bottom-0 bg-white grid grid-flow-col z-40;
+  @apply fixed left-0 right-0 bottom-0 bg-white grid grid-flow-col z-40 shadow-xs;
   grid-auto-columns: 1fr;
-  box-shadow: theme('boxShadow.2xl'), theme('boxShadow.xs');
 }
 @screen sm {
   .tabbar:global(.sm\:hidden) {

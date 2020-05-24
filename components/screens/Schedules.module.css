@@ -51,6 +51,8 @@
 .noscheduleslink {
   @apply relative z-40;
 }
-.noscheduleslink:hover + .noscheduleslinkBackdrop {
-  opacity: 1;
+@media (hover: hover) {
+  .noscheduleslink:hover + .noscheduleslinkBackdrop {
+    opacity: 1;
+  }
 }

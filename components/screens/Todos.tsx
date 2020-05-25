@@ -652,7 +652,7 @@ export default () => {
             })}
           >
             <Header>
-              <span className="font-bold mr-1">{dayText}</span> {dateText}
+              <span className="font-bold block mr-1">{dayText}</span> {dateText}
             </Header>
             <Items>
               {day.schedule.map((pocket) =>

@@ -11,7 +11,7 @@
     "classnames": "^2.2.6",
     "localforage": "^1.7.3",
     "nanoid": "^3.1.9",
-    "next": "^9.4.3",
+    "next": "^9.4.4",
     "react": "0.0.0-experimental-33c3af284",
     "react-dom": "0.0.0-experimental-33c3af284",
     "react-spring": "^9.0.0-rc.3",

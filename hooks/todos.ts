@@ -4,11 +4,11 @@ import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { atom, selector, useRecoilState, useSetRecoilState } from 'recoil'
 
-export const todosState = atom({
+export const todosState = atom<Todo[]>({
   key: 'todos',
   default: null,
 })
-const asyncTodosState = selector({
+const asyncTodosState = selector<Todo[]>({
   key: 'asyncTodosState',
   get: async ({ get }) => {
     try {

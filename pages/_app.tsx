@@ -5,9 +5,12 @@ import Head from 'next/head'
 import { memo, Suspense, useEffect } from 'react'
 import { Globals } from 'react-spring'
 import { RecoilRoot } from 'recoil'
+// global css, exempt from CSS module restrictions
 import 'styles/_app.css'
+// Loaded to initiate automatic analytics and performance metrics
+import 'utils/firebase'
 
-// @TODO install @types/recoil when available
+// @TODO extract more into dynamically imported components to see if it can improve First Load JS stats
 
 const ObserveSession = memo(() => {
   useObserveSession()

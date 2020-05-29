@@ -5,9 +5,10 @@ import Head from 'next/head'
 import { memo, Suspense, useEffect } from 'react'
 import { Globals } from 'react-spring'
 import { RecoilRoot } from 'recoil'
+// global css, exempt from CSS module restrictions
 import 'styles/_app.css'
-
-// @TODO install @types/recoil when available
+// Loaded to initiate automatic analytics and performance metrics
+import 'utils/firebase'
 
 const ObserveSession = memo(() => {
   useObserveSession()

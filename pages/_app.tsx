@@ -10,6 +10,8 @@ import 'styles/_app.css'
 // Loaded to initiate automatic analytics and performance metrics
 import 'utils/firebase'
 
+// @TODO extract more into dynamically imported components to see if it can improve First Load JS stats
+
 const ObserveSession = memo(() => {
   useObserveSession()
 

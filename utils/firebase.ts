@@ -1,6 +1,5 @@
-// @TODO investigate if there's gains from importing these in the utils that use them
 import firebase from 'firebase/app'
-
+// @TODO investigate if there's gains from importing these in the utils that use them
 import 'firebase/analytics'
 import 'firebase/auth'
 import 'firebase/firestore'

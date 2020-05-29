@@ -11,11 +11,11 @@ import {
 } from 'recoil'
 import { sortByHoursMinutesString } from 'utils/time'
 
-export const schedulesState = atom({
+export const schedulesState = atom<Schedule[]>({
   key: 'schedules',
   default: null,
 })
-const asyncSchedulesState = selector({
+const asyncSchedulesState = selector<Schedule[]>({
   key: 'asyncSchedulesState',
   get: async ({ get }) => {
     try {

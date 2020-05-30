@@ -1,4 +1,5 @@
 import firebase from 'firebase/app'
+
 import 'firebase/analytics'
 import 'firebase/performance'
 
@@ -11,12 +12,6 @@ const config = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-}
-
-if (typeof window !== 'undefined') {
-  console.log('firebase', config)
-  // @ts-expect-error
-  window.test = firebase
 }
 
 // Check that `window` is in scope for the analytics module!

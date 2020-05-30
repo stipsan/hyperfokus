@@ -6,6 +6,8 @@ type Props = {
 
 export default ({ children }: Props) => (
   <Head>
-    <title>{children} | HyperFokus</title>
+    <title>
+      {children} | {process.env.NEXT_PUBLIC_APP_NAME}
+    </title>
   </Head>
 )

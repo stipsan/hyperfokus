@@ -10,14 +10,33 @@ import { useRouter } from 'next/router'
 import { useEffect, useReducer, useState } from 'react'
 import type { Dispatch, FC, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
+import firebase from 'utils/firebase'
 import { getRepeatMessage } from 'utils/time'
 import styles from './Schedules.module.css'
+
+const TrackCreateDialog = () => {
+  useEffect(() => {
+    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+      app_name: process.env.NEXT_PUBLIC_APP_NAME,
+      screen_name: 'New Schedule',
+    })
+  }, [])
+
+  return null
+}
 
 const CreateDialog = ({
   setSchedules,
 }: {
   setSchedules: Dispatch<SetStateAction<Schedule[]>>
 }) => {
+  useEffect(() => {
+    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+      app_name: process.env.NEXT_PUBLIC_APP_NAME,
+      screen_name: 'New Schedule',
+    })
+  }, [])
+
   const router = useRouter()
   const close = () => {
     router.push(router.pathname, undefined, { shallow: true, scroll: false })
@@ -38,6 +57,7 @@ const CreateDialog = ({
           close()
         }}
       />
+      <TrackCreateDialog />
     </AnimatedDialog>
   )
 }
@@ -413,6 +433,16 @@ const ScheduleForm = ({
   )
 }
 
+const TrackEditDialog = () => {
+  useEffect(() => {
+    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+      app_name: process.env.NEXT_PUBLIC_APP_NAME,
+      screen_name: 'Edit Schedule',
+    })
+  }, [])
+
+  return null
+}
 const EditDialog = ({
   schedules,
   setSchedules,
@@ -504,6 +534,7 @@ const EditDialog = ({
           }
         }}
       />
+      <TrackEditDialog />
     </AnimatedDialog>
   )
 }
@@ -537,6 +568,13 @@ const NoSchedulesPlaceholder = () => {
 }
 
 export default () => {
+  useEffect(() => {
+    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+      app_name: process.env.NEXT_PUBLIC_APP_NAME,
+      screen_name: 'Schedules',
+    })
+  }, [])
+
   useSchedulesObserver()
   const [schedules, setSchedules] = useSchedules()
 

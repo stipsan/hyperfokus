@@ -5,13 +5,14 @@ import {
   useResetRecoilState,
   useSetRecoilState,
 } from 'recoil'
+import firebase from 'utils/firebase'
 import { schedulesState } from './schedules'
 import { todosState } from './todos'
 
-const sessionKey = 'hyperfokus.storage'
+export const sessionKey = 'hyperfokus.storage'
 export type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
 
-const sanitize = (unsafeState: SessionState): SessionState => {
+export const sanitize = (unsafeState: SessionState): SessionState => {
   switch (unsafeState) {
     case 'demo':
     case 'firebase':
@@ -24,10 +25,7 @@ const sanitize = (unsafeState: SessionState): SessionState => {
 
 export const sessionProviderState = atom({
   key: 'SessionProvider',
-  default:
-    typeof window === 'undefined'
-      ? ('' as SessionState)
-      : sanitize(localStorage.getItem(sessionKey) as SessionState),
+  default: '',
 })
 
 export const useSessionValue = () => {
@@ -52,6 +50,7 @@ const useSetSession = () => {
     setState(session)
     resetSchedules()
     resetTodos()
+    firebase.analytics().setUserProperties({ session })
   }
 }
 

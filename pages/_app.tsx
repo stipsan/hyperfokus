@@ -27,6 +27,10 @@ const ObserveSession = memo(() => {
   return null
 })
 
+// @TODO temp workaround to initializeState firing multiple times.
+// I thought it would only fire once?
+let session: SessionState
+
 export default ({ Component, pageProps }: AppProps) => {
   // Suspense fallbacks are invisible for a set delay to avoid spinner flash on first load
   // and adding this class ensures it's turned off in case something else is suspended after
@@ -62,11 +66,8 @@ export default ({ Component, pageProps }: AppProps) => {
       </Head>
       <RecoilRoot
         initializeState={({ set }) => {
-          if (typeof window !== 'undefined') {
-            console.count('initializeState')
-            const session = sanitize(
-              localStorage.getItem(sessionKey) as SessionState
-            )
+          if (typeof window !== 'undefined' && !session) {
+            session = sanitize(localStorage.getItem(sessionKey) as SessionState)
             set(sessionProviderState, session)
             firebase.analytics().setUserProperties({ session })
           }

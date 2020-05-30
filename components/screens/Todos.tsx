@@ -27,6 +27,7 @@ import {
 } from 'react'
 import type { Dispatch, FC, ReactNode, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
+import firebase from 'utils/firebase'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './Todos.module.css'
@@ -363,6 +364,13 @@ const CreateDialog = ({
   onDismiss: () => void
   setTodos: Dispatch<SetStateAction<Todo[]>>
 }) => {
+  useEffect(() => {
+    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+      app_name: process.env.NEXT_PUBLIC_APP_NAME,
+      screen_name: 'New Todo',
+    })
+  }, [])
+
   const idRef = useRef(null)
 
   useEffect(() => {
@@ -424,6 +432,13 @@ const EditDialog = ({
   onDismiss: () => void
   id: string
 }) => {
+  useEffect(() => {
+    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+      app_name: process.env.NEXT_PUBLIC_APP_NAME,
+      screen_name: 'Edit Todo',
+    })
+  }, [])
+
   const [initialState, setInitialState] = useState(() =>
     todos.find((todo) => todo.id === id)
   )
@@ -507,6 +522,13 @@ const EditDialog = ({
 }
 
 export default () => {
+  useEffect(() => {
+    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+      app_name: process.env.NEXT_PUBLIC_APP_NAME,
+      screen_name: 'Todos',
+    })
+  }, [])
+
   useSchedulesObserver()
   useTodosObserver()
 

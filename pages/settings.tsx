@@ -5,6 +5,7 @@ import { useSessionSetState, useSessionValue } from 'hooks/session'
 import dynamic from 'next/dynamic'
 import Router from 'next/router'
 import type { FC } from 'react'
+import firebase from 'utils/firebase'
 
 const CloudSyncSettings = dynamic(
   () => import('components/CloudSyncSettings'),
@@ -80,6 +81,7 @@ const ResetButton = () => {
       variant="danger"
       onClick={() => {
         Router.push('/')
+        firebase.analytics().logEvent('reset')
         setSession('')
       }}
     >

@@ -1,5 +1,11 @@
 import { useReduceMotion } from 'hooks/motion'
-import { useObserveSession } from 'hooks/session'
+import {
+  sanitize,
+  sessionKey,
+  sessionProviderState,
+  useObserveSession,
+} from 'hooks/session'
+import type { SessionState } from 'hooks/session'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 //import { analytics } from 'firebase'
@@ -54,7 +60,18 @@ export default ({ Component, pageProps }: AppProps) => {
         <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
       </Head>
-      <RecoilRoot>
+      <RecoilRoot
+        initializeState={({ set }) => {
+          if (typeof window !== 'undefined') {
+            console.count('initializeState')
+            const session = sanitize(
+              localStorage.getItem(sessionKey) as SessionState
+            )
+            set(sessionProviderState, session)
+            firebase.analytics().setUserProperties({ session })
+          }
+        }}
+      >
         <Suspense
           fallback={
             <div className="my-40 text-xl text-blue-900 text-center loading">

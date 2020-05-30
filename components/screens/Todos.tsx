@@ -336,6 +336,9 @@ const TodoItem: React.FC<{
             })
             return newTodos
           })
+          firebase.analytics().logEvent('todo_toggle', {
+            completed: event.target.checked,
+          })
         }}
       />
     </li>
@@ -406,6 +409,10 @@ const CreateDialog = ({
             : [{ ...newTodo, order: top }, ...todos]
         })
         onDismiss()
+        firebase.analytics().logEvent('todo_create', {
+          duration: state.duration,
+          order: state.order,
+        })
       }}
     />
   )
@@ -502,6 +509,10 @@ const EditDialog = ({
         })
         setInitialState(state)
         onDismiss()
+        firebase.analytics().logEvent('todo_edit', {
+          duration: state.duration,
+          order: state.order,
+        })
       }}
       onDelete={() => {
         if (
@@ -515,6 +526,10 @@ const EditDialog = ({
             return newTodos
           })
           onDismiss()
+          firebase.analytics().logEvent('todo_delete', {
+            duration: initialState.duration,
+            order: initialState.order,
+          })
         }
       }}
     />
@@ -704,6 +719,7 @@ export default () => {
                 done: todo.done || !!todo.completed,
               }))
             )
+            firebase.analytics().logEvent('todo_archive')
           }}
         >
           Archive Completed Todos
@@ -718,6 +734,11 @@ export default () => {
               ;(document.activeElement as HTMLElement)?.blur()
               todayRef.current?.scrollIntoView({ block: 'start' })
             })
+            firebase
+              .analytics()
+              .logEvent(
+                hyperfocusing ? 'hyperfocusing_stop' : 'hyperfocusing_start'
+              )
           }}
         >
           {hyperfocusing ? 'Disable Hyperfocusing' : 'Enable Hyperfocusing'}

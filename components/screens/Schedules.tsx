@@ -55,6 +55,12 @@ const CreateDialog = ({
             return [...schedules, { ...state, id: nanoid() }]
           })
           close()
+          firebase.analytics().logEvent('schedule_create', {
+            start: state.start,
+            end: state.end,
+            duration: state.duration,
+            repeat: state.repeat,
+          })
         }}
       />
       <TrackCreateDialog />
@@ -514,6 +520,13 @@ const EditDialog = ({
           })
           setInitialState(state)
           close()
+          firebase.analytics().logEvent('schedule_edit', {
+            start: state.start,
+            end: state.end,
+            duration: state.duration,
+            repeat: state.repeat,
+            enabled: state.enabled,
+          })
         }}
         onDelete={() => {
           if (
@@ -531,6 +544,13 @@ const EditDialog = ({
               return newSchedules
             })
             close()
+            firebase.analytics().logEvent('schedule_delete', {
+              start: initialState.start,
+              end: initialState.end,
+              duration: initialState.duration,
+              repeat: initialState.repeat,
+              enabled: initialState.enabled,
+            })
           }
         }}
       />

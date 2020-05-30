@@ -50,7 +50,7 @@ export default ({ Component, pageProps }: AppProps) => {
   return (
     <>
       <Head>
-        <title>HyperFokus</title>
+        <title>{process.env.NEXT_PUBLIC_APP_NAME}</title>
         <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
       </Head>

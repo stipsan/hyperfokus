@@ -1,12 +1,21 @@
 import HeaderLogo from 'components/HeaderLogo'
 import HeadTitle from 'components/HeadTitle'
 import { useSessionSetState } from 'hooks/session'
+import { useEffect } from 'react'
+import firebase from 'utils/firebase'
 
 //const title = "Hyperfocus your idle time and get things done"
-const title = "Hyperfocus your todos until they're done | HyperFokus"
+const title = "Hyperfocus your todos until they're done"
 
 export default () => {
   const setSession = useSessionSetState()
+
+  useEffect(() => {
+    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+      app_name: process.env.NEXT_PUBLIC_APP_NAME,
+      screen_name: 'Welcome',
+    })
+  }, [])
 
   return (
     <>

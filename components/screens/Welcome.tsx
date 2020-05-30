@@ -18,7 +18,7 @@ export default () => {
             <img
               className="object-cover object-center rounded"
               alt=""
-              src="https://dummyimage.com/720x600"
+              src="/720x600.png"
               height="600px"
               width="720px"
               style={{

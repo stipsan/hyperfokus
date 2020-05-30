@@ -2,17 +2,20 @@ import { useReduceMotion } from 'hooks/motion'
 import { useObserveSession } from 'hooks/session'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
+//import { analytics } from 'firebase'
+import Router from 'next/router'
 import { memo, Suspense, useEffect } from 'react'
 import { Globals } from 'react-spring'
 import { RecoilRoot } from 'recoil'
 // global css, exempt from CSS module restrictions
 import 'styles/_app.css'
 // Loaded to initiate automatic analytics and performance metrics
-import 'utils/firebase'
+import firebase from 'utils/firebase'
 
 // @TODO extract more into dynamically imported components to see if it can improve First Load JS stats
 
 const ObserveSession = memo(() => {
+  // Ensures the current database provider is broadcast to other tabs, ensuring they're in sync
   useObserveSession()
 
   return null
@@ -31,6 +34,18 @@ export default ({ Component, pageProps }: AppProps) => {
       skipAnimation: prefersReducedMotion,
     })
   }, [prefersReducedMotion])
+
+  useEffect(() => {
+    const handleRouteChange = (url) => {
+      firebase.analytics().logEvent(firebase.analytics.EventName.PAGE_VIEW, {
+        page_path: url,
+      })
+    }
+    Router.events.on('routeChangeComplete', handleRouteChange)
+    return () => {
+      Router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [])
 
   return (
     <>

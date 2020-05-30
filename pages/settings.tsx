@@ -14,7 +14,7 @@ const CloudSyncSettings = dynamic(
 const title = 'Settings'
 
 const Card: FC = ({ children }) => (
-  <section className="shadow-md py-4 px-6 mt-16 rounded-lg">{children}</section>
+  <section className="shadow-md py-4 px-6 my-16 rounded-lg">{children}</section>
 )
 const CardHeader: FC = ({ children }) => (
   <h2 className="mb-4 font-bold text-xl">{children}</h2>

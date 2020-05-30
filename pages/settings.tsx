@@ -2,9 +2,34 @@ import Button from 'components/Button'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
+import dynamic from 'next/dynamic'
 import Router from 'next/router'
+import type { FC } from 'react'
+
+const CloudSyncSettings = dynamic(
+  () => import('components/CloudSyncSettings'),
+  { ssr: false }
+)
 
 const title = 'Settings'
+
+const Card: FC = ({ children }) => (
+  <section className="shadow-md py-4 px-6 mt-16 rounded-lg">{children}</section>
+)
+const CardHeader: FC = ({ children }) => (
+  <h2 className="mb-4 font-bold text-xl">{children}</h2>
+)
+
+const CloudSyncCard = () => {
+  return (
+    <Card>
+      <CardHeader>Cloud Sync (Early Preview)</CardHeader>
+      <div className="py-24">
+        <CloudSyncSettings />
+      </div>
+    </Card>
+  )
+}
 
 const EnableLocalStorage = () => {
   const session = useSessionValue()
@@ -51,7 +76,8 @@ const ResetButton = () => {
 
   return (
     <Button
-      className="mt-6"
+      className="my-24 mx-auto block"
+      variant="danger"
       onClick={() => {
         Router.push('/')
         setSession('')
@@ -80,9 +106,19 @@ export default () => {
       <HeadTitle>{title}</HeadTitle>
       <AppLayout title={title}>
         <MoreContainer>
-          <div className="px-inset">
-            <ResetButton />
-            {process.env.NODE_ENV === 'development' && <LocalDebug />}
+          <div className="px-inset container">
+            <Card>
+              <CardHeader>Appearance</CardHeader>
+              <p className="block mx-auto my-24 text-center">
+                Under construction…
+              </p>
+            </Card>
+            <CloudSyncCard />
+            <Card>
+              <CardHeader>Advanced</CardHeader>
+              <ResetButton />
+              {process.env.NODE_ENV === 'development' && <LocalDebug />}
+            </Card>
           </div>
         </MoreContainer>
       </AppLayout>

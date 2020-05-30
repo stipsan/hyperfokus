@@ -37,7 +37,7 @@ export default ({ Component, pageProps }: AppProps) => {
       <Head>
         <title>HyperFokus</title>
         <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
-        <link rel="preload" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
       </Head>
       <RecoilRoot>
         <Suspense

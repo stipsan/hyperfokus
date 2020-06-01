@@ -1,111 +1,56 @@
+import cx from 'classnames'
 import { useAuth, useAuthObserver } from 'hooks/auth'
-import { Suspense, useState } from 'react'
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import auth from 'utils/auth'
 import firebase from 'utils/firebase'
+import Button from './Button'
+import styles from './CloudSyncSettings.module.css'
 
-// @TODO move into utils/auth
-const uiConfig = {
-  // Popup signin flow rather than redirect flow.
-  signInFlow: 'popup',
-  // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-  signInSuccessUrl: '/',
-  signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
-}
+const buttonClass = 'bg-gray-100 hover:bg-gray-300 text-gray-800 font-semibold'
 
-const useUser = () => {
-  // Used just to make react rerender the components without cloning the auth object in local state
-  const [initialized, forceStateUpdate] = useState<true | false | undefined>()
-  console.log('initialized', initialized)
+const AuthStep = () => {
+  const loggedIn = useAuth()
 
-  if (initialized !== undefined) {
-    return firebase.auth().currentUser
+  if (loggedIn) {
+    return (
+      <>
+        <div className="mt-3 sm:mt-0">
+          You're logged in as: {auth().currentUser?.displayName}
+        </div>
+        <Button className={buttonClass} onClick={() => auth().signOut()}>
+          Logout
+        </Button>
+      </>
+    )
   }
-  throw new Promise((resolve) => {
-    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        console.log('Logged in', user, unsubscribe, firebase.auth().currentUser)
-        // User is signed in.
-      } else {
-        console.log('Guest', user, unsubscribe, firebase.auth().currentUser)
-      }
-      // 2. Purging the ref ensures the hook won't suspend render again by throwing this promice
-      //promise.current = null
-      // 3. onAuthStateChanged can fire multiple times, and there's no built in "once" functionality
-      //unsubscribe()
-      // 1. Resolving the promise allows react to resume render
-      resolve()
-      forceStateUpdate(!!user)
-    })
-  })
 
-  /*
-  useEffect(() => {
-    console.log('useEffect in useUser', firebase.auth().currentUser)
-    forceStateUpdate(true)
-  }, [])
-
-  const promise = useRef<{ resolve: () => void }>()
-
-  if (initialized === undefined && !promise.current) {
-    throw new Promise((resolve) => {
-      promise.current = { resolve }
-    })
-  }
-  if (initialized !== undefined && promise.current) {
-    console.count('promise.current.resolve()')
-    promise.current.resolve()
-  }
-  // */
-
-  /*
-
-  // Technique that suspends render until the initial auth state is determined
-  const promise = useRef<undefined | null | Promise<unknown>>(undefined)
-  if (promise.current === undefined) {
-    console.log('promise.current', promise.current)
-    console.count('What is going on')
-    promise.current = new Promise((resolve) => {
-      const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          console.log(
-            'Logged in',
-            user,
-            unsubscribe,
-            firebase.auth().currentUser
-          )
-          // User is signed in.
-        } else {
-          console.log('Guest', user, unsubscribe, firebase.auth().currentUser)
+  return (
+    <>
+      <div className="mt-3 sm:mt-0">Step 1: start by logging in</div>
+      <Button
+        className={cx(buttonClass, 'flex items-center')}
+        onClick={() =>
+          auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider())
         }
-        // 2. Purging the ref ensures the hook won't suspend render again by throwing this promice
-        //promise.current = null
-        // 3. onAuthStateChanged can fire multiple times, and there's no built in "once" functionality
-        unsubscribe()
-        // 1. Resolving the promise allows react to resume render
-        resolve()
-      })
-    })
-  }
-  if (promise.current) {
-    console.log('promise.current again', promise.current)
-    // Suspending render!
-    throw promise.current
-  }
-  // */
-
-  return firebase.auth().currentUser
+      >
+        <img
+          alt="Google logo"
+          className="h-6 w-6"
+          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+        />
+        <span className="ml-3">Sign in with Google</span>
+      </Button>
+    </>
+  )
 }
 
 export default () => {
   useAuthObserver()
-  const user = useAuth()
-  console.log({ user }, auth().currentUser)
-  console.count('CloudSyncSettings render')
+
   return (
-    <Suspense fallback="Loading…">
-      Long grid: {auth().currentUser?.displayName}
-      <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth()} />
-    </Suspense>
+    <div
+      className={cx('grid grid-cols-1 grid items-center gap-3', styles.grid)}
+    >
+      <AuthStep />
+    </div>
   )
 }

@@ -1,50 +1,48 @@
-import type { User } from 'firebase'
+import { useEffect } from 'react'
 import { atom, selector, useRecoilValue, useSetRecoilState } from 'recoil'
 import auth from 'utils/auth'
 
-export const authState = atom<User>({
+export const authState = atom<boolean>({
   key: 'auth',
   default: undefined,
 })
-const asyncAuthState = selector<User>({
+const asyncAuthState = selector<boolean>({
   key: 'asyncAuthState',
   get: async ({ get }) => {
+    // @TODO deal specifically with the error codes that can happen in this callback
+    // https://firebase.google.com/docs/reference/js/firebase.auth.Auth#getredirectresult
+    await auth().getRedirectResult()
+
     try {
       const cache = get(authState)
 
       // It's only undefined when it should be fetched
       if (cache === undefined) {
-        await new Promise((resolve) => setTimeout(() => resolve(), 3000))
+        //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
         return await new Promise((resolve, reject) => {
           const unsubscribe = auth().onAuthStateChanged(
             (user) => {
-              if (user) {
-                console.log('Logged in', user, unsubscribe, auth().currentUser)
-                // User is signed in.
-              } else {
-                console.log('Guest', user, unsubscribe, auth().currentUser)
-              }
-
               unsubscribe()
-              // JSON cloning to avoid circular references breaking recoil
-              // @TODO check if https://github.com/facebookexperimental/Recoil/pull/153 fixes it
-              resolve(JSON.parse(JSON.stringify(user)))
+              resolve(!!user)
             },
-            (error) => reject(error)
+            (error) => {
+              unsubscribe()
+              reject(error)
+            }
           )
         })
       }
 
       return cache
     } catch (err) {
-      console.error('oh no wtf!', err)
+      console.error('oh no failed to get auth state!', err)
     }
   },
   set: ({ set }, newValue) => set(authState, newValue),
 })
 
 // State setter and getter, useful when managing the auth
-export const useAuth = (): User => {
+export const useAuth = () => {
   const auth = useRecoilValue(asyncAuthState)
 
   return auth
@@ -55,14 +53,12 @@ export const useAuthObserver = () => {
   const setAuth = useSetRecoilState(authState)
 
   // Sync the state in case it's been updated
-  /*
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(
-      (user) => setAuth(user),
+      (user) => setAuth(!!user),
       (err) => console.error(err)
     )
 
     return () => unsubscribe()
   }, [])
-  // */
 }

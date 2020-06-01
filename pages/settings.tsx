@@ -3,9 +3,40 @@ import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
 import Router from 'next/router'
-import { lazy, Suspense } from 'react'
+import { Component, lazy, Suspense } from 'react'
 import type { FC } from 'react'
 import firebase from 'utils/firebase'
+
+class ErrorBoundary extends Component<{}, { hasError: boolean }> {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true }
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // You can also log the error to an error reporting service
+    firebase.analytics().logEvent(firebase.analytics.EventName.EXCEPTION, {
+      fatal: true,
+      description: error.toString(),
+      error,
+      errorInfo,
+    })
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>Something went wrong.</h1>
+    }
+
+    return this.props.children
+  }
+}
 
 const CloudSyncSettings = lazy(() => import('components/CloudSyncSettings'))
 
@@ -23,9 +54,11 @@ const CloudSyncCard = () => {
     <Card>
       <CardHeader>Cloud Sync (Early Preview)</CardHeader>
       <div className="py-24">
-        <Suspense fallback={<p className="text-center">Loading…</p>}>
-          <CloudSyncSettings />
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<p className="text-center">Loading…</p>}>
+            <CloudSyncSettings />
+          </Suspense>
+        </ErrorBoundary>
       </div>
     </Card>
   )

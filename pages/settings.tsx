@@ -2,15 +2,12 @@ import Button from 'components/Button'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
-import dynamic from 'next/dynamic'
 import Router from 'next/router'
+import { lazy, Suspense } from 'react'
 import type { FC } from 'react'
 import firebase from 'utils/firebase'
 
-const CloudSyncSettings = dynamic(
-  () => import('components/CloudSyncSettings'),
-  { ssr: false }
-)
+const CloudSyncSettings = lazy(() => import('components/CloudSyncSettings'))
 
 const title = 'Settings'
 
@@ -26,7 +23,9 @@ const CloudSyncCard = () => {
     <Card>
       <CardHeader>Cloud Sync (Early Preview)</CardHeader>
       <div className="py-24">
-        <CloudSyncSettings />
+        <Suspense fallback={<p className="text-center">Loading…</p>}>
+          <CloudSyncSettings />
+        </Suspense>
       </div>
     </Card>
   )

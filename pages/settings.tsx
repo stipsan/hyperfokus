@@ -53,7 +53,7 @@ const CloudSyncCard = () => {
   return (
     <Card>
       <CardHeader>Cloud Sync (Early Preview)</CardHeader>
-      <div className="py-24">
+      <div className="py-12">
         <ErrorBoundary>
           <Suspense fallback={<p className="text-center">Loading…</p>}>
             <CloudSyncSettings />

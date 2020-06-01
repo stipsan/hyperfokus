@@ -9,13 +9,13 @@ export const authState = atom<boolean>({
 const asyncAuthState = selector<boolean>({
   key: 'asyncAuthState',
   get: async ({ get }) => {
+    const cache = get(authState)
+
     // @TODO deal specifically with the error codes that can happen in this callback
     // https://firebase.google.com/docs/reference/js/firebase.auth.Auth#getredirectresult
     await auth().getRedirectResult()
 
     try {
-      const cache = get(authState)
-
       // It's only undefined when it should be fetched
       if (cache === undefined) {
         //await new Promise((resolve) => setTimeout(() => resolve(), 3000))

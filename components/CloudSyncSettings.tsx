@@ -28,11 +28,22 @@ const AuthStep = () => {
       <div className="mt-3 sm:mt-0">Step 1: start by logging in</div>
       <Button
         className={cx(buttonClass, 'flex items-center')}
-        onClick={() =>
-          auth()
-            .signInWithRedirect(new firebase.auth.GoogleAuthProvider())
-            .catch((reason) => alert(reason))
-        }
+        onClick={async () => {
+          try {
+            await auth().signInWithRedirect(
+              new firebase.auth.GoogleAuthProvider()
+            )
+          } catch (error) {
+            firebase
+              .analytics()
+              .logEvent(firebase.analytics.EventName.EXCEPTION, {
+                fatal: true,
+                description: error.toString(),
+                error,
+              })
+            alert(error)
+          }
+        }}
       >
         <img
           alt="Google logo"

@@ -29,7 +29,9 @@ const AuthStep = () => {
       <Button
         className={cx(buttonClass, 'flex items-center')}
         onClick={() =>
-          auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider())
+          auth()
+            .signInWithRedirect(new firebase.auth.GoogleAuthProvider())
+            .catch((reason) => alert(reason))
         }
       >
         <img
@@ -37,7 +39,7 @@ const AuthStep = () => {
           className="h-6 w-6"
           src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
         />
-        <span className="ml-3">Sign in with Google</span>
+        <span className="ml-2">Sign in with Google</span>
       </Button>
     </>
   )

@@ -1,27 +1,34 @@
 import cx from 'classnames'
-import 'firebase/firestore'
-import { authState, useAuth, useAuthObserver } from 'hooks/auth'
+import type { User } from 'firebase/app'
+import { useAnalytics } from 'hooks/analytics'
 // @ts-expect-error
 import { Suspense, unstable_SuspenseList as SuspenseList } from 'react'
-import { atom, selector, useRecoilState } from 'recoil'
-import auth from 'utils/auth'
-import firebase from 'utils/firebase'
+import {
+  AuthCheck,
+  FirebaseAppProvider,
+  useAuth,
+  useFirestore,
+  useFirestoreDocData,
+  useUser,
+} from 'reactfire'
+import firebase, { config } from 'utils/firebase'
 import Button from './Button'
 import styles from './CloudSyncSettings.module.css'
 
 const buttonClass = 'bg-gray-100 hover:bg-gray-300 text-gray-800 font-semibold'
 
 const AuthStep = () => {
-  const loggedIn = useAuth()
+  const auth = useAuth()
+  const user = useUser<User>()
+  const analytics = useAnalytics()
 
-  if (loggedIn) {
+  if (user) {
     return (
       <>
         <div>
-          You're logged in as: {auth().currentUser?.displayName} (
-          {auth().currentUser?.email})
+          You're logged in as: {user.displayName} ({user.email})
         </div>
-        <Button className={buttonClass} onClick={() => auth().signOut()}>
+        <Button className={buttonClass} onClick={() => auth.signOut()}>
           Logout
         </Button>
       </>
@@ -35,17 +42,15 @@ const AuthStep = () => {
         className={cx(buttonClass, 'flex items-center')}
         onClick={async () => {
           try {
-            await auth().signInWithRedirect(
+            await auth.signInWithRedirect(
               new firebase.auth.GoogleAuthProvider()
             )
           } catch (error) {
-            firebase
-              .analytics()
-              .logEvent(firebase.analytics.EventName.EXCEPTION, {
-                fatal: true,
-                description: error.toString(),
-                error,
-              })
+            analytics.logEvent(firebase.analytics.EventName.EXCEPTION, {
+              fatal: true,
+              description: error.toString(),
+              error,
+            })
             alert(error)
           }
         }}
@@ -61,81 +66,32 @@ const AuthStep = () => {
   )
 }
 
-const requestBetaAtom = atom<null | {
-  email?: string
-  name?: string
-  message?: string
-}>({
-  key: 'requestBetaAtom',
-  default: undefined,
-})
-const requestBetaState = selector<null | {
-  email?: string
-  name?: string
-  message?: string
-}>({
-  key: 'requestBetaState',
-  get: async ({ get }) => {
-    const cache = get(requestBetaAtom)
-    const loggedIn = get(authState)
-
-    if (cache !== undefined) {
-      return cache
-    }
-
-    try {
-      // It's only undefined when it should be fetched
-      if (loggedIn) {
-        //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
-        const betaRequest = await firebase
-          .firestore()
-          .collection('betarequests')
-          .doc(firebase.auth().currentUser.uid)
-          .get()
-        if (betaRequest.exists) {
-          return betaRequest.data()
-        }
-      }
-
-      return new Promise((resolve) => setTimeout(() => resolve(null), 1000))
-    } catch (err) {
-      console.error('oh no failed to get auth state!', err)
-    }
-  },
-  set: ({ set }, newValue) => set(requestBetaAtom, newValue),
-})
-
 const RequestStep = () => {
-  const loggedIn = useAuth()
-  const [betaRequest, setBetaRequest] = useRecoilState(requestBetaState)
+  const user = useUser<User>()
+  const firestore = useFirestore()
+  const analytics = useAnalytics()
+  const betaReqRef = firestore.collection('betarequests').doc(user.uid)
+  const betaReq = useFirestoreDocData<{
+    email?: string
+    name?: string
+    message?: string
+  }>(betaReqRef)
 
-  if (!loggedIn) {
-    return null
-  }
-
-  if (betaRequest) {
+  if (betaReq.email) {
     return (
       <>
         <div className="mt-8 sm:mt-0">You've requested beta access.</div>
         <Button
           className={buttonClass}
           onClick={async () => {
-            const { uid } = auth().currentUser
             try {
-              await firebase
-                .firestore()
-                .collection('betarequests')
-                .doc(uid)
-                .delete()
-              setBetaRequest(null)
+              await betaReqRef.delete()
             } catch (error) {
-              firebase
-                .analytics()
-                .logEvent(firebase.analytics.EventName.EXCEPTION, {
-                  fatal: true,
-                  description: error.toString(),
-                  error,
-                })
+              analytics.logEvent(firebase.analytics.EventName.EXCEPTION, {
+                fatal: true,
+                description: error.toString(),
+                error,
+              })
               alert(error)
             }
           }}
@@ -153,15 +109,10 @@ const RequestStep = () => {
         className={cx('flex items-center')}
         variant="primary"
         onClick={async () => {
-          const { uid, displayName, email } = auth().currentUser
+          const { displayName, email } = user
           const betaRequest = { name: displayName, email, message: '' }
           try {
-            await firebase
-              .firestore()
-              .collection('betarequests')
-              .doc(uid)
-              .set(betaRequest)
-            setBetaRequest(betaRequest)
+            await betaReqRef.set(betaRequest)
           } catch (error) {
             firebase
               .analytics()
@@ -180,17 +131,16 @@ const RequestStep = () => {
   )
 }
 
-export default () => {
-  useAuthObserver()
-
-  return (
+export default () => (
+  <FirebaseAppProvider firebaseConfig={config}>
+    <p className="mb-6">Enable Cloud Sync in 3 steps:</p>
     <div
       className={cx(
         'grid grid-cols-1 grid items-center gap-3 sm:row-gap-8',
         styles.grid
       )}
     >
-      <SuspenseList>
+      <SuspenseList revealOrder="together">
         <Suspense
           fallback={
             <>
@@ -209,9 +159,11 @@ export default () => {
             </>
           }
         >
-          <RequestStep />
+          <AuthCheck fallback={null}>
+            <RequestStep />
+          </AuthCheck>
         </Suspense>
       </SuspenseList>
     </div>
-  )
-}
+  </FirebaseAppProvider>
+)

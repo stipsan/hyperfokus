@@ -5,9 +5,7 @@ import { usePerformance } from 'reactfire'
 // The hook is required to load the lib and initializing it
 
 export default memo(() => {
-  const performance = usePerformance()
-
-  console.log({ performance })
+  usePerformance()
 
   return null
 })

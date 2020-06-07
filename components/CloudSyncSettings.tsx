@@ -20,7 +20,6 @@ const AuthStep = () => {
   const auth = useAuth()
   const user = useUser<User>()
   const logException = useLogException()
-  console.log({ auth })
 
   if (user) {
     return (
@@ -84,11 +83,10 @@ const RequestStep = () => {
     }
   }
 
-  if (betaInvite.since) {
-    console.log({ betaInvite })
+  if (betaInvite.since && betaReq.email) {
     return (
       <>
-        <div className="mt-8 sm:mt-0">You've requested beta access.</div>
+        <div className="mt-8 sm:mt-0">Your beta request is approved.</div>
         <Button className={buttonClass} onClick={cancel}>
           Cancel
         </Button>
@@ -109,7 +107,7 @@ const RequestStep = () => {
 
   return (
     <>
-      <div className="mt-8 sm:mt-0">Then request beta access</div>
+      <div className="mt-8 sm:mt-0">Step 2:</div>
       <Button
         className={cx('flex items-center')}
         variant="primary"

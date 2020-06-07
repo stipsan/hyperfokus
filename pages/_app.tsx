@@ -1,35 +1,27 @@
 import { useReduceMotion } from 'hooks/motion'
-import {
-  sanitize,
-  sessionKey,
-  sessionProviderState,
-  useObserveSession,
-} from 'hooks/session'
-import type { SessionState } from 'hooks/session'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-//import { analytics } from 'firebase'
-import Router from 'next/router'
-import { memo, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Globals } from 'react-spring'
+import { FirebaseAppProvider } from 'reactfire'
 import { RecoilRoot } from 'recoil'
 // global css, exempt from CSS module restrictions
 import 'styles/_app.css'
-// Loaded to initiate automatic analytics and performance metrics
-import firebase from 'utils/firebase'
 
-// @TODO extract more into dynamically imported components to see if it can improve First Load JS stats
+const SessionObserver = lazy(() => import('components/SessionObserver'))
+const RouteObserver = lazy(() => import('components/RouteObserver'))
+const PerformanceObserver = lazy(() => import('components/PerformanceObserver'))
 
-const ObserveSession = memo(() => {
-  // Ensures the current database provider is broadcast to other tabs, ensuring they're in sync
-  useObserveSession()
-
-  return null
-})
-
-// @TODO temp workaround to initializeState firing multiple times.
-// I thought it would only fire once?
-let session: SessionState
+const config = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+}
 
 export default ({ Component, pageProps }: AppProps) => {
   // Suspense fallbacks are invisible for a set delay to avoid spinner flash on first load
@@ -45,16 +37,9 @@ export default ({ Component, pageProps }: AppProps) => {
     })
   }, [prefersReducedMotion])
 
+  const [mounted, setMounted] = useState(false)
   useEffect(() => {
-    const handleRouteChange = (url) => {
-      firebase.analytics().logEvent(firebase.analytics.EventName.PAGE_VIEW, {
-        page_path: url,
-      })
-    }
-    Router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      Router.events.off('routeChangeComplete', handleRouteChange)
-    }
+    setMounted(true)
   }, [])
 
   return (
@@ -64,26 +49,26 @@ export default ({ Component, pageProps }: AppProps) => {
         <meta name="viewport" content="initial-scale=1, viewport-fit=cover" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
       </Head>
-      <RecoilRoot
-        initializeState={({ set }) => {
-          if (typeof window !== 'undefined' && !session) {
-            session = sanitize(localStorage.getItem(sessionKey) as SessionState)
-            set(sessionProviderState, session)
-            firebase.analytics().setUserProperties({ session })
-          }
-        }}
-      >
-        <Suspense
-          fallback={
-            <div className="my-40 text-xl text-blue-900 text-center loading">
-              Loading...
-            </div>
-          }
-        >
-          <ObserveSession />
-          <Component {...pageProps} />
-        </Suspense>
-      </RecoilRoot>
+      <FirebaseAppProvider firebaseConfig={config}>
+        <RecoilRoot>
+          <Suspense
+            fallback={
+              <div className="my-40 text-xl text-blue-900 text-center loading">
+                Loading...
+              </div>
+            }
+          >
+            <Component {...pageProps} />
+            {mounted && (
+              <>
+                <SessionObserver />
+                <RouteObserver />
+                <PerformanceObserver />
+              </>
+            )}
+          </Suspense>
+        </RecoilRoot>
+      </FirebaseAppProvider>
     </>
   )
 }

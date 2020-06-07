@@ -9,3 +9,20 @@ export const useAnalytics = () => {
 
   return useFirebaseAnalytics()
 }
+
+export const useLogException = () => {
+  const analytics = useAnalytics()
+
+  return (error: Error, errorInfo?: unknown) => {
+    analytics.logEvent('exception', {
+      fatal: true,
+      description: error.toString(),
+      error,
+      errorInfo,
+    })
+    // If errorInfo is provided, we'll assume it's coming from an ErrorBoundary
+    if (!errorInfo) {
+      alert(error)
+    }
+  }
+}

@@ -1,17 +1,16 @@
 import cx from 'classnames'
+import firebase from 'firebase/app'
 import type { User } from 'firebase/app'
-import { useAnalytics } from 'hooks/analytics'
+import { useLogException } from 'hooks/analytics'
 // @ts-expect-error
 import { Suspense, unstable_SuspenseList as SuspenseList } from 'react'
 import {
   AuthCheck,
-  FirebaseAppProvider,
   useAuth,
   useFirestore,
   useFirestoreDocData,
   useUser,
 } from 'reactfire'
-import firebase, { config } from 'utils/firebase'
 import Button from './Button'
 import styles from './CloudSyncSettings.module.css'
 
@@ -20,7 +19,8 @@ const buttonClass = 'bg-gray-100 hover:bg-gray-300 text-gray-800 font-semibold'
 const AuthStep = () => {
   const auth = useAuth()
   const user = useUser<User>()
-  const analytics = useAnalytics()
+  const logException = useLogException()
+  console.log({ auth })
 
   if (user) {
     return (
@@ -46,12 +46,7 @@ const AuthStep = () => {
               new firebase.auth.GoogleAuthProvider()
             )
           } catch (error) {
-            analytics.logEvent(firebase.analytics.EventName.EXCEPTION, {
-              fatal: true,
-              description: error.toString(),
-              error,
-            })
-            alert(error)
+            logException(error)
           }
         }}
       >
@@ -69,33 +64,43 @@ const AuthStep = () => {
 const RequestStep = () => {
   const user = useUser<User>()
   const firestore = useFirestore()
-  const analytics = useAnalytics()
+  const logException = useLogException()
   const betaReqRef = firestore.collection('betarequests').doc(user.uid)
   const betaReq = useFirestoreDocData<{
     email?: string
     name?: string
     message?: string
   }>(betaReqRef)
+  const betaInviteRef = firestore.collection('betainvites').doc(user.uid)
+  const betaInvite = useFirestoreDocData<{
+    since?: Date
+  }>(betaInviteRef)
+
+  const cancel = async () => {
+    try {
+      await betaReqRef.delete()
+    } catch (error) {
+      logException(error)
+    }
+  }
+
+  if (betaInvite.since) {
+    console.log({ betaInvite })
+    return (
+      <>
+        <div className="mt-8 sm:mt-0">You've requested beta access.</div>
+        <Button className={buttonClass} onClick={cancel}>
+          Cancel
+        </Button>
+      </>
+    )
+  }
 
   if (betaReq.email) {
     return (
       <>
         <div className="mt-8 sm:mt-0">You've requested beta access.</div>
-        <Button
-          className={buttonClass}
-          onClick={async () => {
-            try {
-              await betaReqRef.delete()
-            } catch (error) {
-              analytics.logEvent(firebase.analytics.EventName.EXCEPTION, {
-                fatal: true,
-                description: error.toString(),
-                error,
-              })
-              alert(error)
-            }
-          }}
-        >
+        <Button className={buttonClass} onClick={cancel}>
           Cancel
         </Button>
       </>
@@ -114,14 +119,7 @@ const RequestStep = () => {
           try {
             await betaReqRef.set(betaRequest)
           } catch (error) {
-            firebase
-              .analytics()
-              .logEvent(firebase.analytics.EventName.EXCEPTION, {
-                fatal: true,
-                description: error.toString(),
-                error,
-              })
-            alert(error)
+            logException(error)
           }
         }}
       >
@@ -132,7 +130,7 @@ const RequestStep = () => {
 }
 
 export default () => (
-  <FirebaseAppProvider firebaseConfig={config}>
+  <>
     <p className="mb-6">Enable Cloud Sync in 3 steps:</p>
     <div
       className={cx(
@@ -165,5 +163,5 @@ export default () => (
         </Suspense>
       </SuspenseList>
     </div>
-  </FirebaseAppProvider>
+  </>
 )

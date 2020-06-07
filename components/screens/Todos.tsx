@@ -12,6 +12,7 @@ import {
   setMinutes,
   setSeconds,
 } from 'date-fns'
+import { useAnalytics } from 'hooks/analytics'
 import { useActiveSchedules, useSchedulesObserver } from 'hooks/schedules'
 import { useTodos, useTodosObserver } from 'hooks/todos'
 import { nanoid } from 'nanoid'
@@ -27,7 +28,6 @@ import {
 } from 'react'
 import type { Dispatch, FC, ReactNode, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
-import firebase from 'utils/firebase'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './Todos.module.css'
@@ -280,6 +280,7 @@ const TodoItem: React.FC<{
   now: Date
   setTodos: Dispatch<SetStateAction<Todo[]>>
 }> = ({ todo, isToday, now, setTodos }) => {
+  const analytics = useAnalytics()
   let isOverdue = false
   let isCurrent = false
   if (isToday) {
@@ -336,7 +337,7 @@ const TodoItem: React.FC<{
             })
             return newTodos
           })
-          firebase.analytics().logEvent('todo_toggle', {
+          analytics.logEvent('todo_toggle', {
             completed: event.target.checked,
           })
         }}
@@ -367,8 +368,9 @@ const CreateDialog = ({
   onDismiss: () => void
   setTodos: Dispatch<SetStateAction<Todo[]>>
 }) => {
+  const analytics = useAnalytics()
   useEffect(() => {
-    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+    analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Todo',
     })
@@ -409,7 +411,7 @@ const CreateDialog = ({
             : [{ ...newTodo, order: top }, ...todos]
         })
         onDismiss()
-        firebase.analytics().logEvent('todo_create', {
+        analytics.logEvent('todo_create', {
           duration: state.duration,
           order: state.order,
         })
@@ -439,8 +441,9 @@ const EditDialog = ({
   onDismiss: () => void
   id: string
 }) => {
+  const analytics = useAnalytics()
   useEffect(() => {
-    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+    analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Edit Todo',
     })
@@ -509,7 +512,7 @@ const EditDialog = ({
         })
         setInitialState(state)
         onDismiss()
-        firebase.analytics().logEvent('todo_edit', {
+        analytics.logEvent('todo_edit', {
           duration: state.duration,
           order: state.order,
         })
@@ -526,7 +529,7 @@ const EditDialog = ({
             return newTodos
           })
           onDismiss()
-          firebase.analytics().logEvent('todo_delete', {
+          analytics.logEvent('todo_delete', {
             duration: initialState.duration,
             order: initialState.order,
           })
@@ -537,8 +540,9 @@ const EditDialog = ({
 }
 
 export default () => {
+  const analytics = useAnalytics()
   useEffect(() => {
-    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+    analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Todos',
     })
@@ -719,7 +723,7 @@ export default () => {
                 done: todo.done || !!todo.completed,
               }))
             )
-            firebase.analytics().logEvent('todo_archive')
+            analytics.logEvent('todo_archive')
           }}
         >
           Archive Completed Todos
@@ -734,11 +738,9 @@ export default () => {
               ;(document.activeElement as HTMLElement)?.blur()
               todayRef.current?.scrollIntoView({ block: 'start' })
             })
-            firebase
-              .analytics()
-              .logEvent(
-                hyperfocusing ? 'hyperfocusing_stop' : 'hyperfocusing_start'
-              )
+            analytics.logEvent(
+              hyperfocusing ? 'hyperfocusing_stop' : 'hyperfocusing_start'
+            )
           }}
         >
           {hyperfocusing ? 'Disable Hyperfocusing' : 'Enable Hyperfocusing'}

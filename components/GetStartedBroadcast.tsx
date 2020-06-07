@@ -1,7 +1,7 @@
 import cx from 'classnames'
+import { useAnalytics } from 'hooks/analytics'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
 import { useEffect, useRef } from 'react'
-import firebase from 'utils/firebase'
 import styles from './GetStartedBroadcast.module.css'
 
 // @TODO change behavior if the user clicks "Stop the demo, I'm ready!"
@@ -13,6 +13,7 @@ export default () => {
   const session = useSessionValue()
   const setSession = useSessionSetState()
   const containerRef = useRef<HTMLDivElement>(null)
+  const analytics = useAnalytics()
 
   useEffect(() => {
     if (session === 'demo' && containerRef.current) {
@@ -45,7 +46,7 @@ export default () => {
         className="inline-block text-sm font-bold rounded-full text-yellow-100 bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800 py-1 px-2 mt-1 focus:outline-none focus:shadow-outline"
         onClick={() => {
           setSession('localstorage')
-          firebase.analytics().logEvent('demo_end')
+          analytics.logEvent('demo_end')
         }}
       >
         Stop the demo, I'm ready!

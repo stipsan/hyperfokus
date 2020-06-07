@@ -5,7 +5,6 @@ import {
   useResetRecoilState,
   useSetRecoilState,
 } from 'recoil'
-import firebase from 'utils/firebase'
 import { schedulesState } from './schedules'
 import { todosState } from './todos'
 
@@ -25,7 +24,10 @@ export const sanitize = (unsafeState: SessionState): SessionState => {
 
 export const sessionProviderState = atom({
   key: 'SessionProvider',
-  default: '',
+  default:
+    typeof window !== 'undefined'
+      ? sanitize(localStorage.getItem(sessionKey) as SessionState)
+      : '',
 })
 
 export const useSessionValue = () => {
@@ -50,7 +52,6 @@ const useSetSession = () => {
     setState(session)
     resetSchedules()
     resetTodos()
-    firebase.analytics().setUserProperties({ session })
   }
 }
 
@@ -93,6 +94,15 @@ export const useObserveSession = () => {
       setSession(newValue)
     }
     window.addEventListener('storage', handler)
+
+    // Check if local state has changed since startup began
+    const currentState = sanitize(
+      localStorage.getItem(sessionKey) as SessionState
+    )
+    if (prevState !== currentState) {
+      setSession(currentState)
+    }
+
     return () => {
       window.removeEventListener('storage', handler)
     }

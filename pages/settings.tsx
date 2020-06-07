@@ -1,13 +1,16 @@
 import Button from 'components/Button'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
+import { useAnalytics, useLogException } from 'hooks/analytics'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
 import Router from 'next/router'
 import { Component, lazy, Suspense } from 'react'
 import type { FC } from 'react'
-import firebase from 'utils/firebase'
 
-class ErrorBoundary extends Component<{}, { hasError: boolean }> {
+class ErrorBoundary extends Component<
+  { logException: (error: Error, errorInfo?: unknown) => void },
+  { hasError: boolean }
+> {
   constructor(props) {
     super(props)
     this.state = { hasError: false }
@@ -19,13 +22,7 @@ class ErrorBoundary extends Component<{}, { hasError: boolean }> {
   }
 
   componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service
-    firebase.analytics().logEvent(firebase.analytics.EventName.EXCEPTION, {
-      fatal: true,
-      description: error.toString(),
-      error,
-      errorInfo,
-    })
+    this.props.logException(error, errorInfo)
   }
 
   render() {
@@ -50,11 +47,12 @@ const CardHeader: FC = ({ children }) => (
 )
 
 const CloudSyncCard = () => {
+  const logException = useLogException()
   return (
     <Card>
       <CardHeader>Cloud Sync (Early Preview)</CardHeader>
       <div className="py-12">
-        <ErrorBoundary>
+        <ErrorBoundary logException={logException}>
           <Suspense fallback={<p className="text-center">Loading…</p>}>
             <CloudSyncSettings />
           </Suspense>
@@ -106,6 +104,7 @@ const EnableDemo = () => {
 
 const ResetButton = () => {
   const setSession = useSessionSetState()
+  const analytics = useAnalytics()
 
   return (
     <Button
@@ -113,7 +112,7 @@ const ResetButton = () => {
       variant="danger"
       onClick={() => {
         Router.push('/')
-        firebase.analytics().logEvent('reset')
+        analytics.logEvent('reset')
         setSession('')
       }}
     >

@@ -1,17 +1,18 @@
 import HeaderLogo from 'components/HeaderLogo'
 import HeadTitle from 'components/HeadTitle'
+import { useAnalytics } from 'hooks/analytics'
 import { useSessionSetState } from 'hooks/session'
 import { useEffect } from 'react'
-import firebase from 'utils/firebase'
 
 //const title = "Hyperfocus your idle time and get things done"
 const title = "Hyperfocus your todos until they're done"
 
 export default () => {
   const setSession = useSessionSetState()
+  const analytics = useAnalytics()
 
   useEffect(() => {
-    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+    analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Welcome',
     })
@@ -50,7 +51,7 @@ export default () => {
                 className="inline-flex font-bold text-white bg-blue-500 border-0 py-2 px-6 focus:outline-none focus:shadow-outline hover:bg-blue-600 rounded text-lg"
                 onClick={() => {
                   setSession('demo')
-                  firebase.analytics().logEvent('demo_start')
+                  analytics.logEvent('demo_start')
                 }}
               >
                 Try demo

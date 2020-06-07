@@ -3,6 +3,7 @@ import AnimatedDialog from 'components/AnimatedDialog'
 import Button, { className } from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import type { Schedule } from 'database/types'
+import { useAnalytics } from 'hooks/analytics'
 import { useSchedules, useSchedulesObserver } from 'hooks/schedules'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
@@ -10,13 +11,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useReducer, useState } from 'react'
 import type { Dispatch, FC, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
-import firebase from 'utils/firebase'
 import { getRepeatMessage } from 'utils/time'
 import styles from './Schedules.module.css'
 
 const TrackCreateDialog = () => {
+  const analytics = useAnalytics()
   useEffect(() => {
-    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+    analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Schedule',
     })
@@ -30,8 +31,9 @@ const CreateDialog = ({
 }: {
   setSchedules: Dispatch<SetStateAction<Schedule[]>>
 }) => {
+  const analytics = useAnalytics()
   useEffect(() => {
-    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+    analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Schedule',
     })
@@ -55,7 +57,7 @@ const CreateDialog = ({
             return [...schedules, { ...state, id: nanoid() }]
           })
           close()
-          firebase.analytics().logEvent('schedule_create', {
+          analytics.logEvent('schedule_create', {
             start: state.start,
             end: state.end,
             duration: state.duration,
@@ -440,8 +442,9 @@ const ScheduleForm = ({
 }
 
 const TrackEditDialog = () => {
+  const analytics = useAnalytics()
   useEffect(() => {
-    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+    analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Edit Schedule',
     })
@@ -456,6 +459,7 @@ const EditDialog = ({
   schedules: Schedule[]
   setSchedules: Dispatch<SetStateAction<Schedule[]>>
 }) => {
+  const analytics = useAnalytics()
   const router = useRouter()
   const [initialState, setInitialState] = useState(() =>
     schedules.find((schedule) => schedule.id === router.query.edit)
@@ -520,7 +524,7 @@ const EditDialog = ({
           })
           setInitialState(state)
           close()
-          firebase.analytics().logEvent('schedule_edit', {
+          analytics.logEvent('schedule_edit', {
             start: state.start,
             end: state.end,
             duration: state.duration,
@@ -544,7 +548,7 @@ const EditDialog = ({
               return newSchedules
             })
             close()
-            firebase.analytics().logEvent('schedule_delete', {
+            analytics.logEvent('schedule_delete', {
               start: initialState.start,
               end: initialState.end,
               duration: initialState.duration,
@@ -588,8 +592,9 @@ const NoSchedulesPlaceholder = () => {
 }
 
 export default () => {
+  const analytics = useAnalytics()
   useEffect(() => {
-    firebase.analytics().logEvent(firebase.analytics.EventName.SCREEN_VIEW, {
+    analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Schedules',
     })

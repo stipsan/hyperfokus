@@ -368,6 +368,7 @@ const CreateDialog = ({
   onDismiss: () => void
   setTodos: Dispatch<SetStateAction<Todo[]>>
 }) => {
+  const logException = useLogException()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -396,25 +397,29 @@ const CreateDialog = ({
   return (
     <TodoForm
       onDismiss={onDismiss}
-      onSubmit={(state) => {
-        setTodos((todos) => {
-          const newTodo = {
-            ...state,
-            id: nanoid(),
-            description: state.description.substring(0, 2048),
-          }
-          idRef.current = newTodo.id
-          const { top, bottom } = findTopAndBottom(todos)
+      onSubmit={async (state) => {
+        try {
+          await setTodos((todos) => {
+            const newTodo = {
+              ...state,
+              id: nanoid(),
+              description: state.description.substring(0, 2048),
+            }
+            idRef.current = newTodo.id
+            const { top, bottom } = findTopAndBottom(todos)
 
-          return state.order > 0
-            ? [...todos, { ...newTodo, order: bottom }]
-            : [{ ...newTodo, order: top }, ...todos]
-        })
-        onDismiss()
-        analytics.logEvent('todo_create', {
-          duration: state.duration,
-          order: state.order,
-        })
+            return state.order > 0
+              ? [...todos, { ...newTodo, order: bottom }]
+              : [{ ...newTodo, order: top }, ...todos]
+          })
+          onDismiss()
+          analytics.logEvent('todo_create', {
+            duration: state.duration,
+            order: state.order,
+          })
+        } catch (err) {
+          logException(err)
+        }
       }}
     />
   )
@@ -476,47 +481,51 @@ const EditDialog = ({
       editing
       initialState={initialState}
       onDismiss={onDismiss}
-      onSubmit={(state) => {
-        setTodos((todos) => {
-          const index = todos.findIndex(
-            (schedule) => schedule.id === initialState.id
-          )
-          let { order } = todos[index]
-          let changedOrder = false
+      onSubmit={async (state) => {
+        try {
+          await setTodos((todos) => {
+            const index = todos.findIndex(
+              (schedule) => schedule.id === initialState.id
+            )
+            let { order } = todos[index]
+            let changedOrder = false
 
-          if (order !== state.order) {
-            const { top, bottom } = findTopAndBottom(todos)
-            order = state.order > order ? bottom + 1 : top - 1
-            changedOrder = true
-          }
+            if (order !== state.order) {
+              const { top, bottom } = findTopAndBottom(todos)
+              order = state.order > order ? bottom + 1 : top - 1
+              changedOrder = true
+            }
 
-          const newTodos = replaceItemAtIndex(todos, index, {
-            ...todos[index],
-            description: state.description.substring(0, 2048),
-            duration: state.duration,
-            order,
-          })
-
-          if (changedOrder) {
-            newTodos.sort((a, b) => {
-              if (a.order < b.order) {
-                return -1
-              }
-              if (a.order > b.order) {
-                return 1
-              }
-              return 0
+            const newTodos = replaceItemAtIndex(todos, index, {
+              ...todos[index],
+              description: state.description.substring(0, 2048),
+              duration: state.duration,
+              order,
             })
-          }
 
-          return newTodos
-        })
-        setInitialState(state)
-        onDismiss()
-        analytics.logEvent('todo_edit', {
-          duration: state.duration,
-          order: state.order,
-        })
+            if (changedOrder) {
+              newTodos.sort((a, b) => {
+                if (a.order < b.order) {
+                  return -1
+                }
+                if (a.order > b.order) {
+                  return 1
+                }
+                return 0
+              })
+            }
+
+            return newTodos
+          })
+          setInitialState(state)
+          onDismiss()
+          analytics.logEvent('todo_edit', {
+            duration: state.duration,
+            order: state.order,
+          })
+        } catch (err) {
+          logException(err)
+        }
       }}
       onDelete={async () => {
         if (

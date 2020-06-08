@@ -12,7 +12,7 @@ import {
   setMinutes,
   setSeconds,
 } from 'date-fns'
-import { useAnalytics } from 'hooks/analytics'
+import { useAnalytics, useLogException } from 'hooks/analytics'
 import { useActiveSchedules, useSchedulesObserver } from 'hooks/schedules'
 import { useTodos, useTodosObserver } from 'hooks/todos'
 import { nanoid } from 'nanoid'
@@ -441,6 +441,7 @@ const EditDialog = ({
   onDismiss: () => void
   id: string
 }) => {
+  const logException = useLogException()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -523,16 +524,22 @@ const EditDialog = ({
             `Are you sure you want to delete "${initialState.description}"?`
           )
         ) {
-          setTodos((todos) => {
-            const index = todos.findIndex((todo) => todo.id === initialState.id)
-            const newTodos = removeItemAtIndex(todos, index)
-            return newTodos
-          })
-          onDismiss()
-          analytics.logEvent('todo_delete', {
-            duration: initialState.duration,
-            order: initialState.order,
-          })
+          try {
+            setTodos((todos) => {
+              const index = todos.findIndex(
+                (todo) => todo.id === initialState.id
+              )
+              const newTodos = removeItemAtIndex(todos, index)
+              return newTodos
+            })
+            onDismiss()
+            analytics.logEvent('todo_delete', {
+              duration: initialState.duration,
+              order: initialState.order,
+            })
+          } catch (err) {
+            logException(err)
+          }
         }
       }}
     />

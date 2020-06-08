@@ -12,7 +12,7 @@ import {
   setMinutes,
   setSeconds,
 } from 'date-fns'
-import { useAnalytics } from 'hooks/analytics'
+import { useAnalytics, useLogException } from 'hooks/analytics'
 import { useActiveSchedules, useSchedulesObserver } from 'hooks/schedules'
 import { useTodos, useTodosObserver } from 'hooks/todos'
 import { nanoid } from 'nanoid'
@@ -129,6 +129,8 @@ const TodoForm = ({
   onDelete?: () => void
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
+  let initialOrder = parseInt(initialState.order.toString(), 10)
+  if (Number.isNaN(initialOrder)) initialOrder = 0
 
   return (
     <form
@@ -194,9 +196,11 @@ const TodoForm = ({
               })
             }
           >
-            <option value={initialState.order}>Keep current ordering</option>
-            <option value={initialState.order - 1}>Move to the top</option>
-            <option value={initialState.order + 1}>Move to the bottom</option>
+            <option value={initialOrder.toString()}>
+              Keep current ordering
+            </option>
+            <option value={initialOrder - 1}>Move to the top</option>
+            <option value={initialOrder + 1}>Move to the bottom</option>
           </select>
         </Field>
       ) : (
@@ -368,6 +372,7 @@ const CreateDialog = ({
   onDismiss: () => void
   setTodos: Dispatch<SetStateAction<Todo[]>>
 }) => {
+  const logException = useLogException()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -396,37 +401,40 @@ const CreateDialog = ({
   return (
     <TodoForm
       onDismiss={onDismiss}
-      onSubmit={(state) => {
-        setTodos((todos) => {
-          const newTodo = {
-            ...state,
-            id: nanoid(),
-            description: state.description.substring(0, 2048),
-          }
-          idRef.current = newTodo.id
-          const { top, bottom } = findTopAndBottom(todos)
+      onSubmit={async (state) => {
+        try {
+          await setTodos((todos) => {
+            const newTodo = {
+              ...state,
+              id: nanoid(),
+              description: state.description.substring(0, 2048),
+            }
+            idRef.current = newTodo.id
+            const { top, bottom } = findTopAndBottom(todos)
 
-          return state.order > 0
-            ? [...todos, { ...newTodo, order: bottom }]
-            : [{ ...newTodo, order: top }, ...todos]
-        })
-        onDismiss()
-        analytics.logEvent('todo_create', {
-          duration: state.duration,
-          order: state.order,
-        })
+            return state.order > 0
+              ? [...todos, { ...newTodo, order: bottom }]
+              : [{ ...newTodo, order: top }, ...todos]
+          })
+          onDismiss()
+          analytics.logEvent('todo_create', {
+            duration: state.duration,
+            order: state.order,
+          })
+        } catch (err) {
+          logException(err)
+        }
       }}
     />
   )
 }
 
 function findTopAndBottom(todos: Todo[]): { top: number; bottom: number } {
-  const mappedOrders = todos.map((todo) => todo.order)
-  const top = mappedOrders.reduce((min, cur) => Math.min(min, cur), Infinity)
-  const bottom = mappedOrders.reduce(
-    (max, cur) => Math.max(max, cur),
-    -Infinity
+  const mappedOrders = todos.map((todo) =>
+    isFinite(todo.order) ? todo.order : 0
   )
+  const top = mappedOrders.reduce((min, cur) => Math.min(min, cur), -1)
+  const bottom = mappedOrders.reduce((max, cur) => Math.max(max, cur), 1)
   return { top, bottom }
 }
 
@@ -441,6 +449,7 @@ const EditDialog = ({
   onDismiss: () => void
   id: string
 }) => {
+  const logException = useLogException()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -475,64 +484,77 @@ const EditDialog = ({
       editing
       initialState={initialState}
       onDismiss={onDismiss}
-      onSubmit={(state) => {
-        setTodos((todos) => {
-          const index = todos.findIndex(
-            (schedule) => schedule.id === initialState.id
-          )
-          let { order } = todos[index]
-          let changedOrder = false
+      onSubmit={async (state) => {
+        try {
+          await setTodos((todos) => {
+            const index = todos.findIndex(
+              (schedule) => schedule.id === initialState.id
+            )
+            let { order } = todos[index]
+            if (!isFinite(order)) {
+              order = 0
+            }
+            let changedOrder = false
 
-          if (order !== state.order) {
-            const { top, bottom } = findTopAndBottom(todos)
-            order = state.order > order ? bottom + 1 : top - 1
-            changedOrder = true
-          }
+            if (order !== state.order) {
+              const { top, bottom } = findTopAndBottom(todos)
+              order = state.order > order ? bottom + 1 : top - 1
+              changedOrder = true
+            }
 
-          const newTodos = replaceItemAtIndex(todos, index, {
-            ...todos[index],
-            description: state.description.substring(0, 2048),
-            duration: state.duration,
-            order,
-          })
-
-          if (changedOrder) {
-            newTodos.sort((a, b) => {
-              if (a.order < b.order) {
-                return -1
-              }
-              if (a.order > b.order) {
-                return 1
-              }
-              return 0
+            const newTodos = replaceItemAtIndex(todos, index, {
+              ...todos[index],
+              description: state.description.substring(0, 2048),
+              duration: state.duration,
+              order,
             })
-          }
 
-          return newTodos
-        })
-        setInitialState(state)
-        onDismiss()
-        analytics.logEvent('todo_edit', {
-          duration: state.duration,
-          order: state.order,
-        })
+            if (changedOrder) {
+              newTodos.sort((a, b) => {
+                if (a.order < b.order) {
+                  return -1
+                }
+                if (a.order > b.order) {
+                  return 1
+                }
+                return 0
+              })
+            }
+
+            return newTodos
+          })
+          setInitialState(state)
+          onDismiss()
+          analytics.logEvent('todo_edit', {
+            duration: state.duration,
+            order: state.order,
+          })
+        } catch (err) {
+          logException(err)
+        }
       }}
-      onDelete={() => {
+      onDelete={async () => {
         if (
           confirm(
             `Are you sure you want to delete "${initialState.description}"?`
           )
         ) {
-          setTodos((todos) => {
-            const index = todos.findIndex((todo) => todo.id === initialState.id)
-            const newTodos = removeItemAtIndex(todos, index)
-            return newTodos
-          })
-          onDismiss()
-          analytics.logEvent('todo_delete', {
-            duration: initialState.duration,
-            order: initialState.order,
-          })
+          try {
+            await setTodos((todos) => {
+              const index = todos.findIndex(
+                (todo) => todo.id === initialState.id
+              )
+              const newTodos = removeItemAtIndex(todos, index)
+              return newTodos
+            })
+            onDismiss()
+            analytics.logEvent('todo_delete', {
+              duration: initialState.duration,
+              order: initialState.order,
+            })
+          } catch (err) {
+            logException(err)
+          }
         }
       }}
     />

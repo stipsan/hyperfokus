@@ -24,7 +24,7 @@ const database: DatabaseType = {
   async setSchedules(nextSchedules) {
     await localforage.setItem('schedules', nextSchedules)
     // Always write to the modified timestamp in case another tab is listening to changes
-    localStorage.setItem(schedulesKey, JSON.stringify(new Date()))
+    await localStorage.setItem(schedulesKey, JSON.stringify(new Date()))
   },
   observeSchedules(success, failure) {
     // Fire an success event right away
@@ -65,7 +65,7 @@ const database: DatabaseType = {
   async setTodos(nextTodos) {
     await localforage.setItem('todos', nextTodos)
     // Always write to the modified timestamp in case another tab is listening to changes
-    localStorage.setItem(todosKey, JSON.stringify(new Date()))
+    await localStorage.setItem(todosKey, JSON.stringify(new Date()))
   },
   addTodo() {
     throw new TypeError('Not implemented!')

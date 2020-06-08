@@ -518,14 +518,14 @@ const EditDialog = ({
           order: state.order,
         })
       }}
-      onDelete={() => {
+      onDelete={async () => {
         if (
           confirm(
             `Are you sure you want to delete "${initialState.description}"?`
           )
         ) {
           try {
-            setTodos((todos) => {
+            await setTodos((todos) => {
               const index = todos.findIndex(
                 (todo) => todo.id === initialState.id
               )

@@ -2,6 +2,7 @@ import cx from 'classnames'
 import firebase from 'firebase/app'
 import type { User } from 'firebase/app'
 import { useLogException } from 'hooks/analytics'
+import { useSessionValue } from 'hooks/session'
 // @ts-expect-error
 import { Suspense, unstable_SuspenseList as SuspenseList } from 'react'
 import {
@@ -127,6 +128,31 @@ const RequestStep = () => {
   )
 }
 
+const FinalStep = () => {
+  const session = useSessionValue()
+  const user = useUser<User>()
+  const firestore = useFirestore()
+  const logException = useLogException()
+
+  const enable = async () => {}
+  const disable = async () => {}
+
+  return (
+    <>
+      <div className="mt-8 sm:mt-0">Step 3:</div>
+      {session !== 'firebase' ? (
+        <Button variant="primary" onClick={enable}>
+          Enable Cloud Sync
+        </Button>
+      ) : (
+        <Button variant="danger" onClick={disable}>
+          Disable Cloud Sync
+        </Button>
+      )}
+    </>
+  )
+}
+
 export default () => (
   <>
     <p className="mb-6">Enable Cloud Sync in 3 steps:</p>
@@ -157,6 +183,18 @@ export default () => (
         >
           <AuthCheck fallback={null}>
             <RequestStep />
+          </AuthCheck>
+        </Suspense>
+        <Suspense
+          fallback={
+            <>
+              <div className="py-2">Loading final step...</div>
+              <span />
+            </>
+          }
+        >
+          <AuthCheck fallback={null}>
+            <FinalStep />
           </AuthCheck>
         </Suspense>
       </SuspenseList>

@@ -158,6 +158,15 @@ const FinalStep = () => {
       analytics.logEvent('attempted_start_cloud_sync')
       return alert(`You need to finish step 2 first`)
     }
+
+    if (
+      !confirm(
+        `Only read operations are supported, if you enable you'll need to wait a few days before you can create, modify and delete schedules and todos again. Please confirm if you're ok with this, or cancel to keep using local storage.`
+      )
+    ) {
+      return
+    }
+
     try {
       const [localSchedules, localTodos] = await Promise.all([
         localStorage.getSchedules(),
@@ -216,7 +225,9 @@ const FinalStep = () => {
       logException(err)
     }
   }
-  const disable = async () => {}
+  const disable = async () => {
+    setSession('localstorage')
+  }
 
   return (
     <>

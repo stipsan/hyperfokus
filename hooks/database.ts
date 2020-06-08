@@ -11,6 +11,8 @@ const loadDatabase = async (provider) => {
       return import('database/localstorage')
     case 'demo':
       return import('database/demo')
+    case 'firebase':
+      return import('database/firebase')
     default:
       throw new TypeError(`Invalid provider: ${provider}`)
   }
@@ -28,7 +30,11 @@ export const useDatabase = (requestedSession?: SessionState) => {
 
   // @TODO move to the selector
   // Ensure this hook is never called without a valid provider
-  if (session !== 'localstorage' && session !== 'demo') {
+  if (
+    session !== 'localstorage' &&
+    session !== 'demo' &&
+    session !== 'firebase'
+  ) {
     throw new TypeError(
       session ? `Invalid provider: ${session}` : 'No database provider set'
     )

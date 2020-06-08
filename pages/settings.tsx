@@ -62,46 +62,6 @@ const CloudSyncCard = () => {
   )
 }
 
-const EnableLocalStorage = () => {
-  const session = useSessionValue()
-  const setSession = useSessionSetState()
-
-  return (
-    <Button
-      onClick={() => setSession('localstorage')}
-      variant={session === 'localstorage' ? 'primary' : 'default'}
-    >
-      {session === 'localstorage' ? 'Using local storage' : 'Use local storage'}
-    </Button>
-  )
-}
-const EnableFirebase = () => {
-  const session = useSessionValue()
-  const setSession = useSessionSetState()
-
-  return (
-    <Button
-      onClick={() => setSession('firebase')}
-      variant={session === 'firebase' ? 'primary' : 'default'}
-    >
-      {session === 'firebase' ? 'Using firebase' : 'Use firebase'}
-    </Button>
-  )
-}
-
-const EnableDemo = () => {
-  const session = useSessionValue()
-  const setSession = useSessionSetState()
-
-  return (
-    session !== 'demo' && (
-      <Button onClick={() => setSession('demo')} variant={'default'}>
-        {'Use demo'}
-      </Button>
-    )
-  )
-}
-
 const ResetButton = () => {
   const setSession = useSessionSetState()
   const analytics = useAnalytics()
@@ -121,18 +81,6 @@ const ResetButton = () => {
   )
 }
 
-const LocalDebug = () => (
-  <>
-    <br />
-    <EnableDemo />
-
-    <br />
-    <EnableLocalStorage />
-    <br />
-    <EnableFirebase />
-  </>
-)
-
 export default () => {
   return (
     <>
@@ -150,7 +98,6 @@ export default () => {
             <Card>
               <CardHeader>Advanced</CardHeader>
               <ResetButton />
-              {process.env.NODE_ENV === 'development' && <LocalDebug />}
             </Card>
           </div>
         </MoreContainer>

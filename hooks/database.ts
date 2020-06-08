@@ -22,8 +22,9 @@ export const getDatabase = async ({ get }) => {
   return db
 }
 
-export const useDatabase = () => {
-  const session = useSessionValue()
+export const useDatabase = (requestedSession?: SessionState) => {
+  const currentSession = useSessionValue()
+  const session = requestedSession || currentSession
 
   // @TODO move to the selector
   // Ensure this hook is never called without a valid provider

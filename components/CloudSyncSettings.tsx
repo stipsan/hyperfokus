@@ -1,8 +1,9 @@
 import cx from 'classnames'
 import firebase from 'firebase/app'
 import type { User } from 'firebase/app'
-import { useLogException } from 'hooks/analytics'
-import { useSessionValue } from 'hooks/session'
+import { useAnalytics, useLogException } from 'hooks/analytics'
+import { useDatabase } from 'hooks/database'
+import { useSessionSetState, useSessionValue } from 'hooks/session'
 // @ts-expect-error
 import { Suspense, unstable_SuspenseList as SuspenseList } from 'react'
 import {
@@ -26,7 +27,7 @@ const AuthStep = () => {
     return (
       <>
         <div>
-          You're logged in as: {user.displayName} ({user.email})
+          Step 1: You're logged in as {user.displayName} ({user.email})
         </div>
         <Button className={buttonClass} onClick={() => auth.signOut()}>
           Logout
@@ -37,7 +38,7 @@ const AuthStep = () => {
 
   return (
     <>
-      <div className="mt-8 sm:mt-0">Start by signing in</div>
+      <div className="mt-8 sm:mt-0">Step 1: Start by signing in</div>
       <Button
         className={cx(buttonClass, 'flex items-center')}
         onClick={async () => {
@@ -87,7 +88,9 @@ const RequestStep = () => {
   if (betaInvite.since && betaReq.email) {
     return (
       <>
-        <div className="mt-8 sm:mt-0">Your beta request is approved.</div>
+        <div className="mt-8 sm:mt-0">
+          Step 2: Your beta request is approved.
+        </div>
         <Button className={buttonClass} onClick={cancel}>
           Cancel
         </Button>
@@ -98,7 +101,9 @@ const RequestStep = () => {
   if (betaReq.email) {
     return (
       <>
-        <div className="mt-8 sm:mt-0">You've requested beta access.</div>
+        <div className="mt-8 sm:mt-0">
+          Step 2: You've requested beta access.
+        </div>
         <Button className={buttonClass} onClick={cancel}>
           Cancel
         </Button>
@@ -130,18 +135,98 @@ const RequestStep = () => {
 
 const FinalStep = () => {
   const session = useSessionValue()
+  const setSession = useSessionSetState()
+  const analytics = useAnalytics()
   const user = useUser<User>()
   const firestore = useFirestore()
   const logException = useLogException()
+  const localStorage = useDatabase('localstorage')
+  const betaReqRef = firestore.collection('betarequests').doc(user.uid)
+  const betaReq = useFirestoreDocData<{
+    email?: string
+    name?: string
+    message?: string
+  }>(betaReqRef)
+  const betaInviteRef = firestore.collection('betainvites').doc(user.uid)
+  const betaInvite = useFirestoreDocData<{
+    since?: Date
+  }>(betaInviteRef)
+  let canEnable = !!betaInvite.since && !!betaReq.email
 
-  const enable = async () => {}
+  const enable = async () => {
+    if (!canEnable) {
+      analytics.logEvent('attempted_start_cloud_sync')
+      return alert(`You need to finish step 2 first`)
+    }
+    try {
+      const [localSchedules, localTodos] = await Promise.all([
+        localStorage.getSchedules(),
+        localStorage.getTodos(),
+      ])
+
+      const schedulesSnapshots = await firestore
+        .collection('schedules')
+        .where('author', '==', user.uid)
+        .get()
+      let schedulesId = ''
+      schedulesSnapshots.forEach((snapshot) => {
+        schedulesId = snapshot.id
+      })
+
+      // No schedules doc exists so lets make one
+      if (schedulesId === '') {
+        const newScheduleRef = await firestore
+          .collection('schedules')
+          .add({ author: user.uid })
+        schedulesId = newScheduleRef.id
+      }
+      const schedulesRef = firestore.collection('schedules').doc(schedulesId)
+
+      await firestore.runTransaction(async (transaction) => {
+        const schedulesDoc = await transaction.get(schedulesRef)
+        let { rules = [] } = schedulesDoc.data()
+
+        const usedIds = new Set()
+        rules = [...rules, ...localSchedules].filter((rule) => {
+          if (usedIds.has(rule.id)) {
+            return false
+          }
+          usedIds.add(rule.id)
+          return true
+        })
+
+        await transaction.update(schedulesRef, { rules })
+      })
+
+      await Promise.all(
+        localTodos.map(
+          ({ id, completed = null, modified = null, ...localTodo }) =>
+            firestore
+              .collection('todos')
+              .doc(`${user.uid}-${id}`)
+              .set(
+                { completed, modified, ...localTodo, author: user.uid },
+                { merge: true }
+              )
+        )
+      )
+
+      setSession('firebase')
+    } catch (err) {
+      logException(err)
+    }
+  }
   const disable = async () => {}
 
   return (
     <>
       <div className="mt-8 sm:mt-0">Step 3:</div>
       {session !== 'firebase' ? (
-        <Button variant="primary" onClick={enable}>
+        <Button
+          variant={canEnable ? 'primary' : undefined}
+          className={canEnable ? undefined : buttonClass}
+          onClick={enable}
+        >
           Enable Cloud Sync
         </Button>
       ) : (

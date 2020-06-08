@@ -129,6 +129,8 @@ const TodoForm = ({
   onDelete?: () => void
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
+  let initialOrder = parseInt(initialState.order.toString(), 10)
+  if (Number.isNaN(initialOrder)) initialOrder = 0
 
   return (
     <form
@@ -194,9 +196,11 @@ const TodoForm = ({
               })
             }
           >
-            <option value={initialState.order}>Keep current ordering</option>
-            <option value={initialState.order - 1}>Move to the top</option>
-            <option value={initialState.order + 1}>Move to the bottom</option>
+            <option value={initialOrder.toString()}>
+              Keep current ordering
+            </option>
+            <option value={initialOrder - 1}>Move to the top</option>
+            <option value={initialOrder + 1}>Move to the bottom</option>
           </select>
         </Field>
       ) : (
@@ -426,12 +430,11 @@ const CreateDialog = ({
 }
 
 function findTopAndBottom(todos: Todo[]): { top: number; bottom: number } {
-  const mappedOrders = todos.map((todo) => todo.order)
-  const top = mappedOrders.reduce((min, cur) => Math.min(min, cur), Infinity)
-  const bottom = mappedOrders.reduce(
-    (max, cur) => Math.max(max, cur),
-    -Infinity
+  const mappedOrders = todos.map((todo) =>
+    isFinite(todo.order) ? todo.order : 0
   )
+  const top = mappedOrders.reduce((min, cur) => Math.min(min, cur), -1)
+  const bottom = mappedOrders.reduce((max, cur) => Math.max(max, cur), 1)
   return { top, bottom }
 }
 
@@ -488,6 +491,9 @@ const EditDialog = ({
               (schedule) => schedule.id === initialState.id
             )
             let { order } = todos[index]
+            if (!isFinite(order)) {
+              order = 0
+            }
             let changedOrder = false
 
             if (order !== state.order) {

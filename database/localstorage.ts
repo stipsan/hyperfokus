@@ -67,27 +67,6 @@ const database: DatabaseType = {
     // Always write to the modified timestamp in case another tab is listening to changes
     await localStorage.setItem(todosKey, JSON.stringify(new Date()))
   },
-  addTodo() {
-    throw new TypeError('Not implemented!')
-  },
-  editTodo() {
-    throw new TypeError('Not implemented!')
-  },
-  completeTodo() {
-    throw new TypeError('Not implemented!')
-  },
-  incompleteTodo() {
-    throw new TypeError('Not implemented!')
-  },
-  getCompletedTodos() {
-    throw new TypeError('Not implemented!')
-  },
-  archiveCompletedTodos() {
-    throw new TypeError('Not implemented!')
-  },
-  reorderTodos() {
-    throw new TypeError('Not implemented!')
-  },
 }
 
 export default database

@@ -7,34 +7,28 @@ const loaded = new Map<SessionState, DatabaseType>()
 
 const loadDatabase = async (provider) => {
   switch (provider) {
-    case 'localstorage':
-      return import('database/localstorage')
     case 'demo':
       return import('database/demo')
-    case 'firebase':
-      return import('database/firebase')
+    case 'localstorage':
+      return import('database/localstorage')
     default:
       throw new TypeError(`Invalid provider: ${provider}`)
   }
 }
 
-// For usage in selectors
+// @TODO deprecate this recoil selector helper
 export const getDatabase = async ({ get }) => {
   const { default: db } = await loadDatabase(get(sessionProviderState))
   return db
 }
 
+// @TODO deprecate this hook
 export const useDatabase = (requestedSession?: SessionState) => {
   const currentSession = useSessionValue()
   const session = requestedSession || currentSession
 
-  // @TODO move to the selector
   // Ensure this hook is never called without a valid provider
-  if (
-    session !== 'localstorage' &&
-    session !== 'demo' &&
-    session !== 'firebase'
-  ) {
+  if (session !== 'localstorage' && session !== 'demo') {
     throw new TypeError(
       session ? `Invalid provider: ${session}` : 'No database provider set'
     )

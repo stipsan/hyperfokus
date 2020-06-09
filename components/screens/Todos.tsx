@@ -3,6 +3,8 @@ import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
+import { useActiveSchedules } from 'components/SchedulesProvider'
+import { useTodos, useTodosDispatch } from 'components/TodosProvider'
 import type { Todo } from 'database/types'
 import {
   isAfter,
@@ -13,21 +15,18 @@ import {
   setSeconds,
 } from 'date-fns'
 import { useAnalytics, useLogException } from 'hooks/analytics'
-import { useActiveSchedules, useSchedulesObserver } from 'hooks/schedules'
-import { useTodos, useTodosObserver } from 'hooks/todos'
-import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
   forwardRef,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
   useState,
 } from 'react'
-import type { Dispatch, FC, ReactNode, SetStateAction } from 'react'
-import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
+import type { FC, ReactNode } from 'react'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './Todos.module.css'
@@ -187,6 +186,7 @@ const TodoForm = ({
             id="ordering"
             value={state.order}
             onChange={(event) =>
+              // @TODO rewrite reorder signals to use enum strings instead of numbers to signal sorting
               dispatch({
                 type: 'change',
                 payload: {
@@ -199,8 +199,8 @@ const TodoForm = ({
             <option value={initialOrder.toString()}>
               Keep current ordering
             </option>
-            <option value={initialOrder - 1}>Move to the top</option>
-            <option value={initialOrder + 1}>Move to the bottom</option>
+            <option value={-1}>Move to the top</option>
+            <option value={1}>Move to the bottom</option>
           </select>
         </Field>
       ) : (
@@ -282,9 +282,10 @@ const TodoItem: React.FC<{
   todo: ForecastTodo
   isToday: boolean
   now: Date
-  setTodos: Dispatch<SetStateAction<Todo[]>>
-}> = ({ todo, isToday, now, setTodos }) => {
+}> = ({ todo, isToday, now }) => {
   const analytics = useAnalytics()
+  const logException = useLogException()
+  const { completeTodo, incompleteTodo } = useTodosDispatch()
   let isOverdue = false
   let isCurrent = false
   if (isToday) {
@@ -331,19 +332,19 @@ const TodoItem: React.FC<{
       <StyledCheckbox
         checked={!!todo.completed}
         onClick={(event) => event.stopPropagation()}
-        onChange={(event) => {
-          setTodos((todos) => {
-            const index = todos.findIndex((search) => search.id === todo.id)
+        onChange={async (event) => {
+          const { checked } = event.target
+          try {
+            if (checked) {
+              await completeTodo(todo.id)
+            } else {
+              await incompleteTodo(todo.id)
+            }
 
-            const newTodos = replaceItemAtIndex(todos, index, {
-              ...todos[index],
-              completed: todos[index].completed ? undefined : new Date(),
-            })
-            return newTodos
-          })
-          analytics.logEvent('todo_toggle', {
-            completed: event.target.checked,
-          })
+            analytics.logEvent('todo_toggle', { completed: checked })
+          } catch (err) {
+            logException(err)
+          }
         }}
       />
     </li>
@@ -365,14 +366,9 @@ const Section = forwardRef<
   </section>
 ))
 
-const CreateDialog = ({
-  onDismiss,
-  setTodos,
-}: {
-  onDismiss: () => void
-  setTodos: Dispatch<SetStateAction<Todo[]>>
-}) => {
+const CreateDialog = ({ onDismiss }: { onDismiss: () => void }) => {
   const logException = useLogException()
+  const { addTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -403,19 +399,8 @@ const CreateDialog = ({
       onDismiss={onDismiss}
       onSubmit={async (state) => {
         try {
-          await setTodos((todos) => {
-            const newTodo = {
-              ...state,
-              id: nanoid(),
-              description: state.description.substring(0, 2048),
-            }
-            idRef.current = newTodo.id
-            const { top, bottom } = findTopAndBottom(todos)
-
-            return state.order > 0
-              ? [...todos, { ...newTodo, order: bottom }]
-              : [{ ...newTodo, order: top }, ...todos]
-          })
+          const { id } = await addTodo(state)
+          idRef.current = id
           onDismiss()
           analytics.logEvent('todo_create', {
             duration: state.duration,
@@ -429,27 +414,17 @@ const CreateDialog = ({
   )
 }
 
-function findTopAndBottom(todos: Todo[]): { top: number; bottom: number } {
-  const mappedOrders = todos.map((todo) =>
-    isFinite(todo.order) ? todo.order : 0
-  )
-  const top = mappedOrders.reduce((min, cur) => Math.min(min, cur), -1)
-  const bottom = mappedOrders.reduce((max, cur) => Math.max(max, cur), 1)
-  return { top, bottom }
-}
-
 const EditDialog = ({
   todos,
-  setTodos,
   onDismiss,
   id,
 }: {
   todos: Todo[]
-  setTodos: Dispatch<SetStateAction<Todo[]>>
   onDismiss: () => void
   id: string
 }) => {
   const logException = useLogException()
+  const { editTodo, deleteTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -486,43 +461,7 @@ const EditDialog = ({
       onDismiss={onDismiss}
       onSubmit={async (state) => {
         try {
-          await setTodos((todos) => {
-            const index = todos.findIndex(
-              (schedule) => schedule.id === initialState.id
-            )
-            let { order } = todos[index]
-            if (!isFinite(order)) {
-              order = 0
-            }
-            let changedOrder = false
-
-            if (order !== state.order) {
-              const { top, bottom } = findTopAndBottom(todos)
-              order = state.order > order ? bottom + 1 : top - 1
-              changedOrder = true
-            }
-
-            const newTodos = replaceItemAtIndex(todos, index, {
-              ...todos[index],
-              description: state.description.substring(0, 2048),
-              duration: state.duration,
-              order,
-            })
-
-            if (changedOrder) {
-              newTodos.sort((a, b) => {
-                if (a.order < b.order) {
-                  return -1
-                }
-                if (a.order > b.order) {
-                  return 1
-                }
-                return 0
-              })
-            }
-
-            return newTodos
-          })
+          await editTodo(state, id)
           setInitialState(state)
           onDismiss()
           analytics.logEvent('todo_edit', {
@@ -540,13 +479,7 @@ const EditDialog = ({
           )
         ) {
           try {
-            await setTodos((todos) => {
-              const index = todos.findIndex(
-                (todo) => todo.id === initialState.id
-              )
-              const newTodos = removeItemAtIndex(todos, index)
-              return newTodos
-            })
+            await deleteTodo(id)
             onDismiss()
             analytics.logEvent('todo_delete', {
               duration: initialState.duration,
@@ -570,13 +503,13 @@ export default () => {
     })
   }, [])
 
-  useSchedulesObserver()
-  useTodosObserver()
-
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
   const schedules = useActiveSchedules()
-  const [todos, setTodos] = useTodos()
+  const todos = useTodos()
+  const { archiveTodos } = useTodosDispatch()
+  const logException = useLogException()
+
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
   )
@@ -597,7 +530,7 @@ export default () => {
   }, 1000 * 60)
 
   // Regen forecast when necessary
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (schedules.length > 0 && todos.length > 0) {
       setForecast(getForecast(schedules, todos, lastReset))
     } else {
@@ -665,7 +598,6 @@ export default () => {
                 key={activity.id}
                 todo={{ ...activity, start: 'N/A', end: 'N/A' }}
                 now={now}
-                setTodos={setTodos}
                 isToday={false}
               />
             ))}
@@ -681,7 +613,6 @@ export default () => {
               key={activity.id}
               todo={{ ...activity, start: 'N/A', end: 'N/A' }}
               now={now}
-              setTodos={setTodos}
               isToday={false}
             />
           ))}
@@ -725,7 +656,6 @@ export default () => {
                     todo={task}
                     isToday={isToday}
                     now={now}
-                    setTodos={setTodos}
                   />
                 ))
               )}
@@ -737,15 +667,14 @@ export default () => {
         <Button
           variant="primary"
           className="block mx-auto my-4"
-          onClick={() => {
-            setLastReset(new Date())
-            setTodos((todos) =>
-              todos.map((todo) => ({
-                ...todo,
-                done: todo.done || !!todo.completed,
-              }))
-            )
-            analytics.logEvent('todo_archive')
+          onClick={async () => {
+            try {
+              await archiveTodos()
+              setLastReset(new Date())
+              analytics.logEvent('todo_archive')
+            } catch (err) {
+              logException(err)
+            }
           }}
         >
           Archive Completed Todos
@@ -773,7 +702,7 @@ export default () => {
         onDismiss={onDismiss}
         aria-label="Create new todo"
       >
-        <CreateDialog setTodos={setTodos} onDismiss={onDismiss} />
+        <CreateDialog onDismiss={onDismiss} />
       </AnimatedDialog>
       <AnimatedDialog
         isOpen={!router.query.create && todoIds.has(router.query.edit)}
@@ -782,7 +711,6 @@ export default () => {
       >
         <EditDialog
           onDismiss={onDismiss}
-          setTodos={setTodos}
           todos={todos}
           id={router.query.edit as string}
         />

@@ -4,7 +4,13 @@ if (typeof window === 'undefined') {
   throw new TypeError(`This module can't be run on the server!`)
 }
 
-import { Repeat, ScheduleDelta, Todo, TodoDelta } from './types'
+import type {
+  DatabaseType,
+  Repeat,
+  ScheduleDelta,
+  Todo,
+  TodoDelta,
+} from './types'
 
 const repeatNone: Repeat = {
   monday: false,
@@ -42,7 +48,7 @@ const repeatAll: Repeat = {
   saturday: true,
   sunday: true,
 }
-let schedules = [
+export let schedules = [
   { start: '07:20', duration: 60, end: '08:20', repeat: repeatWeekdays },
   { start: '11:00', duration: 120, end: '13:00', repeat: repeatWeekends },
   {
@@ -109,7 +115,7 @@ let schedules = [
   ...schedule,
 }))
 
-let todos = [
+export let todos = [
   {
     description: 'Ability to create todos.',
     duration: 30,
@@ -191,7 +197,7 @@ let todos = [
   }
 )
 
-export default {
+const database: DatabaseType = {
   getSchedules() {
     return Promise.resolve(schedules)
   },
@@ -214,159 +220,6 @@ export default {
 
     return Promise.resolve()
   },
-  addTodo(todoDelta) {
-    const todo: Todo = {
-      id: `activity-${todos.length + 1}`,
-      order: todos.length + 1,
-      done: false,
-      created: new Date(),
-      modified: new Date(),
-      ...todoDelta,
-    }
-    todos = [...todos, todo]
-
-    return Promise.resolve(todo)
-  },
-  editTodo(todoId, todoDelta) {
-    return new Promise((resolve, reject) => {
-      try {
-        const index = todos.findIndex((todo) => todo.id === todoId)
-        const { description, duration } = todoDelta
-        todos[index] = {
-          ...todos[index],
-          description,
-          duration,
-          modified: new Date(),
-        }
-
-        resolve()
-      } catch (err) {
-        reject(err)
-      }
-    })
-  },
-  completeTodo(todoId) {
-    return new Promise((resolve, reject) => {
-      try {
-        const index = todos.findIndex((todos) => todos.id === todoId)
-        todos[index] = {
-          ...todos[index],
-          completed: new Date(),
-        }
-
-        resolve()
-      } catch (err) {
-        reject(err)
-      }
-    })
-  },
-  incompleteTodo(todoId) {
-    return new Promise((resolve, reject) => {
-      try {
-        const index = todos.findIndex((todo) => todo.id === todoId)
-        todos[index] = {
-          ...todos[index],
-          completed: undefined,
-          done: false,
-        }
-
-        resolve()
-      } catch (err) {
-        reject(err)
-      }
-    })
-  },
-  getCompletedTodos() {
-    return Promise.resolve(
-      todos
-        .filter((todo) => todo.done)
-        .sort((a, b) => {
-          if (!a.completed || !b.completed) {
-            return 0
-          }
-
-          if (a.completed < b.completed) {
-            return 1
-          }
-          if (a.completed > b.completed) {
-            return -1
-          }
-
-          return 0
-        })
-    )
-  },
-  archiveCompletedTodos() {
-    return new Promise((resolve, reject) => {
-      try {
-        const completedTodos = todos.filter(
-          (todo) => !todo.done && !!todo.completed
-        )
-
-        completedTodos.forEach((completedTodo) => {
-          const index = todos.findIndex((todo) => todo.id === completedTodo.id)
-          todos[index] = { ...todos[index], done: true }
-        })
-
-        resolve()
-      } catch (err) {
-        reject(err)
-      }
-    })
-  },
-  reorderTodos(todoId, order) {
-    return new Promise((resolve, reject) => {
-      try {
-        todos
-          .sort((a, b) => {
-            if (a.id === todoId && b.id === todoId) {
-              return 0
-            }
-
-            if (order === -1) {
-              console.log('sorting to top')
-
-              // Handle all cases please
-              if (a.id === todoId) {
-                return -1
-              }
-
-              if (b.id === todoId) {
-                return 1
-              }
-            }
-
-            if (order === 1) {
-              console.log('sorting to bottom')
-
-              if (a.id === todoId) {
-                return 1
-              }
-
-              if (b.id === todoId) {
-                return -1
-              }
-            }
-
-            if (a.order > b.order) {
-              return 1
-            }
-
-            if (a.order < b.order) {
-              return -1
-            }
-
-            return 0
-          })
-          .forEach((todo, i) => {
-            todo.order = i
-            todo.modified = new Date()
-          })
-
-        resolve()
-      } catch (err) {
-        reject(err)
-      }
-    })
-  },
 }
+
+export default database

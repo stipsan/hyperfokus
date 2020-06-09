@@ -14,6 +14,9 @@ export const useLogException = () => {
   const analytics = useAnalytics()
 
   return (error: Error, errorInfo?: unknown) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.error(error)
+    }
     analytics.logEvent('exception', {
       fatal: true,
       description: error.toString(),

@@ -1,3 +1,3 @@
 import type { ReactNode } from 'react'
 
-export default ({ children }: { children: ReactNode }) => null
+export default ({ children }: { children: ReactNode }) => <>{children}</>

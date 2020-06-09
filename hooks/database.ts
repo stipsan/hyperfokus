@@ -7,12 +7,12 @@ const loaded = new Map<SessionState, DatabaseType>()
 
 const loadDatabase = async (provider) => {
   switch (provider) {
-    case 'localstorage':
-      return import('database/localstorage')
     case 'demo':
       return import('database/demo')
     case 'firebase':
       return import('database/firebase')
+    case 'localstorage':
+      return import('database/localstorage')
     default:
       throw new TypeError(`Invalid provider: ${provider}`)
   }

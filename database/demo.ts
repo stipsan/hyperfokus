@@ -42,7 +42,7 @@ const repeatAll: Repeat = {
   saturday: true,
   sunday: true,
 }
-let schedules = [
+export let schedules = [
   { start: '07:20', duration: 60, end: '08:20', repeat: repeatWeekdays },
   { start: '11:00', duration: 120, end: '13:00', repeat: repeatWeekends },
   {
@@ -109,7 +109,7 @@ let schedules = [
   ...schedule,
 }))
 
-let todos = [
+export let todos = [
   {
     description: 'Ability to create todos.',
     duration: 30,

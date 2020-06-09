@@ -1,7 +1,9 @@
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import { AppLayout, MainContainer } from 'components/layouts'
+import SchedulesProvider from 'components/SchedulesProvider'
 import Todos from 'components/screens/Todos'
 import Welcome from 'components/screens/Welcome'
+import TodosProvider from 'components/TodosProvider'
 import { useSessionValue } from 'hooks/session'
 import { useEffect } from 'react'
 
@@ -22,7 +24,11 @@ export default () => {
       <AppLayout createLink="New todo">
         <GetStartedBroadcast />
         <MainContainer>
-          <Todos />
+          <SchedulesProvider>
+            <TodosProvider>
+              <Todos />
+            </TodosProvider>
+          </SchedulesProvider>
         </MainContainer>
       </AppLayout>
     </>

@@ -3,6 +3,7 @@ import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
+import { useActiveSchedules } from 'components/SchedulesProvider'
 import type { Todo } from 'database/types'
 import {
   isAfter,
@@ -13,7 +14,6 @@ import {
   setSeconds,
 } from 'date-fns'
 import { useAnalytics, useLogException } from 'hooks/analytics'
-import { useActiveSchedules, useSchedulesObserver } from 'hooks/schedules'
 import { useTodos, useTodosObserver } from 'hooks/todos'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
@@ -570,7 +570,6 @@ export default () => {
     })
   }, [])
 
-  useSchedulesObserver()
   useTodosObserver()
 
   const router = useRouter()

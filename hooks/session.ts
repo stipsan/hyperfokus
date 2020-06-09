@@ -5,7 +5,6 @@ import {
   useResetRecoilState,
   useSetRecoilState,
 } from 'recoil'
-import { schedulesState } from './schedules'
 import { todosState } from './todos'
 
 export const sessionKey = 'hyperfokus.storage'
@@ -45,12 +44,11 @@ export const useSessionValue = () => {
 const useSetSession = () => {
   const setState = useSetRecoilState(sessionProviderState)
   // States that need to be reset when changing session
-  const resetSchedules = useResetRecoilState(schedulesState)
+
   const resetTodos = useResetRecoilState(todosState)
 
   return (session: SessionState) => {
     setState(session)
-    resetSchedules()
     resetTodos()
   }
 }

@@ -2,9 +2,9 @@ import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button, { className } from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
+import { useSchedules } from 'components/SchedulesProvider'
 import type { Schedule } from 'database/types'
 import { useAnalytics } from 'hooks/analytics'
-import { useSchedules, useSchedulesObserver } from 'hooks/schedules'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -600,8 +600,7 @@ export default () => {
     })
   }, [])
 
-  useSchedulesObserver()
-  const [schedules, setSchedules] = useSchedules()
+  const { schedules, setSchedules } = useSchedules()
 
   return (
     <div className={cx({ 'border-b-2': schedules.length > 0 })}>

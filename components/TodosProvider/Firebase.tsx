@@ -25,9 +25,12 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
   const user = useUser<User>()
   const firestore = useFirestore()
   const todosRef = firestore.collection('todos').where('author', '==', user.uid)
-  const todosData = useFirestoreCollectionData<TodoDoc>(todosRef, {
-    idField: 'id',
-  })
+  const todosData = useFirestoreCollectionData<TodoDoc>(
+    todosRef.orderBy('order', 'desc'),
+    {
+      idField: 'id',
+    }
+  )
   const todos = useMemo(
     () =>
       todosData.map((todo) => {
@@ -59,6 +62,42 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
   // @TODO verify that firestore is stable
   const context = useMemo(
     (): TodosDispatchContext => ({
+      addTodo: async ({
+        completed,
+        created,
+        description,
+        done,
+        duration,
+        modified,
+        order,
+      }) => {
+        const data = {
+          author: user.uid,
+          completed: completed === undefined ? null : completed,
+          created,
+          description,
+          done,
+          duration,
+          modified: modified === undefined ? null : modified,
+          order,
+        }
+
+        if (order > 0) {
+          const todos = await todosRef.orderBy('order', 'desc').limit(1).get()
+          todos.forEach((todo) => {
+            data.order = todo.data().order + 1
+          })
+        } else {
+          const todos = await todosRef.orderBy('order', 'asc').limit(1).get()
+          todos.forEach((todo) => {
+            data.order = todo.data().order - 1
+          })
+        }
+
+        const ref = await firestore.collection('todos').add(data)
+
+        return { id: ref.id }
+      },
       completeTodo: async (id) => {
         await firestore
           .collection('todos')
@@ -72,7 +111,7 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
           .update({ completed: null, done: false })
       },
     }),
-    [firestore]
+    [firestore, user.uid]
   )
 
   return (

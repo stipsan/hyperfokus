@@ -15,7 +15,6 @@ import {
   setSeconds,
 } from 'date-fns'
 import { useAnalytics, useLogException } from 'hooks/analytics'
-import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
@@ -282,8 +281,7 @@ const TodoItem: React.FC<{
   todo: ForecastTodo
   isToday: boolean
   now: Date
-  setTodos: Dispatch<SetStateAction<Todo[]>>
-}> = ({ todo, isToday, now, setTodos }) => {
+}> = ({ todo, isToday, now }) => {
   const analytics = useAnalytics()
   const logException = useLogException()
   const { completeTodo, incompleteTodo } = useTodosDispatch()
@@ -367,14 +365,9 @@ const Section = forwardRef<
   </section>
 ))
 
-const CreateDialog = ({
-  onDismiss,
-  setTodos,
-}: {
-  onDismiss: () => void
-  setTodos: Dispatch<SetStateAction<Todo[]>>
-}) => {
+const CreateDialog = ({ onDismiss }: { onDismiss: () => void }) => {
   const logException = useLogException()
+  const { addTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -405,19 +398,8 @@ const CreateDialog = ({
       onDismiss={onDismiss}
       onSubmit={async (state) => {
         try {
-          await setTodos((todos) => {
-            const newTodo = {
-              ...state,
-              id: nanoid(),
-              description: state.description.substring(0, 2048),
-            }
-            idRef.current = newTodo.id
-            const { top, bottom } = findTopAndBottom(todos)
-
-            return state.order > 0
-              ? [...todos, { ...newTodo, order: bottom }]
-              : [{ ...newTodo, order: top }, ...todos]
-          })
+          const { id } = await addTodo(state)
+          idRef.current = id
           onDismiss()
           analytics.logEvent('todo_create', {
             duration: state.duration,
@@ -667,7 +649,6 @@ export default () => {
                 key={activity.id}
                 todo={{ ...activity, start: 'N/A', end: 'N/A' }}
                 now={now}
-                setTodos={setTodos}
                 isToday={false}
               />
             ))}
@@ -683,7 +664,6 @@ export default () => {
               key={activity.id}
               todo={{ ...activity, start: 'N/A', end: 'N/A' }}
               now={now}
-              setTodos={setTodos}
               isToday={false}
             />
           ))}
@@ -727,7 +707,6 @@ export default () => {
                     todo={task}
                     isToday={isToday}
                     now={now}
-                    setTodos={setTodos}
                   />
                 ))
               )}
@@ -775,7 +754,7 @@ export default () => {
         onDismiss={onDismiss}
         aria-label="Create new todo"
       >
-        <CreateDialog setTodos={setTodos} onDismiss={onDismiss} />
+        <CreateDialog onDismiss={onDismiss} />
       </AnimatedDialog>
       <AnimatedDialog
         isOpen={!router.query.create && todoIds.has(router.query.edit)}

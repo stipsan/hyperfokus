@@ -1,6 +1,7 @@
 import database from 'database/localstorage'
 import type { Todo } from 'database/types'
 import { useLogException } from 'hooks/analytics'
+import { nanoid } from 'nanoid'
 import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { atom, selector, useRecoilState, useSetRecoilState } from 'recoil'
@@ -51,8 +52,29 @@ export default ({ children }: { children: ReactNode }) => {
   //       useMemo should only call its setter once, only StateProvider should trigger rerenders
   const context = useMemo(
     (): TodosDispatchContext => ({
-      completeTodo: (id) => {
-        setTodos((todos) => {
+      addTodo: async (data) => {
+        const id = nanoid()
+
+        await setTodos((todos) => {
+          const todo = { ...data, id }
+
+          if (todos.length < 1) {
+            return [todo]
+          }
+
+          if (todo.order > 0) {
+            const { order: bottom } = todos[todos.length - 1]
+            return [...todos, { ...todo, order: bottom + 1 }]
+          }
+
+          const { order: top } = todos[0]
+          return [{ ...todo, order: top - 1 }, ...todos]
+        })
+
+        return { id }
+      },
+      completeTodo: async (id) => {
+        await setTodos((todos) => {
           const index = todos.findIndex((search) => search.id === id)
           return replaceItemAtIndex(todos, index, {
             ...todos[index],
@@ -60,8 +82,8 @@ export default ({ children }: { children: ReactNode }) => {
           })
         })
       },
-      incompleteTodo: (id) => {
-        setTodos((todos) => {
+      incompleteTodo: async (id) => {
+        await setTodos((todos) => {
           const index = todos.findIndex((search) => search.id === id)
           return replaceItemAtIndex(todos, index, {
             ...todos[index],

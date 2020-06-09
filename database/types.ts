@@ -75,16 +75,4 @@ export interface DatabaseType {
   ): () => void
   setTodos(todos: Todo[]): Promise<void>
   getTodos(): Promise<Todo[]>
-  addTodo(todo: TodoDelta): Promise<Todo>
-  editTodo(todoId: string, todo: TodoDelta): Promise<unknown>
-  /** toggle an todo as completed */
-  completeTodo(todoId: string): Promise<unknown>
-  /** untoggle an todo as completed, puts it back on the board */
-  incompleteTodo(todoId: string): Promise<unknown>
-  /** Fetches truly finished todos */
-  getCompletedTodos(): Promise<Todo[]>
-  /** Fetches all todos that are completed and archives them so the schedule can be recreated */
-  archiveCompletedTodos(): Promise<unknown>
-  /** Reorder all todos, and make the selected todo either top 1 or bottom -1 */
-  reorderTodos(todoId: string, ordering: number): Promise<unknown>
 }

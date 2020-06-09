@@ -26,7 +26,7 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
   const firestore = useFirestore()
   const todosRef = firestore.collection('todos').where('author', '==', user.uid)
   const todosData = useFirestoreCollectionData<TodoDoc>(
-    todosRef.orderBy('order', 'desc'),
+    todosRef.orderBy('order', 'asc'),
     {
       idField: 'id',
     }
@@ -92,6 +92,11 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
           todos.forEach((todo) => {
             data.order = todo.data().order - 1
           })
+        }
+
+        // Workaround tainted data
+        if (!isFinite(data.order)) {
+          data.order = 0
         }
 
         const ref = await firestore.collection('todos').add(data)

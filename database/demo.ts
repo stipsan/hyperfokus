@@ -4,7 +4,13 @@ if (typeof window === 'undefined') {
   throw new TypeError(`This module can't be run on the server!`)
 }
 
-import { Repeat, ScheduleDelta, Todo, TodoDelta } from './types'
+import type {
+  DatabaseType,
+  Repeat,
+  ScheduleDelta,
+  Todo,
+  TodoDelta,
+} from './types'
 
 const repeatNone: Repeat = {
   monday: false,
@@ -191,7 +197,7 @@ export let todos = [
   }
 )
 
-export default {
+const database: DatabaseType = {
   getSchedules() {
     return Promise.resolve(schedules)
   },
@@ -213,19 +219,6 @@ export default {
     todos = JSON.parse(JSON.stringify(nextTodos))
 
     return Promise.resolve()
-  },
-  addTodo(todoDelta) {
-    const todo: Todo = {
-      id: `activity-${todos.length + 1}`,
-      order: todos.length + 1,
-      done: false,
-      created: new Date(),
-      modified: new Date(),
-      ...todoDelta,
-    }
-    todos = [...todos, todo]
-
-    return Promise.resolve(todo)
   },
   editTodo(todoId, todoDelta) {
     return new Promise((resolve, reject) => {
@@ -370,3 +363,5 @@ export default {
     })
   },
 }
+
+export default database

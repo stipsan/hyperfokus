@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { atom, useRecoilState } from 'recoil'
-import { replaceItemAtIndex } from 'utils/array'
+import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import { DispatchProvider, StateProvider } from './Context'
 import type { TodosDispatchContext } from './Context'
 
@@ -37,6 +37,37 @@ export default ({ children }: { children: ReactNode }) => {
 
           const { order: top } = todos[0]
           return [{ ...todo, order: top - 1 }, ...todos]
+        })
+
+        return { id }
+      },
+      editTodo: async (data, id) => {
+        await setTodos((todos) => {
+          const index = todos.findIndex((search) => search.id === id)
+          const todo = {
+            ...todos[index],
+            ...data,
+          }
+
+          if (todos.length < 1) {
+            return [todo]
+          }
+
+          if (todos[index].order !== data.order && data.order === 1) {
+            const { order: bottom } = todos[todos.length - 1]
+            return [
+              ...removeItemAtIndex(todos, index),
+              { ...todo, order: bottom + 1 },
+            ]
+          } else if (todos[index].order !== data.order && data.order === -1) {
+            const { order: top } = todos[0]
+            return [
+              { ...todo, order: top - 1 },
+              ...removeItemAtIndex(todos, index),
+            ]
+          }
+
+          return replaceItemAtIndex(todos, index, todo)
         })
 
         return { id }

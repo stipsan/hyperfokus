@@ -186,6 +186,7 @@ const TodoForm = ({
             id="ordering"
             value={state.order}
             onChange={(event) =>
+              // @TODO rewrite reorder signals to use enum strings instead of numbers to signal sorting
               dispatch({
                 type: 'change',
                 payload: {

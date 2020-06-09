@@ -3,8 +3,9 @@ import type { Todo } from 'database/types'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { atom, useRecoilState } from 'recoil'
-import { Provider } from './Context'
-import type { TodosContext } from './Context'
+import { replaceItemAtIndex } from 'utils/array'
+import { DispatchProvider, StateProvider } from './Context'
+import type { TodosDispatchContext } from './Context'
 
 const todosState = atom<Todo[]>({
   key: 'demoTodos',
@@ -14,12 +15,36 @@ const todosState = atom<Todo[]>({
 export default ({ children }: { children: ReactNode }) => {
   const [todos, setTodos] = useRecoilState(todosState)
 
+  // @TODO trace if setTodos is referencial stable cross renders
+  //       useMemo should only call its setter once, only StateProvider should trigger rerenders
   const context = useMemo(
-    (): TodosContext => ({
-      todos,
+    (): TodosDispatchContext => ({
+      completeTodo: (id) => {
+        setTodos((todos) => {
+          const index = todos.findIndex((search) => search.id === id)
+          return replaceItemAtIndex(todos, index, {
+            ...todos[index],
+            completed: new Date(),
+          })
+        })
+      },
+      incompleteTodo: (id) => {
+        setTodos((todos) => {
+          const index = todos.findIndex((search) => search.id === id)
+          return replaceItemAtIndex(todos, index, {
+            ...todos[index],
+            completed: undefined,
+            done: false,
+          })
+        })
+      },
     }),
-    [todos]
+    [setTodos]
   )
 
-  return <Provider value={context}>{children}</Provider>
+  return (
+    <DispatchProvider value={context}>
+      <StateProvider value={todos}>{children}</StateProvider>
+    </DispatchProvider>
+  )
 }

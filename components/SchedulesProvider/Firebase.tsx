@@ -17,6 +17,17 @@ type ScheduleDoc = {
   rules: Schedule[]
 }
 
+/*
+const sanitize = (schedule: Schedule) => {
+  const { rules } = schedule
+      rules.forEach((rule) => {
+        // @TODO filter and provide sound default values, remove rules that are too broken to fix
+        const { after, duration, enabled, end, repeat, start, id } = rule
+        
+      })
+}
+// */
+
 const SchedulesProvider = ({ children }: { children: ReactNode }) => {
   const user = useUser<User>()
   const firestore = useFirestore()
@@ -47,6 +58,7 @@ const SchedulesProvider = ({ children }: { children: ReactNode }) => {
         }
 
         // Ensure there's no duplicates
+        // @TODO filter and sanitize data
         const usedIds = new Set()
         const rules = schedules.filter((schedule) => {
           if (usedIds.has(schedule.id)) {

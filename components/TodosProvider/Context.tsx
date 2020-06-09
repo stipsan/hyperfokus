@@ -1,24 +1,36 @@
 import type { Todo } from 'database/types'
 import { createContext, useContext } from 'react'
 
-export type TodosContext = {
-  todos: Todo[]
+export type TodosContext = Todo[]
+
+export type TodosDispatchContext = {
+  completeTodo(id: string): void
+  incompleteTodo(id: string): void
 }
 
 const error = new ReferenceError(
   `TodosProvider isn't in the tree, the context for useTodos is missing`
 )
-const context = createContext<TodosContext>({
-  get todos() {
+// @TODO implement thrower when attempting to read the default context
+const context = createContext<TodosContext>([])
+const dispatchContext = createContext<TodosDispatchContext>({
+  get completeTodo() {
     throw error
-    return []
+    return () => {}
+  },
+  get incompleteTodo() {
+    throw error
+    return () => {}
   },
 })
 
-export const { Provider } = context
+export const { Provider: StateProvider } = context
+export const { Provider: DispatchProvider } = dispatchContext
 
-export const useTodos = () => {
-  const { todos } = useContext(context)
+export const useTodos = () => useContext(context)
+
+export const useTodosDispatch = () => {
+  const context = useContext(dispatchContext)
 
   /*
   const setSortedTodos: Dispatch<SetStateAction<Todo[]>> = (value) => {
@@ -35,5 +47,5 @@ export const useTodos = () => {
   }
   // */
 
-  return { todos }
+  return context
 }

@@ -20,7 +20,7 @@ const getProvider = (session: SessionState) => {
   }
 }
 
-export { useTodos } from './Context'
+export { useTodos, useTodosDispatch } from './Context'
 
 export default ({ children }: { children: ReactNode }) => {
   const session = useSessionValue()

@@ -1,5 +1,6 @@
 import database from 'database/localstorage'
 import type { Schedule } from 'database/types'
+import { useLogException } from 'hooks/analytics'
 import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { atom, selector, useRecoilState, useSetRecoilState } from 'recoil'
@@ -14,19 +15,15 @@ const schedulesState = atom<Schedule[]>({
 const asyncSchedulesState = selector<Schedule[]>({
   key: 'asyncLocalstorageSchedules',
   get: async ({ get }) => {
-    try {
-      const cache = get(schedulesState)
+    const cache = get(schedulesState)
 
-      // It's only null when it should be fetched
-      if (cache === null) {
-        //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
-        return database.getSchedules()
-      }
-
-      return cache
-    } catch (err) {
-      console.error('oh no wtf!', err)
+    // It's only null when it should be fetched
+    if (cache === null) {
+      //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
+      return database.getSchedules()
     }
+
+    return cache
   },
   set: async ({ set }, schedules: Schedule[]) => {
     set(schedulesState, schedules)
@@ -35,6 +32,7 @@ const asyncSchedulesState = selector<Schedule[]>({
 })
 
 export default ({ children }: { children: ReactNode }) => {
+  const logException = useLogException()
   const syncSchedules = useSetRecoilState(schedulesState)
   const [schedules, setSchedules] = useRecoilState(asyncSchedulesState)
 
@@ -42,11 +40,11 @@ export default ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = database.observeSchedules(
       (schedules) => syncSchedules(schedules),
-      (err) => console.error(err)
+      (err) => logException(err)
     )
 
     return () => unsubscribe()
-  }, [database])
+  }, [])
 
   const context = useMemo(
     (): SchedulesContext => ({

@@ -4,7 +4,7 @@ import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import { useActiveSchedules } from 'components/SchedulesProvider'
-import { useTodos } from 'components/TodosProvider'
+import { useTodos, useTodosDispatch } from 'components/TodosProvider'
 import type { Todo } from 'database/types'
 import {
   isAfter,
@@ -285,6 +285,8 @@ const TodoItem: React.FC<{
   setTodos: Dispatch<SetStateAction<Todo[]>>
 }> = ({ todo, isToday, now, setTodos }) => {
   const analytics = useAnalytics()
+  const logException = useLogException()
+  const { completeTodo, incompleteTodo } = useTodosDispatch()
   let isOverdue = false
   let isCurrent = false
   if (isToday) {
@@ -331,19 +333,19 @@ const TodoItem: React.FC<{
       <StyledCheckbox
         checked={!!todo.completed}
         onClick={(event) => event.stopPropagation()}
-        onChange={(event) => {
-          setTodos((todos) => {
-            const index = todos.findIndex((search) => search.id === todo.id)
+        onChange={async (event) => {
+          const { checked } = event.target
+          try {
+            if (checked) {
+              await completeTodo(todo.id)
+            } else {
+              await incompleteTodo(todo.id)
+            }
 
-            const newTodos = replaceItemAtIndex(todos, index, {
-              ...todos[index],
-              completed: todos[index].completed ? undefined : new Date(),
-            })
-            return newTodos
-          })
-          analytics.logEvent('todo_toggle', {
-            completed: event.target.checked,
-          })
+            analytics.logEvent('todo_toggle', { completed: checked })
+          } catch (err) {
+            logException(err)
+          }
         }}
       />
     </li>
@@ -573,8 +575,9 @@ export default () => {
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
   const schedules = useActiveSchedules()
-  const { todos } = useTodos()
-  const setTodos = (...args) => console.log('setTodos', ...args)
+  const todos = useTodos()
+  const setTodos = (value) =>
+    console.log('setTodos', typeof value === 'function' ? value(todos) : value)
 
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)

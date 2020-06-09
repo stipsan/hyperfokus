@@ -35,7 +35,7 @@ export const useSchedules = () => {
         let result = sortByHoursMinutesString(a.start, b.start)
         return result !== 0 ? result : sortByHoursMinutesString(a.end, b.end)
       })
-
+      // @TODO should filter and sanitize data to ensure no properties are missing
       return schedules
     })
   }

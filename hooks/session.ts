@@ -1,11 +1,5 @@
 import { useEffect } from 'react'
-import {
-  atom,
-  useRecoilValue,
-  useResetRecoilState,
-  useSetRecoilState,
-} from 'recoil'
-import { todosState } from './todos'
+import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
 
 export const sessionKey = 'hyperfokus.storage'
 export type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
@@ -45,11 +39,8 @@ const useSetSession = () => {
   const setState = useSetRecoilState(sessionProviderState)
   // States that need to be reset when changing session
 
-  const resetTodos = useResetRecoilState(todosState)
-
   return (session: SessionState) => {
     setState(session)
-    resetTodos()
   }
 }
 

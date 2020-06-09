@@ -20,6 +20,7 @@ import { useRouter } from 'next/router'
 import {
   forwardRef,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -506,8 +507,8 @@ export default () => {
   const [hyperfocusing, setHyperfocus] = useState(false)
   const schedules = useActiveSchedules()
   const todos = useTodos()
-  const setTodos = (value) =>
-    console.log('setTodos', typeof value === 'function' ? value(todos) : value)
+  const { archiveTodos } = useTodosDispatch()
+  const logException = useLogException()
 
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
@@ -529,7 +530,7 @@ export default () => {
   }, 1000 * 60)
 
   // Regen forecast when necessary
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (schedules.length > 0 && todos.length > 0) {
       setForecast(getForecast(schedules, todos, lastReset))
     } else {
@@ -666,15 +667,14 @@ export default () => {
         <Button
           variant="primary"
           className="block mx-auto my-4"
-          onClick={() => {
-            setLastReset(new Date())
-            setTodos((todos) =>
-              todos.map((todo) => ({
-                ...todo,
-                done: todo.done || !!todo.completed,
-              }))
-            )
-            analytics.logEvent('todo_archive')
+          onClick={async () => {
+            try {
+              await archiveTodos()
+              setLastReset(new Date())
+              analytics.logEvent('todo_archive')
+            } catch (err) {
+              logException(err)
+            }
           }}
         >
           Archive Completed Todos

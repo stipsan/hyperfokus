@@ -9,6 +9,7 @@ export type TodosDispatchContext = {
   deleteTodo(id: string): void
   completeTodo(id: string): void
   incompleteTodo(id: string): void
+  archiveTodos(): void
 }
 
 const error = new ReferenceError(
@@ -34,6 +35,10 @@ const dispatchContext = createContext<TodosDispatchContext>({
     return () => {}
   },
   get incompleteTodo() {
+    throw error
+    return () => {}
+  },
+  get archiveTodos() {
     throw error
     return () => {}
   },

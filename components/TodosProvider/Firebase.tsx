@@ -154,6 +154,22 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
           .doc(id)
           .update({ completed: null, done: false })
       },
+      archiveTodos: async () => {
+        const snapshots = await todosRef
+          .where('done', '==', false)
+          .where('completed', '>', 0)
+          .get()
+        let ops = []
+        snapshots.forEach((snapshot) => {
+          ops.push(
+            firestore
+              .collection('todos')
+              .doc(snapshot.id)
+              .update({ done: true })
+          )
+        })
+        await Promise.all(ops)
+      },
     }),
     [firestore, user.uid]
   )

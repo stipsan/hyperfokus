@@ -129,6 +129,14 @@ export default ({ children }: { children: ReactNode }) => {
           })
         })
       },
+      archiveTodos: async () => {
+        setTodos((todos) =>
+          todos.map((todo) => ({
+            ...todo,
+            done: todo.done || !!todo.completed,
+          }))
+        )
+      },
     }),
     [setTodos]
   )

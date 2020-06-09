@@ -157,7 +157,7 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
       archiveTodos: async () => {
         const snapshots = await todosRef
           .where('done', '==', false)
-          .where('completed', '>', 0)
+          .where('completed', '<', new Date())
           .get()
         let ops = []
         snapshots.forEach((snapshot) => {

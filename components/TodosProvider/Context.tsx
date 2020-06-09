@@ -6,6 +6,7 @@ export type TodosContext = Todo[]
 export type TodosDispatchContext = {
   addTodo(data: Todo): Promise<{ id: string }>
   editTodo(data: Todo, id: string): void
+  deleteTodo(id: string): void
   completeTodo(id: string): void
   incompleteTodo(id: string): void
 }
@@ -21,6 +22,10 @@ const dispatchContext = createContext<TodosDispatchContext>({
     return async () => ({ id: '' })
   },
   get editTodo() {
+    throw error
+    return () => {}
+  },
+  get deleteTodo() {
     throw error
     return () => {}
   },

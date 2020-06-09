@@ -25,8 +25,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { Dispatch, FC, ReactNode, SetStateAction } from 'react'
-import { removeItemAtIndex } from 'utils/array'
+import type { FC, ReactNode } from 'react'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './Todos.module.css'
@@ -416,17 +415,15 @@ const CreateDialog = ({ onDismiss }: { onDismiss: () => void }) => {
 
 const EditDialog = ({
   todos,
-  setTodos,
   onDismiss,
   id,
 }: {
   todos: Todo[]
-  setTodos: Dispatch<SetStateAction<Todo[]>>
   onDismiss: () => void
   id: string
 }) => {
   const logException = useLogException()
-  const { editTodo } = useTodosDispatch()
+  const { editTodo, deleteTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -481,13 +478,7 @@ const EditDialog = ({
           )
         ) {
           try {
-            await setTodos((todos) => {
-              const index = todos.findIndex(
-                (todo) => todo.id === initialState.id
-              )
-              const newTodos = removeItemAtIndex(todos, index)
-              return newTodos
-            })
+            await deleteTodo(id)
             onDismiss()
             analytics.logEvent('todo_delete', {
               duration: initialState.duration,
@@ -720,7 +711,6 @@ export default () => {
       >
         <EditDialog
           onDismiss={onDismiss}
-          setTodos={setTodos}
           todos={todos}
           id={router.query.edit as string}
         />

@@ -104,6 +104,12 @@ export default ({ children }: { children: ReactNode }) => {
 
         return { id }
       },
+      deleteTodo: async (id) => {
+        await setTodos((todos) => {
+          const index = todos.findIndex((search) => search.id === id)
+          return removeItemAtIndex(todos, index)
+        })
+      },
       completeTodo: async (id) => {
         await setTodos((todos) => {
           const index = todos.findIndex((search) => search.id === id)

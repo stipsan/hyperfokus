@@ -139,6 +139,9 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
 
         await firestore.collection('todos').doc(id).update(data)
       },
+      deleteTodo: async (id) => {
+        await firestore.collection('todos').doc(id).delete()
+      },
       completeTodo: async (id) => {
         await firestore
           .collection('todos')

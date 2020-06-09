@@ -103,6 +103,42 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
 
         return { id: ref.id }
       },
+      editTodo: async (
+        {
+          description,
+
+          duration,
+          modified,
+          order,
+        },
+        id
+      ) => {
+        const data = {
+          description,
+          duration,
+          modified,
+          order,
+        }
+
+        if (order === 1) {
+          const todos = await todosRef.orderBy('order', 'desc').limit(1).get()
+          todos.forEach((todo) => {
+            data.order = todo.data().order + 1
+          })
+        } else if (order === -1) {
+          const todos = await todosRef.orderBy('order', 'asc').limit(1).get()
+          todos.forEach((todo) => {
+            data.order = todo.data().order - 1
+          })
+        }
+
+        // Workaround tainted data
+        if (!isFinite(data.order)) {
+          data.order = 0
+        }
+
+        await firestore.collection('todos').doc(id).update(data)
+      },
       completeTodo: async (id) => {
         await firestore
           .collection('todos')

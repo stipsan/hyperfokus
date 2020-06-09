@@ -5,6 +5,7 @@ export type TodosContext = Todo[]
 
 export type TodosDispatchContext = {
   addTodo(data: Todo): Promise<{ id: string }>
+  editTodo(data: Todo, id: string): void
   completeTodo(id: string): void
   incompleteTodo(id: string): void
 }
@@ -18,6 +19,10 @@ const dispatchContext = createContext<TodosDispatchContext>({
   get addTodo() {
     throw error
     return async () => ({ id: '' })
+  },
+  get editTodo() {
+    throw error
+    return () => {}
   },
   get completeTodo() {
     throw error
@@ -35,10 +40,20 @@ export const { Provider: DispatchProvider } = dispatchContext
 export const useTodos = () => useContext(context)
 
 export const useTodosDispatch = () => {
-  const { addTodo, ...context } = useContext(dispatchContext)
+  const { addTodo, editTodo, ...context } = useContext(dispatchContext)
 
   const addTodoSanitized = ({ description, ...todo }: Todo) =>
     addTodo({ ...todo, description: description.substring(0, 2048) })
+
+  const editTodoSanitized = ({ description, ...todo }: Todo, id: string) =>
+    editTodo(
+      {
+        ...todo,
+        description: description.substring(0, 2048),
+        modified: new Date(),
+      },
+      id
+    )
 
   /*
   const setSortedTodos: Dispatch<SetStateAction<Todo[]>> = (value) => {
@@ -55,5 +70,5 @@ export const useTodosDispatch = () => {
   }
   // */
 
-  return { ...context, addTodo: addTodoSanitized }
+  return { ...context, addTodo: addTodoSanitized, editTodo: editTodoSanitized }
 }

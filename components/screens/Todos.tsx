@@ -26,7 +26,7 @@ import {
   useState,
 } from 'react'
 import type { Dispatch, FC, ReactNode, SetStateAction } from 'react'
-import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
+import { removeItemAtIndex } from 'utils/array'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './Todos.module.css'
@@ -198,8 +198,8 @@ const TodoForm = ({
             <option value={initialOrder.toString()}>
               Keep current ordering
             </option>
-            <option value={initialOrder - 1}>Move to the top</option>
-            <option value={initialOrder + 1}>Move to the bottom</option>
+            <option value={-1}>Move to the top</option>
+            <option value={1}>Move to the bottom</option>
           </select>
         </Field>
       ) : (
@@ -413,15 +413,6 @@ const CreateDialog = ({ onDismiss }: { onDismiss: () => void }) => {
   )
 }
 
-function findTopAndBottom(todos: Todo[]): { top: number; bottom: number } {
-  const mappedOrders = todos.map((todo) =>
-    isFinite(todo.order) ? todo.order : 0
-  )
-  const top = mappedOrders.reduce((min, cur) => Math.min(min, cur), -1)
-  const bottom = mappedOrders.reduce((max, cur) => Math.max(max, cur), 1)
-  return { top, bottom }
-}
-
 const EditDialog = ({
   todos,
   setTodos,
@@ -434,6 +425,7 @@ const EditDialog = ({
   id: string
 }) => {
   const logException = useLogException()
+  const { editTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -470,43 +462,7 @@ const EditDialog = ({
       onDismiss={onDismiss}
       onSubmit={async (state) => {
         try {
-          await setTodos((todos) => {
-            const index = todos.findIndex(
-              (schedule) => schedule.id === initialState.id
-            )
-            let { order } = todos[index]
-            if (!isFinite(order)) {
-              order = 0
-            }
-            let changedOrder = false
-
-            if (order !== state.order) {
-              const { top, bottom } = findTopAndBottom(todos)
-              order = state.order > order ? bottom + 1 : top - 1
-              changedOrder = true
-            }
-
-            const newTodos = replaceItemAtIndex(todos, index, {
-              ...todos[index],
-              description: state.description.substring(0, 2048),
-              duration: state.duration,
-              order,
-            })
-
-            if (changedOrder) {
-              newTodos.sort((a, b) => {
-                if (a.order < b.order) {
-                  return -1
-                }
-                if (a.order > b.order) {
-                  return 1
-                }
-                return 0
-              })
-            }
-
-            return newTodos
-          })
+          await editTodo(state, id)
           setInitialState(state)
           onDismiss()
           analytics.logEvent('todo_edit', {

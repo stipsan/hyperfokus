@@ -4,6 +4,7 @@ import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import { useActiveSchedules } from 'components/SchedulesProvider'
+import { useTodos } from 'components/TodosProvider'
 import type { Todo } from 'database/types'
 import {
   isAfter,
@@ -14,7 +15,6 @@ import {
   setSeconds,
 } from 'date-fns'
 import { useAnalytics, useLogException } from 'hooks/analytics'
-import { useTodos, useTodosObserver } from 'hooks/todos'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -570,12 +570,12 @@ export default () => {
     })
   }, [])
 
-  useTodosObserver()
-
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
   const schedules = useActiveSchedules()
-  const [todos, setTodos] = useTodos()
+  const { todos } = useTodos()
+  const setTodos = (...args) => console.log('setTodos', ...args)
+
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
   )

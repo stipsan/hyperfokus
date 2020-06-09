@@ -6,7 +6,7 @@ import { atom, useRecoilState } from 'recoil'
 import { Provider } from './Context'
 import type { SchedulesContext } from './Context'
 
-export const schedulesState = atom<Schedule[]>({
+const schedulesState = atom<Schedule[]>({
   key: 'demoSchedules',
   default: schedules,
 })

@@ -25,8 +25,8 @@ const SchedulesProvider = ({ children }: { children: ReactNode }) => {
     .where('author', '==', user.uid)
   const schedulesDoc = useFirestoreCollectionData<ScheduleDoc>(schedulesRef)
 
-  const context = useMemo<SchedulesContext>(
-    () => ({
+  const context = useMemo(
+    (): SchedulesContext => ({
       schedules: schedulesDoc?.[0]?.rules ?? [],
       setSchedules: async (value) => {
         const schedules =

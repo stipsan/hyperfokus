@@ -612,9 +612,9 @@ export default () => {
 
         return (
           <Link
+            shallow
             key={schedule.id}
             href={`?edit=${schedule.id}`}
-            shallow
             scroll={false}
           >
             <a

@@ -48,8 +48,8 @@ export default ({ children }: { children: ReactNode }) => {
     return () => unsubscribe()
   }, [database])
 
-  const context = useMemo<SchedulesContext>(
-    () => ({
+  const context = useMemo(
+    (): SchedulesContext => ({
       schedules,
       setSchedules,
     }),

@@ -14,8 +14,8 @@ const schedulesState = atom<Schedule[]>({
 export default ({ children }: { children: ReactNode }) => {
   const [schedules, setSchedules] = useRecoilState(schedulesState)
 
-  const context = useMemo<SchedulesContext>(
-    () => ({
+  const context = useMemo(
+    (): SchedulesContext => ({
       schedules,
       setSchedules,
     }),

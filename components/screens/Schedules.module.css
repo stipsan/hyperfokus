@@ -12,7 +12,7 @@
 @screen sm {
   .topGrid {
     grid-template-columns: min-content;
-    grid-template-areas: 'start duration end';
+    grid-template-areas: 'start end duration';
   }
 }
 

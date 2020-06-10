@@ -1,6 +1,5 @@
 .logo {
   @apply text-lg;
-  cursor: default;
-  pointer-events: none;
+  cursor: pointer;
   user-select: none;
 }

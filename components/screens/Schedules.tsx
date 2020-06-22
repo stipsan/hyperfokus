@@ -355,13 +355,11 @@ const ScheduleForm = ({
         <Field className={styles.start} label="Start" htmlFor="start">
           <StartTime dispatch={dispatch} state={state} />
         </Field>
-
-        <Field className={styles.duration} label="Duration" htmlFor="duration">
-          <Duration dispatch={dispatch} state={state} />
-        </Field>
-
         <Field className={styles.end} label="End" htmlFor="end">
           <EndTime dispatch={dispatch} state={state} />
+        </Field>
+        <Field className={styles.duration} label="Duration" htmlFor="duration">
+          <Duration dispatch={dispatch} state={state} />
         </Field>
       </div>
 

@@ -1,8 +1,8 @@
 import cx from 'classnames'
+import localStorage from 'database/localstorage'
 import firebase from 'firebase/app'
 import type { User } from 'firebase/app'
 import { useAnalytics, useLogException } from 'hooks/analytics'
-import { useDatabase } from 'hooks/database'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
 // @ts-expect-error
 import { Suspense, unstable_SuspenseList as SuspenseList } from 'react'
@@ -140,7 +140,7 @@ const FinalStep = () => {
   const user = useUser<User>()
   const firestore = useFirestore()
   const logException = useLogException()
-  const localStorage = useDatabase('localstorage')
+
   const betaReqRef = firestore.collection('betarequests').doc(user.uid)
   const betaReq = useFirestoreDocData<{
     email?: string

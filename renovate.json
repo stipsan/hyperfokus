@@ -1,4 +1,10 @@
 {
   "extends": ["github>finn-no/renovate-presets:js"],
-  "masterIssue": true
+  "masterIssue": true,
+  "packageRules": [
+    {
+      "packageNames": ["react", "react-dom"],
+      "followTag": "experimental"
+    }
+  ]
 }

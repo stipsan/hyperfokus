@@ -13,8 +13,8 @@
     "localforage": "^1.9.0",
     "nanoid": "^3.1.12",
     "next": "^9.4.4",
-    "react": "0.0.0-experimental-3d0895557",
-    "react-dom": "0.0.0-experimental-3d0895557",
+    "react": "0.0.0-experimental-f77c7b9d7",
+    "react-dom": "0.0.0-experimental-f77c7b9d7",
     "react-spring": "^9.0.0-rc.3",
     "reactfire": "^2.0.3",
     "recoil": "^0.0.10"

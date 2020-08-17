@@ -6,7 +6,7 @@ import Welcome from 'components/screens/Welcome'
 import TodosProvider from 'components/TodosProvider'
 import { useSessionValue } from 'hooks/session'
 
-export default () => {
+export default function IndexPage() {
   const session = useSessionValue()
 
   if (session === '') {

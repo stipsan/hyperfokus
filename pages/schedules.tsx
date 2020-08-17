@@ -8,7 +8,7 @@ import { useSessionValue } from 'hooks/session'
 
 const title = 'Schedules'
 
-export default () => {
+export default function SchedulesPage() {
   const session = useSessionValue()
 
   if (session === '') {

@@ -4,13 +4,15 @@ import UnderConstruction from 'components/UnderConstruction'
 
 const title = 'Completed Todos'
 
-export default () => (
-  <>
-    <HeadTitle>{title}</HeadTitle>
-    <AppLayout title={title}>
-      <MoreContainer>
-        <UnderConstruction />
-      </MoreContainer>
-    </AppLayout>
-  </>
-)
+export default function DonePage() {
+  return (
+    <>
+      <HeadTitle>{title}</HeadTitle>
+      <AppLayout title={title}>
+        <MoreContainer>
+          <UnderConstruction />
+        </MoreContainer>
+      </AppLayout>
+    </>
+  )
+}

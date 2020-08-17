@@ -3,7 +3,7 @@ import { AppLayout, MoreContainer } from 'components/layouts'
 
 const title = 'Help'
 
-export default () => {
+export default function HelpPage() {
   return (
     <>
       <HeadTitle>{title}</HeadTitle>

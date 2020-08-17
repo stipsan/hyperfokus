@@ -589,7 +589,7 @@ const NoSchedulesPlaceholder = () => {
   )
 }
 
-export default () => {
+export default function SchedulesScreen() {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {

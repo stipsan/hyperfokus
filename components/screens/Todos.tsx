@@ -494,7 +494,7 @@ const EditDialog = ({
   )
 }
 
-export default () => {
+export default function TodosScreen() {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {

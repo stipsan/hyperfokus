@@ -2,7 +2,7 @@ import Button from 'components/Button'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MoreContainer } from 'components/layouts'
 import { useAnalytics, useLogException } from 'hooks/analytics'
-import { useSessionSetState, useSessionValue } from 'hooks/session'
+import { useSessionSetState } from 'hooks/session'
 import Router from 'next/router'
 import { Component, lazy, Suspense } from 'react'
 import type { FC } from 'react'
@@ -81,7 +81,7 @@ const ResetButton = () => {
   )
 }
 
-export default () => {
+export default function SettingsPage() {
   return (
     <>
       <HeadTitle>{title}</HeadTitle>

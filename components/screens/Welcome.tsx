@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 //const title = "Hyperfocus your idle time and get things done"
 const title = "Hyperfocus your todos until they're done"
 
-export default () => {
+export default function WelcomeScreen() {
   const setSession = useSessionSetState()
   const analytics = useAnalytics()
 

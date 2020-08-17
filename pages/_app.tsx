@@ -2,7 +2,7 @@ import { useReduceMotion } from 'hooks/motion'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Globals } from 'react-spring'
+//import { Globals } from 'react-spring'
 import { FirebaseAppProvider } from 'reactfire'
 import { RecoilRoot } from 'recoil'
 // global css, exempt from CSS module restrictions
@@ -32,9 +32,15 @@ export default function _AppPage({ Component, pageProps }: AppProps) {
   // Globally disable animations when the user don't want them
   const prefersReducedMotion = useReduceMotion()
   useEffect(() => {
-    Globals.assign({
-      skipAnimation: prefersReducedMotion,
-    })
+    // @TODO remove once react-spring stops misbehaving
+    import('react-spring')
+      .then(({ Globals }) => {
+        Globals.assign({
+          skipAnimation: prefersReducedMotion,
+        })
+        console.warn('Safe to remove react-spring workaround!')
+      })
+      .catch(() => {})
   }, [prefersReducedMotion])
 
   const [mounted, setMounted] = useState(false)

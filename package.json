@@ -12,7 +12,7 @@
     "firebase": "^7.18.0",
     "localforage": "^1.9.0",
     "nanoid": "^3.1.12",
-    "next": "^9.5.2",
+    "next": "^9.5.3-canary.4",
     "react": "0.0.0-experimental-94c0244ba",
     "react-dom": "0.0.0-experimental-94c0244ba",
     "react-spring": "^9.0.0-rc.3",
@@ -48,5 +48,8 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
+  },
+  "resolutions": {
+    "webpack": "^5.0.0-beta.22"
   }
 }

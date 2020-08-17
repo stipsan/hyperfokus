@@ -3,9 +3,7 @@ module.exports = {
     autoPrerender: false,
   },
   experimental: {
-    reactMode: 'concurrent',
-    modern: true,
     productionBrowserSourceMaps: true,
-    optimizeImages: true,
+    reactMode: 'concurrent',
   },
 }

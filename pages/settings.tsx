@@ -7,14 +7,10 @@ import Router from 'next/router'
 import { Component, lazy, Suspense } from 'react'
 import type { FC } from 'react'
 
-class ErrorBoundary extends Component<
-  { logException: (error: Error, errorInfo?: unknown) => void },
-  { hasError: boolean }
-> {
-  constructor(props) {
-    super(props)
-    this.state = { hasError: false }
-  }
+class ErrorBoundary extends Component<{
+  logException: (error: Error, errorInfo?: unknown) => void
+}> {
+  state = { hasError: false }
 
   static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.

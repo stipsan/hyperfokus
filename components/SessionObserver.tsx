@@ -13,7 +13,6 @@ export default memo(() => {
   const session = useSessionValue()
   const analytics = useAnalytics()
   useEffect(() => {
-    // @TODO rewrite to use useAnalytics
     analytics.setUserProperties({ session })
   }, [session])
 

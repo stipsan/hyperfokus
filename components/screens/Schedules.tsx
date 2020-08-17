@@ -479,7 +479,7 @@ const EditDialog = ({
           const focusNode = document.querySelector(
             `a[data-focus="${scheduleId}"]`
           ) as HTMLElement
-          focusNode?.scrollIntoView({ block: 'center' })
+          focusNode?.scrollIntoView({ behavior: 'smooth', block: 'center' })
           focusNode?.focus()
         }, 300)
       }

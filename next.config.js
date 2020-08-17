@@ -7,6 +7,5 @@ module.exports = {
     modern: true,
     productionBrowserSourceMaps: true,
     optimizeImages: true,
-    scrollRestoration: true,
   },
 }

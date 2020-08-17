@@ -4,5 +4,6 @@ module.exports = {
   },
   experimental: {
     reactMode: 'concurrent',
+    productionBrowserSourceMaps: true,
   },
 }

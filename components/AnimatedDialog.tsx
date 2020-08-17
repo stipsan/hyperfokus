@@ -45,6 +45,7 @@ export default ({
     ({ opacity, ...style }, item) =>
       item && (
         <AnimatedDialogOverlay
+          // @ts-expect-error
           style={{ opacity }}
           onDismiss={onDismiss}
           allowPinchZoom

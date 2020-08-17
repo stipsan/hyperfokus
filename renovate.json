@@ -5,6 +5,10 @@
     {
       "packageNames": ["react", "react-dom"],
       "followTag": "experimental"
+    },
+    {
+      "packageNames": ["webpack"],
+      "followTag": "next"
     }
   ]
 }

@@ -3,6 +3,10 @@
   "masterIssue": true,
   "packageRules": [
     {
+      "packageNames": ["next"],
+      "followTag": "canary"
+    },
+    {
       "packageNames": ["react", "react-dom"],
       "followTag": "experimental"
     },

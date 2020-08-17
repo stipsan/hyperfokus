@@ -1,5 +1,12 @@
 const withTM = require('next-transpile-modules')(
-  ['@react-spring/core', '@react-spring/web'],
+  [
+    'react-spring',
+    '@react-spring/core',
+    '@react-spring/web',
+    'drei',
+    'three',
+    'postprocessing',
+  ],
   { unstable_webpack5: true }
 )
 

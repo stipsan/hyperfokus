@@ -4,6 +4,5 @@ module.exports = {
   },
   experimental: {
     reactMode: 'concurrent',
-    modern: true,
   },
 }

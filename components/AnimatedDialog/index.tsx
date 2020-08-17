@@ -24,8 +24,6 @@ export default class AnimatedDialogFailSafe extends Component<Props> {
     return { fallback: true }
   }
 
-  componentDidCatch() {}
-
   render() {
     if (this.state.fallback) {
       return (

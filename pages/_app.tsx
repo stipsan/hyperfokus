@@ -66,11 +66,11 @@ export default function _AppPage({ Component, pageProps }: AppProps) {
           >
             <Component {...pageProps} />
             {mounted && (
-              <>
+              <Suspense fallback={null}>
                 <SessionObserver />
                 <RouteObserver />
                 <PerformanceObserver />
-              </>
+              </Suspense>
             )}
           </Suspense>
         </RecoilRoot>

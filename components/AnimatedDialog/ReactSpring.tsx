@@ -1,24 +1,18 @@
 import { DialogContent, DialogOverlay } from '@reach/dialog'
 import { animated, to, useTransition } from 'react-spring'
-
-type Props = {
-  children: React.ReactNode
-  isOpen: boolean
-  onDismiss: () => void
-  'aria-label': string
-}
+import type { Props } from './index'
 
 const isSafari =
   typeof window !== 'undefined'
     ? /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
     : false
 
-export default ({
+export default function ReactSpringAnimatedDialog({
   children,
   isOpen,
   onDismiss,
   'aria-label': ariaLabel,
-}: Props) => {
+}: Props) {
   const AnimatedDialogOverlay = animated(DialogOverlay)
   const AnimatedDialogContent = animated(DialogContent)
 

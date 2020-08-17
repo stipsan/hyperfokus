@@ -5,7 +5,5 @@ module.exports = {
   experimental: {
     reactMode: 'concurrent',
     modern: true,
-    productionBrowserSourceMaps: true,
-    optimizeImages: true,
   },
 }

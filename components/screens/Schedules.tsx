@@ -41,7 +41,7 @@ const CreateDialog = ({
 
   const router = useRouter()
   const close = () => {
-    router.push(router.pathname, undefined, { shallow: true, scroll: false })
+    router.push(router.pathname, undefined, { shallow: true })
   }
 
   return (
@@ -487,7 +487,7 @@ const EditDialog = ({
   }, [router.query.edit])
 
   const close = () => {
-    router.push(router.pathname, undefined, { shallow: true, scroll: false })
+    router.push(router.pathname, undefined, { shallow: true })
   }
 
   return (
@@ -568,7 +568,7 @@ const NoSchedulesPlaceholder = () => {
         No schedules
       </h1>
 
-      <Link href="?create=true" shallow scroll={false}>
+      <Link href="?create=true" shallow>
         <a
           className={cx(
             className({ variant: 'primary' }),
@@ -609,12 +609,7 @@ export default () => {
         if (repeatMessage) metaInformation.push(repeatMessage)
 
         return (
-          <Link
-            shallow
-            key={schedule.id}
-            href={`?edit=${schedule.id}`}
-            scroll={false}
-          >
+          <Link shallow key={schedule.id} href={`?edit=${schedule.id}`}>
             <a
               data-focus={schedule.id}
               className={cx(

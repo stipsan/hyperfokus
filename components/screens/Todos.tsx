@@ -314,12 +314,12 @@ const TodoItem: React.FC<{
         'is-overdue': isOverdue,
       })}
     >
-      <Link key="time" href={`?edit=${todo.id}`} shallow scroll={false}>
+      <Link key="time" href={`?edit=${todo.id}`} shallow>
         <Time title={`Duration: ${todo.duration} minutes`}>
           {todo.start} – {todo.end}
         </Time>
       </Link>
-      <Link key="description" href={`?edit=${todo.id}`} shallow scroll={false}>
+      <Link key="description" href={`?edit=${todo.id}`} shallow>
         <a
           className={cx(styles.description, 'focus:outline-none px-inset-r')}
           data-focus={todo.id}
@@ -550,7 +550,7 @@ export default () => {
   console.log(uniqueIds, todos.length)
 // */
   const onDismiss = () => {
-    router.push(router.pathname, undefined, { shallow: true, scroll: false })
+    router.push(router.pathname, undefined, { shallow: true })
   }
 
   const somethingRecentlyCompleted = todos.some(

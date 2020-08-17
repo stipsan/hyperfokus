@@ -95,7 +95,7 @@ const CreateLink = ({
   label: string
   tabIndex?: number
 }) => (
-  <Link href="?create=true" shallow scroll={false}>
+  <Link href="?create=true" shallow>
     <a
       tabIndex={tabIndex}
       className="py-2 px-3 focus:outline-none focus:shadow-outline bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900 rounded"

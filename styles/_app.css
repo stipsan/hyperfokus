@@ -37,13 +37,13 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-// Fast tap events
+/* Fast tap events */
 a,
 button {
   touch-action: manipulation;
 }
 
-// Handle display cutouts
+/* Handle display cutouts */
 .px-inset {
   @apply px-4;
 }

@@ -23,7 +23,7 @@ const config = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 }
 
-export default ({ Component, pageProps }: AppProps) => {
+export default function _AppPage({ Component, pageProps }: AppProps) {
   // Suspense fallbacks are invisible for a set delay to avoid spinner flash on first load
   // and adding this class ensures it's turned off in case something else is suspended after
   // the app is fully loaded and the user navigates somewhere

@@ -246,7 +246,7 @@ export default () => (
     <p className="mb-6">Enable Cloud Sync in 3 steps:</p>
     <div
       className={cx(
-        'grid grid-cols-1 grid items-center gap-3 sm:row-gap-8',
+        'grid grid-cols-1 items-center gap-3 sm:gap-y-8',
         styles.grid
       )}
     >

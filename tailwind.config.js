@@ -34,4 +34,7 @@ module.exports = {
     require('tailwindcss-gradients'),
     require('tailwindcss-touch')(),
   ],
+  future: {
+    removeDeprecatedGapUtilities: true,
+  },
 }

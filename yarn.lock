@@ -6300,7 +6300,7 @@ webpack-sources@2.0.0-beta.8:
     source-list-map "^2.0.1"
     source-map "~0.6.1"
 
-webpack@4.44.1, webpack@^5.0.0-beta.26:
+webpack@4.44.1, webpack@^5.0.0-beta.27:
   version "5.0.0-beta.27"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.0.0-beta.27.tgz#03af03560faa68c87fd39c502833141fa8343d99"
   integrity sha512-8w3eknUchdgoF0lJ/gM6e2kUvN6O+gzSl/Yw5c444bUnvPSGTlpKnaRs3I4j/vkNZWvpfML8wO5yWaBda8vTCQ==

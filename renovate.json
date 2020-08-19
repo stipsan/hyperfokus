@@ -1,6 +1,9 @@
 {
   "extends": ["github>finn-no/renovate-presets:js"],
   "masterIssue": true,
+  "lockFileMaintenance": {
+    "automerge": true
+  },
   "packageRules": [
     {
       "packageNames": ["next"],

@@ -6,6 +6,10 @@
   },
   "packageRules": [
     {
+      "depTypeList": ["resolutions"],
+      "automerge": true
+    },
+    {
       "packageNames": ["next"],
       "followTag": "canary"
     },

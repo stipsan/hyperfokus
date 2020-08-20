@@ -34,7 +34,7 @@
     "tailwindcss-gradients": "^3.0.0",
     "tailwindcss-skip-link": "^1.0.1",
     "tailwindcss-touch": "^1.0.1",
-    "typescript": "^3.9.7"
+    "typescript": "^4.0.2"
   },
   "husky": {
     "hooks": {

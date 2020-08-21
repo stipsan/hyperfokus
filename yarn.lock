@@ -1297,10 +1297,10 @@
     protobufjs "^6.9.0"
     yargs "^15.3.1"
 
-"@next/react-dev-overlay@9.5.3-canary.18":
-  version "9.5.3-canary.18"
-  resolved "https://registry.yarnpkg.com/@next/react-dev-overlay/-/react-dev-overlay-9.5.3-canary.18.tgz#66303abda4f65380dd9a8ad3351f032916c2dd8b"
-  integrity sha512-B7BhLV7fzKLMad4REAc/hWHYICfNFPOddMEMJ6xFsin6EQJKt4R+LcgNG6Hk5pTVUJkQmXL0N8DK+Orskpqi6A==
+"@next/react-dev-overlay@9.5.3-canary.19":
+  version "9.5.3-canary.19"
+  resolved "https://registry.yarnpkg.com/@next/react-dev-overlay/-/react-dev-overlay-9.5.3-canary.19.tgz#fd408d6d4f01dfaff7f47e0d4f2fa1bbc4a421bc"
+  integrity sha512-0uWE8hXokJBfoVrTzE/8WICOGyWfIMbSzlMmP5doWND5zK81Yzlb0VINrG52ch8jnUvFRF8Y3HNTV0NDlJWRSg==
   dependencies:
     "@babel/code-frame" "7.8.3"
     ally.js "1.4.1"
@@ -1313,10 +1313,10 @@
     stacktrace-parser "0.1.10"
     strip-ansi "6.0.0"
 
-"@next/react-refresh-utils@9.5.3-canary.18":
-  version "9.5.3-canary.18"
-  resolved "https://registry.yarnpkg.com/@next/react-refresh-utils/-/react-refresh-utils-9.5.3-canary.18.tgz#fd84487badb16ed1f2a479b956dfd7ea843f46e6"
-  integrity sha512-dqblib6iWWRjiNm3MkfWcPQpuASRD7Sh/vwYxUBxlcXeHNfZgbsmDvCJBE6RtngAMzSq9OTCM37ZNEvV0rDJCg==
+"@next/react-refresh-utils@9.5.3-canary.19":
+  version "9.5.3-canary.19"
+  resolved "https://registry.yarnpkg.com/@next/react-refresh-utils/-/react-refresh-utils-9.5.3-canary.19.tgz#37b8f0f2bd7da16423b7c27b9464c219f16d38e1"
+  integrity sha512-eTgy4wO6R7VQuNq1pYIRODlOVhfCWjAKib4ySIQSeu/T9SFTK35j2pT1mMq0gEmMig9Kfog3mXQYv0lqAghIeQ==
 
 "@npmcli/move-file@^1.0.1":
   version "1.0.1"
@@ -4382,10 +4382,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-next@^9.5.3-canary.18:
-  version "9.5.3-canary.18"
-  resolved "https://registry.yarnpkg.com/next/-/next-9.5.3-canary.18.tgz#b0b7fe5d5abc9f6931c83fec22da4a7cd5ff0fb6"
-  integrity sha512-AT5AvdDwp9Ey5nir/OMHqAaSXjBCX+/sJQwItvVO0/tS3J+B6F3+25Go56yIbVBMEVmLoTGHLbnsMTwXBwr4Qg==
+next@^9.5.3-canary.19:
+  version "9.5.3-canary.19"
+  resolved "https://registry.yarnpkg.com/next/-/next-9.5.3-canary.19.tgz#294028c485f92439b0f77469b5da7d5bb943fab5"
+  integrity sha512-8BnhMxce71OYcFrIjVQ+yPi2BlSvCv2f8OQguGnpy8y8Wuyq5tWMgIym3al7lQziDdbyykub6o2hwiA7rH8y4Q==
   dependencies:
     "@ampproject/toolbox-optimizer" "2.6.0"
     "@babel/code-frame" "7.8.3"
@@ -4406,8 +4406,8 @@ next@^9.5.3-canary.18:
     "@babel/preset-typescript" "7.9.0"
     "@babel/runtime" "7.9.6"
     "@babel/types" "7.9.6"
-    "@next/react-dev-overlay" "9.5.3-canary.18"
-    "@next/react-refresh-utils" "9.5.3-canary.18"
+    "@next/react-dev-overlay" "9.5.3-canary.19"
+    "@next/react-refresh-utils" "9.5.3-canary.19"
     ast-types "0.13.2"
     babel-plugin-syntax-jsx "6.18.0"
     babel-plugin-transform-define "2.0.0"

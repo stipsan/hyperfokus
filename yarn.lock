@@ -1285,10 +1285,10 @@
     protobufjs "^6.9.0"
     yargs "^15.3.1"
 
-"@next/react-dev-overlay@9.5.4-canary.12":
-  version "9.5.4-canary.12"
-  resolved "https://registry.yarnpkg.com/@next/react-dev-overlay/-/react-dev-overlay-9.5.4-canary.12.tgz#588578e66177ce91768d0aba292bec0ba16842ca"
-  integrity sha512-jaYhkkTGOg5jJp5OhHo5utjszF2Ipy47N1XsXbsz38ycdlE5KijT9Z4y+oXWvWnRhJUEs3rSM9Wz+b2yJoMV5w==
+"@next/react-dev-overlay@9.5.4-canary.13":
+  version "9.5.4-canary.13"
+  resolved "https://registry.yarnpkg.com/@next/react-dev-overlay/-/react-dev-overlay-9.5.4-canary.13.tgz#5521e2baf255668f70c9f835d1bfa6eb7a2b0e9c"
+  integrity sha512-7h7JNWuEGFFmblfdN64bEUKs1erNelv1519jVQSUrxxUdhF++fE4dycjmMBlonKBk7v5WN8QVfQ49+V5062J/g==
   dependencies:
     "@babel/code-frame" "7.10.4"
     ally.js "1.4.1"
@@ -1301,10 +1301,10 @@
     stacktrace-parser "0.1.10"
     strip-ansi "6.0.0"
 
-"@next/react-refresh-utils@9.5.4-canary.12":
-  version "9.5.4-canary.12"
-  resolved "https://registry.yarnpkg.com/@next/react-refresh-utils/-/react-refresh-utils-9.5.4-canary.12.tgz#746c7d0255c6d6288423dd6c4db5029d2955bb9c"
-  integrity sha512-1eKXaPesXlJMm0Rci4bqsGHPZiuR7gdwu13XDZdVjrQFNImLBRiAWbmJieZ9acYH09ppkobapN9tbFlVjDpkJQ==
+"@next/react-refresh-utils@9.5.4-canary.13":
+  version "9.5.4-canary.13"
+  resolved "https://registry.yarnpkg.com/@next/react-refresh-utils/-/react-refresh-utils-9.5.4-canary.13.tgz#068542e3fe61e82ef139e7f59eb6d1381532f005"
+  integrity sha512-HnUQcVGOxQ9ds+SuEDDFp2y11ebfXwUDBBrMsEfy6S1Y+1OUk6ACVzxV7usIpXw0WXy2rFVGKDXSnfWBRz6Y9w==
 
 "@npmcli/move-file@^1.0.1":
   version "1.0.1"
@@ -4300,10 +4300,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-next@^9.5.4-canary.12:
-  version "9.5.4-canary.12"
-  resolved "https://registry.yarnpkg.com/next/-/next-9.5.4-canary.12.tgz#6b41b441b92f5ee4ef2e513e4687b06a2618bdb7"
-  integrity sha512-kidFIAPT9Xh7Ebht0OA7KQS2R9LCcDVXfseCKV8mgZGUviFrgcHMNMOsR5AmTyu78qKByJPcvrd6dMbczT48Kw==
+next@^9.5.4-canary.13:
+  version "9.5.4-canary.13"
+  resolved "https://registry.yarnpkg.com/next/-/next-9.5.4-canary.13.tgz#c1d0d6f5e0305266ae0d02292f6ddd4b7f2ee285"
+  integrity sha512-SklCzylE8KiMVE36AHuQSDD9KfIvQAWfoBEEwzL7QLDIWNjGotx5eQMB9osKyGMpCFy0tNM0w3fjmfhtxgUPCQ==
   dependencies:
     "@ampproject/toolbox-optimizer" "2.6.0"
     "@babel/code-frame" "7.10.4"
@@ -4322,8 +4322,8 @@ next@^9.5.4-canary.12:
     "@babel/preset-typescript" "7.10.4"
     "@babel/runtime" "7.11.2"
     "@babel/types" "7.11.5"
-    "@next/react-dev-overlay" "9.5.4-canary.12"
-    "@next/react-refresh-utils" "9.5.4-canary.12"
+    "@next/react-dev-overlay" "9.5.4-canary.13"
+    "@next/react-refresh-utils" "9.5.4-canary.13"
     ast-types "0.13.2"
     babel-plugin-syntax-jsx "6.18.0"
     babel-plugin-transform-define "2.0.0"
@@ -4359,7 +4359,7 @@ next@^9.5.4-canary.12:
     use-subscription "1.4.1"
     vm-browserify "1.1.2"
     watchpack "2.0.0-beta.13"
-    web-vitals "0.2.1"
+    web-vitals "0.2.4"
     webpack "4.44.1"
     webpack-sources "1.4.3"
 
@@ -6263,10 +6263,10 @@ watchpack@2.0.0-beta.15:
     glob-to-regexp "^0.4.1"
     graceful-fs "^4.1.2"
 
-web-vitals@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/web-vitals/-/web-vitals-0.2.1.tgz#60782fa690243fe35613759a0c26431f57ba7b2d"
-  integrity sha512-2pdRlp6gJpOCg0oMMqwFF0axjk5D9WInc09RSYtqFgPXQ15+YKNQ7YnBBEqAL5jvmfH9WvoXDMb8DHwux7pIew==
+web-vitals@0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/web-vitals/-/web-vitals-0.2.4.tgz#ec3df43c834a207fd7cdefd732b2987896e08511"
+  integrity sha512-6BjspCO9VriYy12z356nL6JBS0GYeEcA457YyRzD+dD6XYCQ75NKhcOHUMHentOE7OcVCIXXDvOm0jKFfQG2Gg==
 
 webidl-conversions@^4.0.2:
   version "4.0.2"

@@ -17,7 +17,7 @@
     "react-dom": "0.0.0-experimental-94c0244ba",
     "react-spring": "^9.0.0-rc.3",
     "reactfire": "^2.0.3",
-    "recoil": "^0.0.11"
+    "recoil": "^0.0.12"
   },
   "devDependencies": {
     "@tailwindcss/custom-forms": "^0.2.1",

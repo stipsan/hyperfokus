@@ -5319,10 +5319,10 @@ readdirp@^2.2.1:
     micromatch "^3.1.10"
     readable-stream "^2.0.2"
 
-recoil@^0.0.12:
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/recoil/-/recoil-0.0.12.tgz#1f0cf8609ab8fed19664a377efe3d27fab484a67"
-  integrity sha512-RIJXLGu+ximiU0Y5K0MC7MENnW/9ddQ3cPEFEvpDQXmhSGEgoMkxW/ic56LKtHDINFPit9gaxGOhEmv0mTHfTQ==
+recoil@^0.0.13:
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/recoil/-/recoil-0.0.13.tgz#23e6d63135c07d8defbd91aaa35dca94ec5c15a6"
+  integrity sha512-2OToaQ8GR//KsdKdaEhMi04QKStLGRpk3qjC58iBpZpUtsByZ4dUy2UJtRcYuhnVlltGZ8HNwcEQRdFOS864SQ==
 
 reduce-css-calc@^2.1.6:
   version "2.1.7"

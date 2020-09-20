@@ -6403,7 +6403,7 @@ webpack-sources@^2.0.0:
     source-list-map "^2.0.1"
     source-map "^0.6.1"
 
-webpack@4.44.1, webpack@^5.0.0-beta.29:
+webpack@4.44.1, webpack@^5.0.0-beta.32:
   version "5.0.0-beta.32"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.0.0-beta.32.tgz#3ac957b9ef064e8502b546dbc8ade42e4d7d5506"
   integrity sha512-PrEyICK8AGeY/yK6yuHk7iuo5y1lMOuD2tI0rM+pG8ZYR6tjdkmvvu0kJGBeor9AaPjB46YA4BDBigMdBLCFCA==

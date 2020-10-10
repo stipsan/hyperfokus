@@ -6418,10 +6418,10 @@ webpack-sources@^2.0.1:
     source-list-map "^2.0.1"
     source-map "^0.6.1"
 
-webpack@4.44.1, webpack@^5.0.0-rc.5:
-  version "5.0.0-rc.5"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.0.0-rc.5.tgz#0414565638ffdd977ac89be5c8a3dbbe222930c4"
-  integrity sha512-I0VE47M678nRbHzBfExSLHZFYrT7zbixM9sUU2f9/cRybMsEPHLXyZepRp3RGPBfjCjR29IsysN5a80dCCJ8aQ==
+webpack@4.44.1, webpack@^5.0.0-rc.6:
+  version "5.0.0-rc.6"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.0.0-rc.6.tgz#d1ffc28fcd0b75dacbbabf269087f7eb15fe54d1"
+  integrity sha512-UeZzugQFKpfqwv4e908rNnXxHILh/+MhNZtGg3hDrLaGpRaagZpVfu2wyrcbyRFhEGNKjJSb5USUOi/kQbNwqA==
   dependencies:
     "@types/eslint-scope" "^3.7.0"
     "@types/estree" "^0.0.45"

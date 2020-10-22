@@ -1,42 +1,70 @@
 import { DialogContent, DialogOverlay } from '@reach/dialog'
-import { Component, lazy } from 'react'
+import { animated, to, useTransition } from 'react-spring'
 
-const AnimatedDialog = lazy(() =>
-  import('./ReactSpring').then((module) => {
-    console.warn('Remove AnimatedDialog workaround!')
-    return module
-  })
-)
-
-// @TODO remove workaround when react-spring works in production again with webpack v5
-
-export type Props = {
+type Props = {
   children: React.ReactNode
   isOpen: boolean
   onDismiss: () => void
   'aria-label': string
 }
 
-export default class AnimatedDialogFailSafe extends Component<Props> {
-  state = { fallback: false }
+const isSafari =
+  typeof window !== 'undefined'
+    ? /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    : false
 
-  static getDerivedStateFromError() {
-    return { fallback: true }
-  }
+export default function ReactSpringAnimatedDialog({
+  children,
+  isOpen,
+  onDismiss,
+  'aria-label': ariaLabel,
+}: Props) {
+  const AnimatedDialogOverlay = animated(DialogOverlay)
+  const AnimatedDialogContent = animated(DialogContent)
 
-  render() {
-    if (this.state.fallback) {
-      return (
-        this.props.isOpen && (
-          <DialogOverlay onDismiss={this.props.onDismiss} allowPinchZoom>
-            <DialogContent aria-label={this.props['aria-label']}>
-              {this.props.children}
-            </DialogContent>
-          </DialogOverlay>
-        )
+  const transitions = useTransition(isOpen, {
+    config: { duration: 150 },
+    from: {
+      opacity: 0,
+      '--dialog-content-transform': 'translateY(2rem)',
+      '--dialog-content-sm-transform': 'scale(0.94)',
+    },
+    enter: {
+      opacity: 1,
+      '--dialog-content-transform': 'translateY(0rem)',
+      '--dialog-content-sm-transform': 'scale(1)',
+    },
+    leave: {
+      opacity: 0,
+      '--dialog-content-transform': 'translateY(4rem)',
+      '--dialog-content-sm-transform': 'scale(0.86)',
+    },
+  })
+
+  return transitions(
+    ({ opacity, ...style }, item) =>
+      item && (
+        <AnimatedDialogOverlay
+          // @ts-expect-error
+          style={{ opacity }}
+          onDismiss={onDismiss}
+          allowPinchZoom
+        >
+          <AnimatedDialogContent
+            style={{
+              ...style,
+              // @ts-expect-error
+              '--position-sticky': isSafari
+                ? to([opacity], (opacity) =>
+                    opacity === 1 ? undefined : 'static'
+                  )
+                : undefined,
+            }}
+            aria-label={ariaLabel}
+          >
+            {children}
+          </AnimatedDialogContent>
+        </AnimatedDialogOverlay>
       )
-    }
-
-    return <AnimatedDialog {...this.props} />
-  }
+  )
 }

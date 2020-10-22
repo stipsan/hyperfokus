@@ -22,9 +22,11 @@ const getProvider = (session: SessionState) => {
 
 export { useTodos, useTodosDispatch } from './Context'
 
-export default ({ children }: { children: ReactNode }) => {
+const Index = ({ children }: { children: ReactNode }) => {
   const session = useSessionValue()
   const Provider = useMemo(() => getProvider(session), [session])
 
   return <Provider>{children}</Provider>
 }
+
+export default Index

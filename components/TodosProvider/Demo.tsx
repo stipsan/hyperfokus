@@ -13,7 +13,7 @@ const todosState = atom<Todo[]>({
   default: todos,
 })
 
-export default ({ children }: { children: ReactNode }) => {
+const Demo = ({ children }: { children: ReactNode }) => {
   const [todos, setTodos] = useRecoilState(todosState)
 
   // @TODO trace if setTodos is referencial stable cross renders
@@ -115,3 +115,5 @@ export default ({ children }: { children: ReactNode }) => {
     </DispatchProvider>
   )
 }
+
+export default Demo

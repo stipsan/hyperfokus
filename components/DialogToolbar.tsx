@@ -7,7 +7,7 @@ type Props = {
   sticky?: boolean
 }
 
-export default ({ left, right, sticky = true }: Props) => (
+const DialogToolbar = ({ left, right, sticky = true }: Props) => (
   <div
     className={cx(
       {
@@ -22,3 +22,5 @@ export default ({ left, right, sticky = true }: Props) => (
     <div className="ml-4 grid grid-flow-col gap-2">{right}</div>
   </div>
 )
+
+export default DialogToolbar

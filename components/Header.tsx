@@ -126,7 +126,7 @@ const isActive = ({ href, pathname }: { href: string; pathname: string }) => {
   }
 }
 
-export default ({ createLink, title }: Props) => {
+const Header = ({ createLink, title }: Props) => {
   const navSideClassNames = 'flex items-center w-full'
 
   const router = useRouter()
@@ -223,3 +223,5 @@ export default ({ createLink, title }: Props) => {
     </>
   )
 }
+
+export default Header

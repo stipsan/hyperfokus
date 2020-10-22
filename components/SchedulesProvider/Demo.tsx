@@ -11,7 +11,7 @@ const schedulesState = atom<Schedule[]>({
   default: schedules,
 })
 
-export default ({ children }: { children: ReactNode }) => {
+const Demo = ({ children }: { children: ReactNode }) => {
   const [schedules, setSchedules] = useRecoilState(schedulesState)
 
   const context = useMemo(
@@ -24,3 +24,5 @@ export default ({ children }: { children: ReactNode }) => {
 
   return <Provider value={context}>{children}</Provider>
 }
+
+export default Demo

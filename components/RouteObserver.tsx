@@ -2,7 +2,7 @@ import { useAnalytics } from 'hooks/analytics'
 import Router from 'next/router'
 import { memo, useEffect } from 'react'
 
-export default memo(() => {
+const RouteObserver = memo(() => {
   const analytics = useAnalytics()
   useEffect(() => {
     const handleRouteChange = (url) => {
@@ -16,3 +16,5 @@ export default memo(() => {
 
   return null
 })
+
+export default RouteObserver

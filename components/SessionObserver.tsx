@@ -5,7 +5,7 @@ import { memo, useEffect } from 'react'
 
 // @TODO extract more into dynamically imported components to see if it can improve First Load JS stats
 
-export default memo(() => {
+const SessionObserver = memo(() => {
   // Ensures the current database provider is broadcast to other tabs, ensuring they're in sync
   useObserveSession()
 
@@ -18,3 +18,4 @@ export default memo(() => {
 
   return null
 })
+export default SessionObserver

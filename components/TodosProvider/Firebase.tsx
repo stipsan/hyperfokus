@@ -181,7 +181,7 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
   )
 }
 
-export default ({ children }: { children: ReactNode }) => (
+const Firebase = ({ children }: { children: ReactNode }) => (
   <AuthCheck
     fallback={
       <>
@@ -196,3 +196,5 @@ export default ({ children }: { children: ReactNode }) => (
     <TodosProviders>{children}</TodosProviders>
   </AuthCheck>
 )
+
+export default Firebase

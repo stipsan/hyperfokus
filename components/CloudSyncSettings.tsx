@@ -241,7 +241,7 @@ const FinalStep = () => {
   )
 }
 
-export default () => (
+const CloudSyncSettings = () => (
   <>
     <p className="mb-6">Enable Cloud Sync in 3 steps:</p>
     <div
@@ -289,3 +289,4 @@ export default () => (
     </div>
   </>
 )
+export default CloudSyncSettings

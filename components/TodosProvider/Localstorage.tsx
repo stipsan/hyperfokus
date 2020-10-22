@@ -33,7 +33,7 @@ const asyncTodosState = selector<Todo[]>({
   },
 })
 
-export default ({ children }: { children: ReactNode }) => {
+const Localstorage = ({ children }: { children: ReactNode }) => {
   const logException = useLogException()
   const syncTodos = useSetRecoilState(todosState)
   const [todos, setTodos] = useRecoilState(asyncTodosState)
@@ -147,3 +147,5 @@ export default ({ children }: { children: ReactNode }) => {
     </DispatchProvider>
   )
 }
+
+export default Localstorage

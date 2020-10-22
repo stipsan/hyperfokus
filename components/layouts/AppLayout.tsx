@@ -11,7 +11,7 @@ type Props = {
   createLink?: string
 }
 
-export default ({ children, title, createLink }: Props) => {
+const AppLayout = ({ children, title, createLink }: Props) => {
   return (
     <>
       <Header title={title} createLink={createLink} />
@@ -28,3 +28,5 @@ export default ({ children, title, createLink }: Props) => {
     </>
   )
 }
+
+export default AppLayout

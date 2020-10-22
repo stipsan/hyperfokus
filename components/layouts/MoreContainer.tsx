@@ -8,7 +8,7 @@ type Props = {
   children: React.ReactNode
 }
 
-export default ({ children }: Props) => {
+const MoreContainer = ({ children }: Props) => {
   return (
     <Suspense
       fallback={
@@ -21,3 +21,5 @@ export default ({ children }: Props) => {
     </Suspense>
   )
 }
+
+export default MoreContainer

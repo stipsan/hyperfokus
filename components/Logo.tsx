@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import styles from './Logo.module.css'
 
-export default () => (
+const Logo = () => (
   <Link href="/">
     <a className={styles.logo} role="img" aria-label="HyperFokus logo">
       <span className="font-extrabold text-blue-800">Hyper</span>
@@ -11,3 +11,5 @@ export default () => (
     </a>
   </Link>
 )
+
+export default Logo

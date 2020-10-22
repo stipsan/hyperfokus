@@ -20,7 +20,7 @@ export const className = ({ className, variant = 'default' }: Props) =>
     className
   )
 
-export default forwardRef(
+const Button = forwardRef(
   (
     {
       className: forwardClassName,
@@ -37,3 +37,5 @@ export default forwardRef(
     />
   )
 )
+
+export default Button

@@ -31,7 +31,7 @@ const asyncSchedulesState = selector<Schedule[]>({
   },
 })
 
-export default ({ children }: { children: ReactNode }) => {
+const Localstorage = ({ children }: { children: ReactNode }) => {
   const logException = useLogException()
   const syncSchedules = useSetRecoilState(schedulesState)
   const [schedules, setSchedules] = useRecoilState(asyncSchedulesState)
@@ -56,3 +56,5 @@ export default ({ children }: { children: ReactNode }) => {
 
   return <Provider value={context}>{children}</Provider>
 }
+
+export default Localstorage

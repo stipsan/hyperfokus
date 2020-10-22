@@ -80,7 +80,7 @@ const SchedulesProvider = ({ children }: { children: ReactNode }) => {
   return <Provider value={context}>{children}</Provider>
 }
 
-export default ({ children }: { children: ReactNode }) => (
+const Firebase = ({ children }: { children: ReactNode }) => (
   <AuthCheck
     fallback={
       <>
@@ -95,3 +95,5 @@ export default ({ children }: { children: ReactNode }) => (
     <SchedulesProvider>{children}</SchedulesProvider>
   </AuthCheck>
 )
+
+export default Firebase

@@ -1,7 +1,6 @@
 import cx from 'classnames'
 import localStorage from 'database/localstorage'
 import firebase from 'firebase/app'
-import type { User } from 'firebase/app'
 import { useAnalytics, useLogException } from 'hooks/analytics'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
 // @ts-expect-error
@@ -20,7 +19,7 @@ const buttonClass = 'bg-gray-100 hover:bg-gray-300 text-gray-800 font-semibold'
 
 const AuthStep = () => {
   const auth = useAuth()
-  const user = useUser<User>()
+  const user = useUser<firebase.User>()
   const logException = useLogException()
 
   if (user) {
@@ -63,7 +62,7 @@ const AuthStep = () => {
 }
 
 const RequestStep = () => {
-  const user = useUser<User>()
+  const user = useUser<firebase.User>()
   const firestore = useFirestore()
   const logException = useLogException()
   const betaReqRef = firestore.collection('betarequests').doc(user.uid)
@@ -137,7 +136,7 @@ const FinalStep = () => {
   const session = useSessionValue()
   const setSession = useSessionSetState()
   const analytics = useAnalytics()
-  const user = useUser<User>()
+  const user = useUser<firebase.User>()
   const firestore = useFirestore()
   const logException = useLogException()
 

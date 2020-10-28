@@ -1,17 +1,17 @@
 import Button from 'components/Button'
 import type { Schedule } from 'database/types'
-import type { User } from 'firebase/app'
+import type firebase from 'firebase'
 import Link from 'next/link'
-import { useMemo } from 'react'
 import type { ReactNode } from 'react'
+import { useMemo } from 'react'
 import {
   AuthCheck,
   useFirestore,
   useFirestoreCollectionData,
   useUser,
 } from 'reactfire'
-import { Provider } from './Context'
 import type { SchedulesContext } from './Context'
+import { Provider } from './Context'
 
 type ScheduleDoc = {
   rules: Schedule[]
@@ -29,7 +29,7 @@ const sanitize = (schedule: Schedule) => {
 // */
 
 const SchedulesProvider = ({ children }: { children: ReactNode }) => {
-  const user = useUser<User>()
+  const user = useUser<firebase.User>()
   const firestore = useFirestore()
   const schedulesRef = firestore
     .collection('schedules')

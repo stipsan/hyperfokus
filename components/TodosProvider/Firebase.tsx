@@ -1,28 +1,28 @@
 //useFirestoreCollectionData(query, { idField: 'id' })
 import Button from 'components/Button'
 import type { Todo } from 'database/types'
-import type { firestore, User } from 'firebase/app'
+import type firebase from 'firebase'
 import Link from 'next/link'
-import { useMemo } from 'react'
 import type { ReactNode } from 'react'
+import { useMemo } from 'react'
 import {
   AuthCheck,
   useFirestore,
   useFirestoreCollectionData,
   useUser,
 } from 'reactfire'
-import { DispatchProvider, StateProvider } from './Context'
 import type { TodosDispatchContext } from './Context'
+import { DispatchProvider, StateProvider } from './Context'
 
 type TodoDoc = {
-  completed?: firestore.Timestamp
-  created: firestore.Timestamp
-  modified?: firestore.Timestamp
+  completed?: firebase.firestore.Timestamp
+  created: firebase.firestore.Timestamp
+  modified?: firebase.firestore.Timestamp
 } & Exclude<Todo, 'completed' | 'created' | 'modified'>
 // @TODO should be a directive that does the union and Exclude thing automatically
 
 const TodosProviders = ({ children }: { children: ReactNode }) => {
-  const user = useUser<User>()
+  const user = useUser<firebase.User>()
   const firestore = useFirestore()
   const todosRef = firestore.collection('todos').where('author', '==', user.uid)
   const todosData = useFirestoreCollectionData<TodoDoc>(

@@ -50,6 +50,6 @@
     "singleQuote": true
   },
   "resolutions": {
-    "webpack": "^5.3.1"
+    "webpack": "^5.3.2"
   }
 }

@@ -22,8 +22,8 @@
   "devDependencies": {
     "@tailwindcss/custom-forms": "^0.2.1",
     "@types/date-fns": "^2.6.0",
-    "@types/node": "^14.14.2",
-    "@types/react": "^16.9.53",
+    "@types/node": "^14.14.6",
+    "@types/react": "^16.9.55",
     "husky": "^4.3.0",
     "lint-staged": "^10.4.2",
     "postcss-preset-env": "^6.7.0",
@@ -34,7 +34,7 @@
     "tailwindcss-gradients": "^3.0.0",
     "tailwindcss-skip-link": "^1.0.1",
     "tailwindcss-touch": "^1.0.1",
-    "typescript": "^4.0.3"
+    "typescript": "^4.0.5"
   },
   "husky": {
     "hooks": {

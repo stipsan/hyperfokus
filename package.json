@@ -5,19 +5,19 @@
     "start": "next start"
   },
   "dependencies": {
-    "@reach/dialog": "^0.11.2",
-    "@reach/menu-button": "^0.11.2",
-    "@use-it/interval": "^0.1.4",
-    "classnames": "^2.2.6",
-    "firebase": "^7.24.0",
-    "localforage": "^1.9.0",
-    "nanoid": "^3.1.16",
-    "next": "^10.0.2",
+    "@reach/dialog": "0.11.2",
+    "@reach/menu-button": "0.11.2",
+    "@use-it/interval": "0.1.4",
+    "classnames": "2.2.6",
+    "firebase": "7.24.0",
+    "localforage": "1.9.0",
+    "nanoid": "3.1.16",
+    "next": "10.0.2",
     "react": "0.0.0-experimental-4ead6b530",
     "react-dom": "0.0.0-experimental-4ead6b530",
-    "react-spring": "^9.0.0-rc.3",
-    "reactfire": "^2.0.3",
-    "recoil": "^0.1.2"
+    "react-spring": "9.0.0-rc.3",
+    "reactfire": "2.0.3",
+    "recoil": "0.1.2"
   },
   "devDependencies": {
     "@tailwindcss/custom-forms": "^0.2.1",

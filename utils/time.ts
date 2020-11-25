@@ -89,7 +89,15 @@ export const getRepeatMessage = (repeat: Repeat) => {
   ]
   if (keys.some((key) => repeat[key])) {
     const repeated = keys.filter((key) => repeat[key])
-    return `every ${repeated.join(', ')}`
+    // @ts-expect-error
+    const message = Intl?.ListFormat
+      ? // @ts-expect-error
+        new Intl.ListFormat('en', {
+          style: 'long',
+          type: 'conjunction',
+        }).format(repeated)
+      : repeated.join(', ')
+    return `every ${message}`
   }
 
   return ''

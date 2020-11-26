@@ -5,8 +5,8 @@
     "start": "next start"
   },
   "dependencies": {
-    "@reach/dialog": "^0.11.2",
-    "@reach/menu-button": "^0.11.2",
+    "@reach/dialog": "^0.12.0",
+    "@reach/menu-button": "^0.12.0",
     "@use-it/interval": "^0.1.4",
     "classnames": "^2.2.6",
     "firebase": "^7.24.0",

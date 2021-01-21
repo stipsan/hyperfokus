@@ -1,14 +1,6 @@
 {
-  "extends": ["github>finn-no/renovate-presets:js"],
-  "masterIssue": true,
-  "lockFileMaintenance": {
-    "automerge": true
-  },
+  "extends": ["github>stipsan/renovate-presets:auto"],
   "packageRules": [
-    {
-      "depTypeList": ["resolutions"],
-      "automerge": true
-    },
     {
       "packageNames": ["react", "react-dom"],
       "followTag": "experimental"

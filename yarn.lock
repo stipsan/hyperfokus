@@ -3897,14 +3897,14 @@ react-clientside-effect@^1.2.2:
   dependencies:
     "@babel/runtime" "^7.0.0"
 
-react-dom@0.0.0-experimental-27659559e:
-  version "0.0.0-experimental-27659559e"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.0.0-experimental-27659559e.tgz#e7718b5656b66525a399d156d17666e215d6e388"
-  integrity sha512-eDuCfcWojPkptbmjgRYfjxGvLFUTOUFXyX6Gs8Gu8pNWaCa9wI9ptin1nv5iKIb3w4Z2zbdSgnk2Fk1f2/B1GA==
+react-dom@0.0.0-experimental-25bfa287f:
+  version "0.0.0-experimental-25bfa287f"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.0.0-experimental-25bfa287f.tgz#479e13e4026492f4eb94994051ddf2a3a1dab1db"
+  integrity sha512-u+DJ4vY88GxHr0lfRImGno+mG6akal7BbJyiAqcVvku6NYxyNeYNDc3+yYoeJHDIQg5BOoX7mLwcI8i+SEdVYQ==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    scheduler "0.0.0-experimental-27659559e"
+    scheduler "0.0.0-experimental-25bfa287f"
 
 react-focus-lock@^2.3.1:
   version "2.4.1"
@@ -4145,10 +4145,10 @@ sass-loader@10.0.5:
     schema-utils "^3.0.0"
     semver "^7.3.2"
 
-scheduler@0.0.0-experimental-27659559e:
-  version "0.0.0-experimental-27659559e"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.0.0-experimental-27659559e.tgz#c9a5f661ac482a610c2455a56931afa2e77261d3"
-  integrity sha512-8ulxFiPri7L/9tjUGGG844nA1NeydNsVa/TvbEdZ585jc1P9MdBxBr94fkQHQHbzYBmlaFpnBGHtXcQJwTlPfg==
+scheduler@0.0.0-experimental-25bfa287f:
+  version "0.0.0-experimental-25bfa287f"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.0.0-experimental-25bfa287f.tgz#8d6ceb0f02f0813d66b4217903fdb455555ed2d4"
+  integrity sha512-/y69aumEcoiIKYMJkr8mjhIXa6vNn6iA+mQQQMYUGB1bJeZu05XCLIw/Zc2/Nj+F3Ok8zW8XHynhvFaYhpgIgw==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

@@ -3915,10 +3915,10 @@ react-style-singleton@^2.1.0:
     invariant "^2.2.4"
     tslib "^1.0.0"
 
-react@0.0.0-experimental-1a7472624:
-  version "0.0.0-experimental-1a7472624"
-  resolved "https://registry.yarnpkg.com/react/-/react-0.0.0-experimental-1a7472624.tgz#d6970c71ce063dff07b1dca7fc5417ef339ac6a4"
-  integrity sha512-7G+q2XIPUZvpgf58KFjmc+CqYaKPSWDBmml8er5SLauL2jzVXmP0LN9adwm9FlIShapi9jxtgj7mSpY7tElmlw==
+react@0.0.0-experimental-11b07597e:
+  version "0.0.0-experimental-11b07597e"
+  resolved "https://registry.yarnpkg.com/react/-/react-0.0.0-experimental-11b07597e.tgz#40ca9591242a02244236721d8fb54de137f3d575"
+  integrity sha512-mqBcieP+KcCQNOaAkLI2kBPXLkqWfdWoAnyLwps8jIU8fGWVW0inoLCkdmWY+EyeHq4izQ3yYU5bj4Ct3PpE4w==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

@@ -3,7 +3,6 @@ module.exports = {
     autoPrerender: false,
   },
   experimental: {
-    productionBrowserSourceMaps: true,
-    reactMode: 'concurrent',
+    reactRoot: true,
   },
 }

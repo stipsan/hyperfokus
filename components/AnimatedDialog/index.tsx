@@ -50,6 +50,7 @@ export default function ReactSpringAnimatedDialog({
           allowPinchZoom
         >
           <AnimatedDialogContent
+            // @ts-expect-error
             style={{
               ...style,
               ['--position-sticky' as string]: isSafari

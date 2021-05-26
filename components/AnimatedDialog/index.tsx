@@ -45,7 +45,6 @@ export default function ReactSpringAnimatedDialog({
     ({ opacity, ...style }, item) =>
       item && (
         <AnimatedDialogOverlay
-          // @ts-expect-error
           style={{ opacity }}
           onDismiss={onDismiss}
           allowPinchZoom
@@ -53,8 +52,7 @@ export default function ReactSpringAnimatedDialog({
           <AnimatedDialogContent
             style={{
               ...style,
-              // @ts-expect-error
-              '--position-sticky': isSafari
+              ['--position-sticky' as string]: isSafari
                 ? to([opacity], (opacity) =>
                     opacity === 1 ? undefined : 'static'
                   )

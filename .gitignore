@@ -102,3 +102,4 @@ dist
 .vscode
 
 .env*.local
+.vercel

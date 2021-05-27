@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@reach/dialog": "^0.15.0",
-    "@reach/menu-button": "^0.11.2",
+    "@reach/menu-button": "^0.15.0",
     "@use-it/interval": "^1.0.0",
     "classnames": "^2.2.6",
     "firebase": "^7.24.0",
@@ -17,7 +17,7 @@
     "react-dom": "0.0.0-experimental-bb1c82155",
     "react-spring": "^9.1.2",
     "reactfire": "^2.0.3",
-    "recoil": "^0.1.2"
+    "recoil": "^0.3.0"
   },
   "devDependencies": {
     "@tailwindcss/custom-forms": "^0.2.1",

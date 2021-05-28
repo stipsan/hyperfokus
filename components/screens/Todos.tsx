@@ -3,6 +3,7 @@ import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
+import TagsFilter from 'components/TagsFilter'
 import { useActiveSchedules } from 'components/SchedulesProvider'
 import { useTodos, useTodosDispatch } from 'components/TodosProvider'
 import type { Todo } from 'database/types'
@@ -505,7 +506,9 @@ export default function TodosScreen() {
 
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
+  // @TODO filter schedules based on tags
   const schedules = useActiveSchedules()
+  // @TODO send tags filter to hook
   const todos = useTodos()
   const { archiveTodos } = useTodosDispatch()
   const logException = useLogException()
@@ -573,6 +576,7 @@ export default function TodosScreen() {
 
   return (
     <>
+      <TagsFilter />
       {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
         <Section key="review fuckup" className="is-warning">
           <Header>Please review</Header>

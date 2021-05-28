@@ -1,0 +1,58 @@
+.schedule {
+  scroll-snap-align: start;
+}
+
+.topGrid {
+  @apply grid gap-2;
+  grid-template-columns: max-content;
+  grid-template-areas:
+    'start end'
+    'duration duration';
+}
+@screen sm {
+  .topGrid {
+    grid-template-columns: min-content;
+    grid-template-areas: 'start end duration';
+  }
+}
+
+.start {
+  grid-area: start;
+}
+
+.duration {
+  grid-area: duration;
+}
+
+.end {
+  grid-area: end;
+}
+
+.repeatGrid {
+  @apply grid-flow-col inline-grid gap-x-4 gap-y-2;
+  grid-template-columns: min-content;
+  grid-template-areas:
+    'weekday weekend'
+    'weekday weekend'
+    'weekday .'
+    'weekday .'
+    'weekday .';
+}
+
+.noscheduleslinkBackdrop {
+  transition: opacity 0.3s ease-out;
+  opacity: 0;
+  background-image: radial-gradient(
+    circle at calc(100% - 30px) calc(0% + 30px),
+    hsl(202deg 40% 96% / 0%) 60px,
+    hsl(202deg 40% 96%) 170px
+  );
+}
+.noscheduleslink {
+  @apply relative z-40;
+}
+@media (hover: hover) {
+  .noscheduleslink:hover + .noscheduleslinkBackdrop {
+    opacity: 1;
+  }
+}

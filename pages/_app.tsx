@@ -1,12 +1,11 @@
-import { useReduceMotion } from 'hooks/motion'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Globals } from 'react-spring'
 import { FirebaseAppProvider } from 'reactfire'
 import { RecoilRoot } from 'recoil'
 // global css, exempt from CSS module restrictions
 import 'styles/_app.css'
+import 'react-spring-bottom-sheet/dist/style.css'
 
 const SessionObserver = lazy(() => import('components/SessionObserver'))
 const RouteObserver = lazy(() => import('components/RouteObserver'))
@@ -28,14 +27,6 @@ export default function _AppPage({ Component, pageProps }: AppProps) {
   // and adding this class ensures it's turned off in case something else is suspended after
   // the app is fully loaded and the user navigates somewhere
   useEffect(() => document.body.classList.add('loaded'), [])
-
-  // Globally disable animations when the user don't want them
-  const prefersReducedMotion = useReduceMotion()
-  useEffect(() => {
-    Globals.assign({
-      skipAnimation: prefersReducedMotion,
-    })
-  }, [prefersReducedMotion])
 
   const [mounted, setMounted] = useState(false)
   useEffect(() => {

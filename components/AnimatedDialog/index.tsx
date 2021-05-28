@@ -1,5 +1,4 @@
-import { DialogContent, DialogOverlay } from '@reach/dialog'
-import { animated, to, useTransition } from 'react-spring'
+import { BottomSheet } from 'react-spring-bottom-sheet'
 
 type Props = {
   children: React.ReactNode
@@ -8,62 +7,26 @@ type Props = {
   'aria-label': string
 }
 
-const isSafari =
-  typeof window !== 'undefined'
-    ? /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-    : false
-
 export default function ReactSpringAnimatedDialog({
   children,
   isOpen,
   onDismiss,
   'aria-label': ariaLabel,
 }: Props) {
-  const AnimatedDialogOverlay = animated(DialogOverlay)
-  const AnimatedDialogContent = animated(DialogContent)
-
-  const transitions = useTransition(isOpen, {
-    config: { duration: 150 },
-    from: {
-      opacity: 0,
-      '--dialog-content-transform': 'translateY(2rem)',
-      '--dialog-content-sm-transform': 'scale(0.94)',
-    },
-    enter: {
-      opacity: 1,
-      '--dialog-content-transform': 'translateY(0rem)',
-      '--dialog-content-sm-transform': 'scale(1)',
-    },
-    leave: {
-      opacity: 0,
-      '--dialog-content-transform': 'translateY(4rem)',
-      '--dialog-content-sm-transform': 'scale(0.86)',
-    },
-  })
-
-  return transitions(
-    ({ opacity, ...style }, item) =>
-      item && (
-        <AnimatedDialogOverlay
-          style={{ opacity }}
-          onDismiss={onDismiss}
-          allowPinchZoom
-        >
-          <AnimatedDialogContent
-            // @ts-expect-error
-            style={{
-              ...style,
-              ['--position-sticky' as string]: isSafari
-                ? to([opacity], (opacity) =>
-                    opacity === 1 ? undefined : 'static'
-                  )
-                : undefined,
-            }}
-            aria-label={ariaLabel}
-          >
-            {children}
-          </AnimatedDialogContent>
-        </AnimatedDialogOverlay>
-      )
+  return (
+    <BottomSheet
+      aria-label={ariaLabel}
+      open={isOpen}
+      onDismiss={onDismiss}
+      // @TODO temp quickfix for z-index troubles, revisit when rsbs supports tw
+      className="relative z-50"
+      style={{
+        ['--rsbs-max-w' as string]: '640px',
+        ['--rsbs-ml' as string]: 'auto',
+        ['--rsbs-mr' as string]: 'auto',
+      }}
+    >
+      <div className="px-3">{children}</div>
+    </BottomSheet>
   )
 }

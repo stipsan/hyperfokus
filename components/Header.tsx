@@ -29,6 +29,7 @@ const topLinks = [
   ['More', '/more'],
 ]
 export const moreLinks = [
+  ['Tags', '/tags'],
   ['Completed Todos', '/done'],
   ['Settings', '/settings'],
   ['Help', '/help'],
@@ -47,8 +48,10 @@ const TopLink: React.FC<{
         className={cx(
           'py-1 px-4 focus:outline-none focus:shadow-outline',
           {
-            'bg-blue-500 hover:bg-blue-500 active:bg-blue-500 text-white': active,
-            'bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900': !active,
+            'bg-blue-500 hover:bg-blue-500 active:bg-blue-500 text-white':
+              active,
+            'bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900':
+              !active,
           },
           className
         )}

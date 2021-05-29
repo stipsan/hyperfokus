@@ -71,6 +71,12 @@ export interface Todo {
 }
 
 export interface DatabaseType {
+  setTags(tags: Tag[]): Promise<unknown>
+  getTags(): Promise<Tag[]>
+  observeTags(
+    success: (tags: Tag[]) => void,
+    failure: (reason: Error) => void
+  ): () => void
   setSchedules(schedules: Schedule[]): Promise<unknown>
   getSchedules(): Promise<Schedule[]>
   observeSchedules(

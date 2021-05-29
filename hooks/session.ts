@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
+import create from 'zustand'
+
 
 export const sessionKey = 'hyperfokus.storage'
 export type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
@@ -15,13 +16,20 @@ export const sanitize = (unsafeState: SessionState): SessionState => {
   }
 }
 
-export const sessionProviderState = atom({
-  key: 'SessionProvider',
-  default:
-    typeof window !== 'undefined'
-      ? sanitize(localStorage.getItem(sessionKey) as SessionState)
-      : '',
-})
+type SessionStoreState = {
+  session: SessionState,
+  setSession: (session: SessionState) => void
+}
+
+const useStore = create<SessionStoreState>(set => ({
+  session: typeof window !== 'undefined'
+  ? sanitize(localStorage.getItem(sessionKey) as SessionState)
+  : '',
+  setSession: (session: SessionState) => set({session})
+}))
+
+
+
 
 export const useSessionValue = () => {
   // Suspend on the server only as we're reading the provider initial state from localStorage
@@ -30,22 +38,20 @@ export const useSessionValue = () => {
     throw new Promise((resolve) => setTimeout(() => resolve(void 0)))
   }
 
-  const session = useRecoilValue(sessionProviderState)
+  const session = useStore(state => state.session)
 
-  return session as SessionState
+  return session
 }
 
 const useSetSession = () => {
-  const setState = useSetRecoilState(sessionProviderState)
+  const setState = useStore(state => state.setSession)
   // States that need to be reset when changing session
 
-  return (session: SessionState) => {
-    setState(session)
-  }
+  return setState
 }
 
 export const useSessionSetState = () => {
-  const prevState = useRecoilValue(sessionProviderState)
+  const prevState = useStore(state => state.session)
   const setSession = useSetSession()
 
   return (unsafeSession: SessionState) => {
@@ -66,7 +72,7 @@ export const useSessionSetState = () => {
 }
 
 export const useObserveSession = () => {
-  const prevState = useRecoilValue(sessionProviderState)
+  const prevState = useStore(state => state.session)
   const setSession = useSetSession()
 
   useEffect(() => {

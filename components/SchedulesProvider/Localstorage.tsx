@@ -3,7 +3,6 @@ import type { Schedule } from 'database/types'
 import { useLogException } from 'hooks/analytics'
 import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
-import { atom, selector, useRecoilState, useSetRecoilState } from 'recoil'
 import { Provider } from './Context'
 import type { SchedulesContext } from './Context'
 

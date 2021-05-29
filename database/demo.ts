@@ -215,6 +215,17 @@ export let todos = [
 })
 
 const database: DatabaseType = {
+  getTags() {
+    return Promise.resolve(tags)
+  },
+  setTags(nextTags) {
+    tags = JSON.parse(JSON.stringify(nextTags))
+
+    return Promise.resolve()
+  },
+  observeTags() {
+    return () => {}
+  },
   getSchedules() {
     return Promise.resolve(schedules)
   },

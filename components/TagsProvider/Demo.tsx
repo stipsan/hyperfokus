@@ -2,7 +2,6 @@ import { tags } from 'database/demo'
 import type { Tag } from 'database/types'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
-import { atom, useRecoilState } from 'recoil'
 import { Provider } from './Context'
 import type { TagsContext } from './Context'
 

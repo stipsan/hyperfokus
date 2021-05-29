@@ -1,45 +1,44 @@
 import database from 'database/localstorage'
-import type { Schedule } from 'database/types'
+import type { Tag } from 'database/types'
 import { useLogException } from 'hooks/analytics'
 import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
-import { atom, selector, useRecoilState, useSetRecoilState } from 'recoil'
 import { Provider } from './Context'
-import type { SchedulesContext } from './Context'
+import type { TagsContext } from './Context'
 
-const schedulesState = atom<Schedule[]>({
-  key: 'localstorageSchedules',
+const tagsState = atom<Tag[]>({
+  key: 'localstorageTags',
   default: null,
 })
 
-const asyncSchedulesState = selector<Schedule[]>({
-  key: 'asyncLocalstorageSchedules',
+const asyncTagsState = selector<Tag[]>({
+  key: 'asyncLocalstorageTags',
   get: async ({ get }) => {
-    const cache = get(schedulesState)
+    const cache = get(tagsState)
 
     // It's only null when it should be fetched
     if (cache === null) {
       //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
-      return database.getSchedules()
+      return database.getTags()
     }
 
     return cache
   },
-  set: async ({ set }, schedules: Schedule[]) => {
-    set(schedulesState, schedules)
-    await database.setSchedules(schedules)
+  set: async ({ set }, tags: Tag[]) => {
+    set(tagsState, tags)
+    await database.setTags(tags)
   },
 })
 
 const Localstorage = ({ children }: { children: ReactNode }) => {
   const logException = useLogException()
-  const syncSchedules = useSetRecoilState(schedulesState)
-  const [schedules, setSchedules] = useRecoilState(asyncSchedulesState)
+  const syncTags = useSetRecoilState(tagsState)
+  const [tags, setTags] = useRecoilState(asyncTagsState)
 
   // Sync the state in case it's been updated
   useEffect(() => {
-    const unsubscribe = database.observeSchedules(
-      (schedules) => syncSchedules(schedules),
+    const unsubscribe = database.observeTags(
+      (tags) => syncTags(tags),
       (err) => logException(err)
     )
 
@@ -47,11 +46,11 @@ const Localstorage = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const context = useMemo(
-    (): SchedulesContext => ({
-      schedules,
-      setSchedules,
+    (): TagsContext => ({
+      tags,
+      setTags,
     }),
-    [schedules]
+    [tags]
   )
 
   return <Provider value={context}>{children}</Provider>

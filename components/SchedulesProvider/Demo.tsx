@@ -2,17 +2,24 @@ import { schedules } from 'database/demo'
 import type { Schedule } from 'database/types'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
-import { atom, useRecoilState } from 'recoil'
+import create from 'zustand'
+
 import { Provider } from './Context'
 import type { SchedulesContext } from './Context'
 
-const schedulesState = atom<Schedule[]>({
-  key: 'demoSchedules',
-  default: schedules,
-})
+type SchedulesState = {
+  schedules: Schedule[]
+  setSchedules: (schedules: Schedule[]) => void
+}
+
+const useStore = create<SchedulesState>((set) => ({
+  schedules,
+  setSchedules: (schedules: Schedule[]) => set({ schedules }),
+}))
 
 const Demo = ({ children }: { children: ReactNode }) => {
-  const [schedules, setSchedules] = useRecoilState(schedulesState)
+  const schedules = useStore((state) => state.schedules)
+  const setSchedules = useStore((state) => state.setSchedules)
 
   const context = useMemo(
     (): SchedulesContext => ({

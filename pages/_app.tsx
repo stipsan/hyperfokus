@@ -2,7 +2,6 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { FirebaseAppProvider } from 'reactfire'
-import { RecoilRoot } from 'recoil'
 // global css, exempt from CSS module restrictions
 import 'styles/_app.css'
 import 'react-spring-bottom-sheet/dist/style.css'
@@ -41,24 +40,22 @@ export default function _AppPage({ Component, pageProps }: AppProps) {
         <link rel="preconnect" href="https://www.googletagmanager.com" />
       </Head>
       <FirebaseAppProvider firebaseConfig={config}>
-        <RecoilRoot>
-          <Suspense
-            fallback={
-              <div className="my-40 text-xl text-blue-900 text-center loading">
-                Loading...
-              </div>
-            }
-          >
-            <Component {...pageProps} />
-            {mounted && (
-              <Suspense fallback={null}>
-                <SessionObserver />
-                <RouteObserver />
-                <PerformanceObserver />
-              </Suspense>
-            )}
-          </Suspense>
-        </RecoilRoot>
+        <Suspense
+          fallback={
+            <div className="my-40 text-xl text-blue-900 text-center loading">
+              Loading...
+            </div>
+          }
+        >
+          <Component {...pageProps} />
+          {mounted && (
+            <Suspense fallback={null}>
+              <SessionObserver />
+              <RouteObserver />
+              <PerformanceObserver />
+            </Suspense>
+          )}
+        </Suspense>
       </FirebaseAppProvider>
     </>
   )

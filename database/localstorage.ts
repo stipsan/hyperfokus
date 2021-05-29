@@ -5,7 +5,7 @@ if (typeof window === 'undefined') {
 }
 
 import localforage from 'localforage'
-import { DatabaseType, Schedule, Todo } from './types'
+import { DatabaseType, Schedule, Todo, Tag } from './types'
 
 localforage.config({
   name: 'hyperfokus',
@@ -13,10 +13,36 @@ localforage.config({
   storeName: 'localstorage',
 })
 
+const tagsKey = 'hyperfokus.tags.modified'
 const schedulesKey = 'hyperfokus.schedules.modified'
 const todosKey = 'hyperfokus.schedules.modified'
 
 const database: DatabaseType = {
+  async getTags() {
+    const tags = (await localforage.getItem('tags')) as Tag[]
+    return tags || []
+  },
+  async setTags(nextTags) {
+    await localforage.setItem('tags', nextTags)
+    // Always write to the modified timestamp in case another tab is listening to changes
+    await localStorage.setItem(tagsKey, JSON.stringify(new Date()))
+  },
+  observeTags(success, failure) {
+    // Fire an success event right away
+    this.getTags().then(success, failure)
+
+    // Cross-tab events
+    const handler = (event: StorageEvent) => {
+      if (event.key !== tagsKey) {
+        return
+      }
+      this.getTags().then(success, failure)
+    }
+    window.addEventListener('storage', handler)
+    return () => {
+      window.removeEventListener('storage', handler)
+    }
+  },
   async getSchedules() {
     const schedules = (await localforage.getItem('schedules')) as Schedule[]
     return schedules || []

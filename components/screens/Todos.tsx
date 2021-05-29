@@ -6,6 +6,7 @@ import DialogToolbar from 'components/DialogToolbar'
 import TagsFilter from 'components/TagsFilter'
 import { useActiveSchedules } from 'components/SchedulesProvider'
 import { useTodos, useTodosDispatch } from 'components/TodosProvider'
+import TagsProvider from 'components/TagsProvider'
 import type { Todo } from 'database/types'
 import {
   isAfter,
@@ -576,7 +577,27 @@ export default function TodosScreen() {
 
   return (
     <>
-      <TagsFilter />
+      <TagsProvider>
+        <TagsFilter />
+        <AnimatedDialog
+          isOpen={!!router.query.create}
+          onDismiss={onDismiss}
+          aria-label="Create new todo"
+        >
+          <CreateDialog onDismiss={onDismiss} />
+        </AnimatedDialog>
+        <AnimatedDialog
+          isOpen={!router.query.create && todoIds.has(router.query.edit)}
+          onDismiss={onDismiss}
+          aria-label="Edit todo"
+        >
+          <EditDialog
+            onDismiss={onDismiss}
+            todos={todos}
+            id={router.query.edit as string}
+          />
+        </AnimatedDialog>
+      </TagsProvider>
       {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
         <Section key="review fuckup" className="is-warning">
           <Header>Please review</Header>
@@ -701,24 +722,6 @@ export default function TodosScreen() {
           {hyperfocusing ? 'Disable Hyperfocusing' : 'Enable Hyperfocusing'}
         </Button>
       )}
-      <AnimatedDialog
-        isOpen={!!router.query.create}
-        onDismiss={onDismiss}
-        aria-label="Create new todo"
-      >
-        <CreateDialog onDismiss={onDismiss} />
-      </AnimatedDialog>
-      <AnimatedDialog
-        isOpen={!router.query.create && todoIds.has(router.query.edit)}
-        onDismiss={onDismiss}
-        aria-label="Edit todo"
-      >
-        <EditDialog
-          onDismiss={onDismiss}
-          todos={todos}
-          id={router.query.edit as string}
-        />
-      </AnimatedDialog>
     </>
   )
 }

@@ -1,22 +1,21 @@
-import type { Schedule } from 'database/types'
-import { createContext, useContext, useMemo } from 'react'
+import type { Tag } from 'database/types'
+import { createContext, useContext } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { sortByHoursMinutesString } from 'utils/time'
 
-export type SchedulesContext = {
-  schedules: Schedule[]
-  setSchedules: Dispatch<SetStateAction<Schedule[]>>
+export type TagsContext = {
+  tags: Tag[]
+  setTags: Dispatch<SetStateAction<Tag[]>>
 }
 
 const error = new ReferenceError(
-  `SchedulesProvider isn't in the tree, the context for useSchedules is missing`
+  `TagsProvider isn't in the tree, the context for useTags is missing`
 )
-const context = createContext<SchedulesContext>({
-  get schedules() {
+const context = createContext<TagsContext>({
+  get tags() {
     throw error
     return []
   },
-  get setSchedules() {
+  get setTags() {
     throw error
     return () => {}
   },
@@ -24,30 +23,18 @@ const context = createContext<SchedulesContext>({
 
 export const { Provider } = context
 
-export const useSchedules = () => {
-  const { schedules, setSchedules } = useContext(context)
+export const useTags = () => {
+  const { tags, setTags } = useContext(context)
 
-  const setSortedSchedules: Dispatch<SetStateAction<Schedule[]>> = (value) => {
-    setSchedules((state) => {
-      const schedules = typeof value === 'function' ? value(state) : value
+  const setSortedTags: Dispatch<SetStateAction<Tag[]>> = (value) => {
+    setTags((state) => {
+      const tags = typeof value === 'function' ? value(state) : value
       // Do the sorting on write instead of on read
-      schedules.sort((a, b) => {
-        let result = sortByHoursMinutesString(a.start, b.start)
-        return result !== 0 ? result : sortByHoursMinutesString(a.end, b.end)
-      })
+      tags.sort((a, b) => a.name.localeCompare(b.name))
       // @TODO should filter and sanitize data to ensure no properties are missing
-      return schedules
+      return tags
     })
   }
 
-  return { schedules, setSchedules: setSortedSchedules }
-}
-
-export const useActiveSchedules = () => {
-  const { schedules } = useSchedules()
-
-  return useMemo<Schedule[]>(
-    () => schedules.filter((schedule) => schedule.enabled),
-    [schedules]
-  )
+  return { tags, setTags: setSortedTags }
 }

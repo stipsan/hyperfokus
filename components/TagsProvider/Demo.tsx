@@ -1,25 +1,25 @@
-import { schedules } from 'database/demo'
-import type { Schedule } from 'database/types'
+import { tags } from 'database/demo'
+import type { Tag } from 'database/types'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { atom, useRecoilState } from 'recoil'
 import { Provider } from './Context'
-import type { SchedulesContext } from './Context'
+import type { TagsContext } from './Context'
 
-const schedulesState = atom<Schedule[]>({
-  key: 'demoSchedules',
-  default: schedules,
+const tagsState = atom<Tag[]>({
+  key: 'demoTags',
+  default: tags,
 })
 
 const Demo = ({ children }: { children: ReactNode }) => {
-  const [schedules, setSchedules] = useRecoilState(schedulesState)
+  const [tags, setTags] = useRecoilState(tagsState)
 
   const context = useMemo(
-    (): SchedulesContext => ({
-      schedules,
-      setSchedules,
+    (): TagsContext => ({
+      tags,
+      setTags,
     }),
-    [schedules]
+    [tags]
   )
 
   return <Provider value={context}>{children}</Provider>

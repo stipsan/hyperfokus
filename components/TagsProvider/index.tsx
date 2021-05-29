@@ -20,13 +20,9 @@ const getProvider = (session: SessionState) => {
   }
 }
 
-export { useActiveSchedules, useSchedules } from './Context'
+export { useTags } from './Context'
 
-export default function SchedulesProvider({
-  children,
-}: {
-  children: ReactNode
-}) {
+export default function TagsProvider({ children }: { children: ReactNode }) {
   const session = useSessionValue()
   const Provider = useMemo(() => getProvider(session), [session])
 

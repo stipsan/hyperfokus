@@ -8,6 +8,7 @@ import type {
   DatabaseType,
   Repeat,
   ScheduleDelta,
+  Tag,
   Todo,
   TodoDelta,
 } from './types'
@@ -115,6 +116,16 @@ export let schedules = [
   ...schedule,
 }))
 
+export let tags = [
+  { name: 'Feature', color: '#2b6cb0' },
+  { name: 'Bug', color: '#DC2626' },
+].map(
+  (tag, i): Tag => ({
+    id: `tag-${i}`,
+    ...tag,
+  })
+)
+
 export let todos = [
   {
     description: 'Ability to create todos.',
@@ -177,25 +188,21 @@ export let todos = [
   },
   { description: 'Norwegian locale and translations.', duration: 120 },
   { description: 'Add help page skeleton', duration: 15, done: true },
-].map(
-  (activity: TodoDelta, i): Todo => {
-    const { created = new Date(), done = false } = activity
-    const {
-      modified = created,
-      completed = done ? new Date() : undefined,
-    } = activity
+].map((activity: TodoDelta, i): Todo => {
+  const { created = new Date(), done = false } = activity
+  const { modified = created, completed = done ? new Date() : undefined } =
+    activity
 
-    return {
-      id: `activity-${i}`,
-      order: i,
-      created,
-      modified,
-      done,
-      completed,
-      ...activity,
-    }
+  return {
+    id: `activity-${i}`,
+    order: i,
+    created,
+    modified,
+    done,
+    completed,
+    ...activity,
   }
-)
+})
 
 const database: DatabaseType = {
   getSchedules() {

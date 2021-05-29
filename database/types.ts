@@ -24,6 +24,12 @@ export interface Schedule {
   deleted?: boolean
 }
 
+export interface Tag {
+  id: string
+  name: string
+  color: string
+}
+
 export type ScheduleInput = Schedule & {
   added: boolean
   edited: boolean

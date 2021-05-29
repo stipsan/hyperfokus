@@ -507,6 +507,9 @@ export default function TodosScreen() {
 
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
+  const [selectedTags, setSelectedTags] = useState<Set<string | boolean>>(
+    () => new Set()
+  )
   // @TODO filter schedules based on tags
   const schedules = useActiveSchedules()
   // @TODO send tags filter to hook
@@ -578,7 +581,7 @@ export default function TodosScreen() {
   return (
     <>
       <TagsProvider>
-        <TagsFilter />
+        <TagsFilter selected={selectedTags} setSelected={setSelectedTags} />
         <AnimatedDialog
           isOpen={!!router.query.create}
           onDismiss={onDismiss}

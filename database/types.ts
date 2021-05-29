@@ -55,6 +55,7 @@ export interface TodoDelta {
   created?: Date
   modified?: Date
   completed?: Date
+  tags?: string[]
 }
 
 export interface Todo {
@@ -66,6 +67,7 @@ export interface Todo {
   created: Date
   modified: Date
   completed?: Date
+  tags?: string[]
 }
 
 export interface DatabaseType {

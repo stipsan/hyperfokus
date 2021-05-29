@@ -13,6 +13,16 @@ import type {
   TodoDelta,
 } from './types'
 
+export let tags = [
+  { name: 'Feature', color: '#2b6cb0' },
+  { name: 'Bug', color: '#DC2626' },
+].map(
+  (tag, i): Tag => ({
+    id: `tag-${i}`,
+    ...tag,
+  })
+)
+
 const repeatNone: Repeat = {
   monday: false,
   tuesday: false,
@@ -116,55 +126,54 @@ export let schedules = [
   ...schedule,
 }))
 
-export let tags = [
-  { name: 'Feature', color: '#2b6cb0' },
-  { name: 'Bug', color: '#DC2626' },
-].map(
-  (tag, i): Tag => ({
-    id: `tag-${i}`,
-    ...tag,
-  })
-)
+
 
 export let todos = [
   {
     description: 'Ability to create todos.',
     duration: 30,
     completed: new Date(),
+    tags: [tags[0].id],
   },
   {
     description: 'Ability to edit todos.',
     duration: 30,
     completed: new Date(),
+    tags: [tags[0].id],
   },
   {
     description: 'Ability to delete todos.',
     duration: 30,
     completed: new Date(),
+    tags: [tags[0].id],
   },
-  { description: 'Settings screen.', duration: 60 },
+  { description: 'Settings screen.', duration: 60,tags: [tags[0].id], },
   {
     description: 'Notify the user of todos that lack duration.',
     duration: 60,
+    tags: [tags[0].id, tags[1].id],
   },
   {
     description: 'Notify of todos that are missing from the forecast.',
     duration: 60,
+    tags: [tags[1].id],
   },
 
   {
     description:
       'Implement daily reset for when todos are moved into the "Completed Todos" log and out of the planner.',
     duration: 30,
+    tags: [tags[1].id],
   },
   {
     description: 'About page with link to GitHub and other info.',
     duration: 30,
   },
-  { description: 'Ability view completed todos.', duration: 30 },
+  { description: 'Ability view completed todos.', duration: 30,tags: [tags[0].id], },
   {
     description: 'Ability to toggle completed status on todos.',
     duration: 30,
+    tags: [tags[0].id],
   },
   {
     description:
@@ -180,6 +189,7 @@ export let todos = [
     description:
       'On mobile the "More" page should have a topbar over links to its subpages.',
     duration: 30,
+    tags: [tags[0].id],
   },
   {
     description:

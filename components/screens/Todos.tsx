@@ -32,6 +32,7 @@ import type { FC, ReactNode } from 'react'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './Todos.module.css'
+import { tags } from 'database/demo'
 
 const Field: FC<{
   className?: string
@@ -513,7 +514,26 @@ export default function TodosScreen() {
   // @TODO filter schedules based on tags
   const schedules = useActiveSchedules()
   // @TODO send tags filter to hook
-  const todos = useTodos()
+  const allTodos = useTodos()
+  const todos = useMemo(() => {
+    if (selectedTags.size === 0) {
+      return allTodos
+    }
+
+    return allTodos.filter((todo) => {
+      // if Untagged, check if tags are emty, or empty array
+      // Else if check if value exists in array
+      if (selectedTags.has(true) && (!todo.tags || todo.tags?.length === 0)) {
+        return true
+      }
+
+      if (todo.tags?.some((tag) => selectedTags.has(tag))) {
+        return true
+      }
+
+      return false
+    })
+  }, [allTodos, selectedTags])
   const { archiveTodos } = useTodosDispatch()
   const logException = useLogException()
 
@@ -527,8 +547,8 @@ export default function TodosScreen() {
   const todayRef = useRef<HTMLElement>(null)
 
   const todoIds = useMemo(
-    () => todos.reduce((ids, todo) => ids.add(todo.id), new Set()),
-    [todos]
+    () => allTodos.reduce((ids, todo) => ids.add(todo.id), new Set()),
+    [allTodos]
   )
 
   // Update the now value every minute in case it changes the schedule

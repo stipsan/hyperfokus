@@ -3,42 +3,51 @@ import type { Schedule } from 'database/types'
 import { useLogException } from 'hooks/analytics'
 import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
+import create from 'zustand'
+import { createAsset } from 'use-asset'
 import { Provider } from './Context'
 import type { SchedulesContext } from './Context'
+import { useCallback } from 'react'
 
-const schedulesState = atom<Schedule[]>({
-  key: 'localstorageSchedules',
-  default: null,
-})
+type SchedulesState = {
+  schedules: Schedule[]
+  setSchedules: (schedules: Schedule[]) => void
+  setSchedulesInDatabase: (schedules) => Promise<void>
+}
 
-const asyncSchedulesState = selector<Schedule[]>({
-  key: 'asyncLocalstorageSchedules',
-  get: async ({ get }) => {
-    const cache = get(schedulesState)
-
-    // It's only null when it should be fetched
-    if (cache === null) {
-      //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
-      return database.getSchedules()
-    }
-
-    return cache
-  },
-  set: async ({ set }, schedules: Schedule[]) => {
-    set(schedulesState, schedules)
+const useStore = create<SchedulesState>((set) => ({
+  schedules: [],
+  setSchedules: (schedules: Schedule[]) => set({ schedules }),
+  setSchedulesInDatabase: async (schedules: Schedule[]) => {
     await database.setSchedules(schedules)
+    return set({ schedules })
   },
-})
+}))
+
+const asset = createAsset(
+  async (setSchedules: SchedulesState['setSchedules']) => {
+    //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
+
+    const schedules = await database.getSchedules()
+    console.log({ schedules })
+
+    setSchedules(schedules)
+  }
+)
 
 const Localstorage = ({ children }: { children: ReactNode }) => {
   const logException = useLogException()
-  const syncSchedules = useSetRecoilState(schedulesState)
-  const [schedules, setSchedules] = useRecoilState(asyncSchedulesState)
+  const setSchedules = useStore((state) => state.setSchedules)
+  asset.read(setSchedules)
+  const schedules = useStore((state) => state.schedules)
+  const setSchedulesInDatabase = useStore(
+    (state) => state.setSchedulesInDatabase
+  )
 
   // Sync the state in case it's been updated
   useEffect(() => {
     const unsubscribe = database.observeSchedules(
-      (schedules) => syncSchedules(schedules),
+      (schedules) => setSchedules(schedules),
       (err) => logException(err)
     )
 
@@ -48,7 +57,7 @@ const Localstorage = ({ children }: { children: ReactNode }) => {
   const context = useMemo(
     (): SchedulesContext => ({
       schedules,
-      setSchedules,
+      setSchedules: setSchedulesInDatabase,
     }),
     [schedules]
   )

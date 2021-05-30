@@ -3,10 +3,15 @@ import { createContext, useContext, useMemo } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { sortByHoursMinutesString } from 'utils/time'
 
-export type SchedulesContext = {
-  schedules: Schedule[]
-  setSchedules: Dispatch<SetStateAction<Schedule[]>>
+export type SchedulesDispatchContext = {
+  addSchedule(data: Schedule): Promise<{ id: string }>
+  editSchedule(data: Schedule, id: string): void
+  deleteSchedule(id: string): void
 }
+
+type SchedulesContext = {
+  schedules: Schedule[]
+} & SchedulesDispatchContext
 
 const error = new ReferenceError(
   `SchedulesProvider isn't in the tree, the context for useSchedules is missing`
@@ -16,7 +21,15 @@ const context = createContext<SchedulesContext>({
     throw error
     return []
   },
-  get setSchedules() {
+  get addSchedule() {
+    throw error
+    return async () => ({ id: '' })
+  },
+  get editSchedule() {
+    throw error
+    return () => {}
+  },
+  get deleteSchedule() {
     throw error
     return () => {}
   },
@@ -25,8 +38,10 @@ const context = createContext<SchedulesContext>({
 export const { Provider } = context
 
 export const useSchedules = () => {
-  const { schedules, setSchedules } = useContext(context)
+  const { schedules, addSchedule, editSchedule, deleteSchedule } =
+    useContext(context)
 
+  /*
   const setSortedSchedules: Dispatch<SetStateAction<Schedule[]>> = (value) => {
     setSchedules((state) => {
       const schedules = typeof value === 'function' ? value(state) : value
@@ -39,8 +54,9 @@ export const useSchedules = () => {
       return schedules
     })
   }
+  // */
 
-  return { schedules, setSchedules: setSortedSchedules }
+  return { schedules, addSchedule, editSchedule, deleteSchedule }
 }
 
 export const useActiveSchedules = () => {

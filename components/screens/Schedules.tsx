@@ -13,6 +13,7 @@ import type { Dispatch, FC, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import { getRepeatMessage } from 'utils/time'
 import styles from './Schedules.module.css'
+import { SchedulesDispatchContext } from 'components/SchedulesProvider/Context'
 
 const TrackCreateDialog = () => {
   const analytics = useAnalytics()
@@ -27,9 +28,9 @@ const TrackCreateDialog = () => {
 }
 
 const CreateDialog = ({
-  setSchedules,
+  addSchedule,
 }: {
-  setSchedules: Dispatch<SetStateAction<Schedule[]>>
+  addSchedule: SchedulesDispatchContext['addSchedule']
 }) => {
   const analytics = useAnalytics()
   useEffect(() => {
@@ -52,10 +53,8 @@ const CreateDialog = ({
     >
       <ScheduleForm
         onDismiss={close}
-        onSubmit={(state) => {
-          setSchedules((schedules) => {
-            return [...schedules, { ...state, id: nanoid() }]
-          })
+        onSubmit={async (state) => {
+          await addSchedule({ ...state, id: nanoid() })
           close()
           analytics.logEvent('schedule_create', {
             start: state.start,
@@ -452,10 +451,12 @@ const TrackEditDialog = () => {
 }
 const EditDialog = ({
   schedules,
-  setSchedules,
+  editSchedule,
+  deleteSchedule,
 }: {
   schedules: Schedule[]
-  setSchedules: Dispatch<SetStateAction<Schedule[]>>
+  editSchedule: SchedulesDispatchContext['editSchedule']
+  deleteSchedule: SchedulesDispatchContext['deleteSchedule']
 }) => {
   const analytics = useAnalytics()
   const router = useRouter()
@@ -504,7 +505,9 @@ const EditDialog = ({
         editing
         initialState={initialState}
         onDismiss={close}
-        onSubmit={(state) => {
+        onSubmit={async (state) => {
+          await editSchedule(state, initialState.id)
+          /*
           setSchedules((schedules) => {
             const index = schedules.findIndex(
               (schedule) => schedule.id === initialState.id
@@ -520,6 +523,7 @@ const EditDialog = ({
             })
             return newSchedules
           })
+          // */
           setInitialState(state)
           close()
           analytics.logEvent('schedule_edit', {
@@ -530,7 +534,7 @@ const EditDialog = ({
             enabled: state.enabled,
           })
         }}
-        onDelete={() => {
+        onDelete={async () => {
           if (
             confirm(
               `Are you sure you want to delete "${initialState.start} – ${
@@ -538,6 +542,8 @@ const EditDialog = ({
               }, ${getRepeatMessage(initialState.repeat)}"?`
             )
           ) {
+            await deleteSchedule(initialState.id)
+            /*
             setSchedules((schedules) => {
               const index = schedules.findIndex(
                 (schedule) => schedule.id === initialState.id
@@ -545,6 +551,7 @@ const EditDialog = ({
               const newSchedules = removeItemAtIndex(schedules, index)
               return newSchedules
             })
+            // */
             close()
             analytics.logEvent('schedule_delete', {
               start: initialState.start,
@@ -598,7 +605,8 @@ export default function SchedulesScreen() {
     })
   }, [])
 
-  const { schedules, setSchedules } = useSchedules()
+  const { schedules, addSchedule, editSchedule, deleteSchedule } =
+    useSchedules()
 
   return (
     <div className={cx({ 'border-b-2': schedules.length > 0 })}>
@@ -632,8 +640,12 @@ export default function SchedulesScreen() {
           </Link>
         )
       })}
-      <EditDialog schedules={schedules} setSchedules={setSchedules} />
-      <CreateDialog setSchedules={setSchedules} />
+      <EditDialog
+        schedules={schedules}
+        editSchedule={editSchedule}
+        deleteSchedule={deleteSchedule}
+      />
+      <CreateDialog addSchedule={addSchedule} />
     </div>
   )
 }

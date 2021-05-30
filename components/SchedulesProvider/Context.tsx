@@ -3,13 +3,14 @@ import { createContext, useContext, useMemo } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { sortByHoursMinutesString } from 'utils/time'
 
+// TODO don't export this, no need to do this split & merge
 export type SchedulesDispatchContext = {
   addSchedule(data: Schedule): Promise<{ id: string }>
   editSchedule(data: Schedule, id: string): void
   deleteSchedule(id: string): void
 }
 
-type SchedulesContext = {
+export type SchedulesContext = {
   schedules: Schedule[]
 } & SchedulesDispatchContext
 

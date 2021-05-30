@@ -1,35 +1,58 @@
 import database from 'database/localstorage'
 import type { Schedule } from 'database/types'
 import { useLogException } from 'hooks/analytics'
-import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
-import create from 'zustand'
+import { useEffect, useMemo } from 'react'
 import { createAsset } from 'use-asset'
-import { Provider } from './Context'
+import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
+import create from 'zustand'
 import type { SchedulesContext } from './Context'
-import { useCallback } from 'react'
+import { Provider } from './Context'
+import { sortByTime } from './utils'
 
-type SchedulesState = {
-  schedules: Schedule[]
+type SchedulesStore = SchedulesContext & {
   setSchedules: (schedules: Schedule[]) => void
-  setSchedulesInDatabase: (schedules) => Promise<void>
 }
 
-const useStore = create<SchedulesState>((set) => ({
+const useStore = create<SchedulesStore>((set, get) => ({
   schedules: [],
   setSchedules: (schedules: Schedule[]) => set({ schedules }),
-  setSchedulesInDatabase: async (schedules: Schedule[]) => {
-    await database.setSchedules(schedules)
-    return set({ schedules })
+  addSchedule: async (schedule: Schedule) => {
+    const { schedules } = get()
+    const updatedSchedules = [...schedules, schedule].sort(sortByTime)
+    await database.setSchedules(updatedSchedules)
+    set({ schedules: updatedSchedules })
+    return { id: schedule.id }
+  },
+  editSchedule: async (schedule: Schedule, id: string) => {
+    const { schedules } = get()
+    const index = schedules.findIndex((schedule) => schedule.id === id)
+
+    const updatedSchedules = replaceItemAtIndex(schedules, index, {
+      ...schedules[index],
+      start: schedule.start,
+      duration: schedule.duration,
+      end: schedule.end,
+      repeat: schedule.repeat,
+      enabled: schedule.enabled,
+    }).sort(sortByTime)
+    await database.setSchedules(updatedSchedules)
+    set({ schedules: updatedSchedules })
+  },
+  deleteSchedule: async (id: string) => {
+    const { schedules } = get()
+    const index = schedules.findIndex((schedule) => schedule.id === id)
+    const updatedSchedules = removeItemAtIndex(schedules, index)
+    await database.setSchedules(updatedSchedules)
+    set({ schedules: updatedSchedules })
   },
 }))
 
 const asset = createAsset(
-  async (setSchedules: SchedulesState['setSchedules']) => {
-    //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
+  async (setSchedules: SchedulesStore['setSchedules']) => {
+    //await new Promise((resolve) => setTimeout(() => resolve(void 0), 3000))
 
     const schedules = await database.getSchedules()
-    console.log({ schedules })
 
     setSchedules(schedules)
   }
@@ -40,9 +63,9 @@ const Localstorage = ({ children }: { children: ReactNode }) => {
   const setSchedules = useStore((state) => state.setSchedules)
   asset.read(setSchedules)
   const schedules = useStore((state) => state.schedules)
-  const setSchedulesInDatabase = useStore(
-    (state) => state.setSchedulesInDatabase
-  )
+  const addSchedule = useStore((state) => state.addSchedule)
+  const editSchedule = useStore((state) => state.editSchedule)
+  const deleteSchedule = useStore((state) => state.deleteSchedule)
 
   // Sync the state in case it's been updated
   useEffect(() => {
@@ -57,9 +80,11 @@ const Localstorage = ({ children }: { children: ReactNode }) => {
   const context = useMemo(
     (): SchedulesContext => ({
       schedules,
-      setSchedules: setSchedulesInDatabase,
+      addSchedule,
+      editSchedule,
+      deleteSchedule,
     }),
-    [schedules]
+    [schedules, addSchedule, editSchedule, deleteSchedule]
   )
 
   return <Provider value={context}>{children}</Provider>

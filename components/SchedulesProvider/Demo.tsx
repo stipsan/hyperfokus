@@ -11,13 +11,13 @@ import { sortByTime } from './utils'
 
 const useStore = create<SchedulesContext>((set) => ({
   schedules,
-  addSchedule: (schedule: Schedule) => {
+  addSchedule: async (schedule: Schedule) => {
     set((state) => ({
       schedules: [...state.schedules, schedule].sort(sortByTime),
     }))
-    return Promise.resolve({ id: schedule.id })
+    return { id: schedule.id }
   },
-  editSchedule: (schedule: Schedule, id: string) =>
+  editSchedule: async (schedule: Schedule, id: string) =>
     set((state) => {
       const index = state.schedules.findIndex((schedule) => schedule.id === id)
 
@@ -31,7 +31,7 @@ const useStore = create<SchedulesContext>((set) => ({
       })
       return { schedules: newSchedules.sort(sortByTime) }
     }),
-  deleteSchedule: (id: string) =>
+  deleteSchedule: async (id: string) =>
     set((state) => {
       const index = state.schedules.findIndex((schedule) => schedule.id === id)
       const newSchedules = removeItemAtIndex(state.schedules, index)

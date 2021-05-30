@@ -6,8 +6,8 @@ import { sortByHoursMinutesString } from 'utils/time'
 // TODO don't export this, no need to do this split & merge
 export type SchedulesDispatchContext = {
   addSchedule(data: Schedule): Promise<{ id: string }>
-  editSchedule(data: Schedule, id: string): void
-  deleteSchedule(id: string): void
+  editSchedule(data: Schedule, id: string): Promise<void>
+  deleteSchedule(id: string): Promise<void>
 }
 
 export type SchedulesContext = {

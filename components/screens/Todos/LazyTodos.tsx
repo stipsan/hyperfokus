@@ -7,6 +7,7 @@ import TagsFilter from 'components/TagsFilter'
 import { useActiveSchedules } from 'components/SchedulesProvider'
 import { useTodos, useTodosDispatch } from 'components/TodosProvider'
 import TagsProvider from 'components/TagsProvider'
+import type { addTodo } from 'components/TodosProvider/Context'
 import type { Todo } from 'database/types'
 import {
   isAfter,
@@ -369,9 +370,14 @@ const Section = forwardRef<
   </section>
 ))
 
-const CreateDialog = ({ onDismiss }: { onDismiss: () => void }) => {
+const CreateDialog = ({
+  onDismiss,
+  addTodo,
+}: {
+  onDismiss: () => void
+  addTodo
+}) => {
   const logException = useLogException()
-  const { addTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -497,7 +503,7 @@ const EditDialog = ({
   )
 }
 
-export default function TodosScreen() {
+export default function TodosScreen({ addTodo }: { addTodo }) {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -607,7 +613,7 @@ export default function TodosScreen() {
           onDismiss={onDismiss}
           aria-label="Create new todo"
         >
-          <CreateDialog onDismiss={onDismiss} />
+          <CreateDialog addTodo={addTodo} onDismiss={onDismiss} />
         </AnimatedDialog>
         <AnimatedDialog
           isOpen={!router.query.create && todoIds.has(router.query.edit)}

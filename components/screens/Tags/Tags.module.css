@@ -11,9 +11,7 @@
     hsl(202deg 40% 96%) 170px
   );
 }
-.notagslink {
-  @apply relative z-40;
-}
+
 @media (hover: hover) {
   .notagslink:hover + .notagslinkBackdrop {
     opacity: 1;

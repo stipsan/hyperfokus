@@ -1,7 +1,6 @@
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MainContainer } from 'components/layouts'
-import SchedulesProvider from 'components/SchedulesProvider'
 import Schedules from 'components/screens/Schedules'
 import Welcome from 'components/screens/Welcome'
 import { useSessionValue } from 'hooks/session'
@@ -21,9 +20,7 @@ export default function SchedulesPage() {
       <AppLayout title={title} createLink="New schedule">
         <GetStartedBroadcast />
         <MainContainer>
-          <SchedulesProvider>
-            <Schedules />
-          </SchedulesProvider>
+          <Schedules />
         </MainContainer>
       </AppLayout>
     </>

@@ -13,7 +13,7 @@ import type { Dispatch, FC, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import { getRepeatMessage } from 'utils/time'
 import styles from './Schedules.module.css'
-import { SchedulesContext } from 'components/SchedulesProvider/Context'
+import type { SchedulesContext } from 'components/SchedulesProvider/Context'
 
 const TrackCreateDialog = () => {
   const analytics = useAnalytics()
@@ -596,7 +596,7 @@ const NoSchedulesPlaceholder = () => {
   )
 }
 
-export default function SchedulesScreen() {
+export default function LazySchedulesScreen() {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {

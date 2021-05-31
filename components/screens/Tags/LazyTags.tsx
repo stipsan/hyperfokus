@@ -264,7 +264,7 @@ const NoTagsPlaceholder = () => {
         <a
           className={cx(
             className({ variant: 'primary' }),
-            'mt-10',
+            'mt-10 relative z-40',
             styles.notagslink
           )}
         >

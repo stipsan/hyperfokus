@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import create from 'zustand'
 import type { SchedulesContext } from './Context'
-import { Provider } from './Context'
 import { sortByTime } from './utils'
 
 const useStore = create<SchedulesContext>((set) => ({
@@ -37,7 +36,12 @@ const useStore = create<SchedulesContext>((set) => ({
     }),
 }))
 
-const Demo = ({ children }: { children: ReactNode }) => {
+function selectSchedules(state: SchedulesContext) {
+  return state.schedules
+}
+export const useSchedules = () => useStore(selectSchedules)
+
+const Demo = ({ children }) => {
   const schedules = useStore((state) => state.schedules)
   const addSchedule = useStore((state) => state.addSchedule)
   const editSchedule = useStore((state) => state.editSchedule)
@@ -52,8 +56,4 @@ const Demo = ({ children }: { children: ReactNode }) => {
     }),
     [schedules, addSchedule, editSchedule, deleteSchedule]
   )
-
-  return <Provider value={context}>{children}</Provider>
 }
-
-export default Demo

@@ -596,7 +596,12 @@ const NoSchedulesPlaceholder = () => {
   )
 }
 
-export default function LazySchedulesScreen() {
+export default function LazySchedulesScreen({
+  schedules,
+  addSchedule,
+  editSchedule,
+  deleteSchedule,
+}: SchedulesContext) {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -604,9 +609,6 @@ export default function LazySchedulesScreen() {
       screen_name: 'Schedules',
     })
   }, [])
-
-  const { schedules, addSchedule, editSchedule, deleteSchedule } =
-    useSchedules()
 
   return (
     <div className={cx({ 'border-b-2': schedules.length > 0 })}>

@@ -4,6 +4,7 @@ import type { User } from 'firebase/app'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useCallback, useMemo } from 'react'
+import FirebaseAuthCheck from 'components/FirebaseAuthCheck'
 import {
   AuthCheck,
   useFirestore,
@@ -107,19 +108,9 @@ const SchedulesProvider = ({ children }: { children: ReactNode }) => {
 }
 
 const Firebase = ({ children }: { children: ReactNode }) => (
-  <AuthCheck
-    fallback={
-      <>
-        <Link href="/settings">
-          <Button className="block mx-auto mt-32" variant="primary">
-            Login
-          </Button>
-        </Link>
-      </>
-    }
-  >
+  <FirebaseAuthCheck>
     <SchedulesProvider>{children}</SchedulesProvider>
-  </AuthCheck>
+  </FirebaseAuthCheck>
 )
 
 export default Firebase

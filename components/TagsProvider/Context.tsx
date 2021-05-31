@@ -1,10 +1,11 @@
 import type { Tag } from 'database/types'
 import { createContext, useContext } from 'react'
-import type { Dispatch, SetStateAction } from 'react'
 
 export type TagsContext = {
   tags: Tag[]
-  setTags: Dispatch<SetStateAction<Tag[]>>
+  addTag(data: Tag): Promise<{ id: string }>
+  editTag(data: Tag, id: string): Promise<void>
+  deleteTag(id: string): Promise<void>
 }
 
 const error = new ReferenceError(
@@ -15,17 +16,29 @@ const context = createContext<TagsContext>({
     throw error
     return []
   },
-  get setTags() {
+  get addTag() {
     throw error
-    return () => {}
+    return async () => ({ id: '' })
+  },
+  get editTag() {
+    throw error
+    return async () => {}
+  },
+  get deleteTag() {
+    throw error
+    return async () => {}
   },
 })
 
 export const { Provider } = context
 
+// TODO rewrite to separate contexts for actions and state (one for each, as actions only change once)
 export const useTags = () => {
-  const { tags, setTags } = useContext(context)
+  const { tags, addTag, editTag, deleteTag } = useContext(context)
 
+  return { tags, addTag, editTag, deleteTag }
+
+  /*
   const setSortedTags: Dispatch<SetStateAction<Tag[]>> = (value) => {
     setTags((state) => {
       const tags = typeof value === 'function' ? value(state) : value
@@ -35,6 +48,7 @@ export const useTags = () => {
       return tags
     })
   }
+  */
 
   return { tags, setTags: setSortedTags }
 }

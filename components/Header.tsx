@@ -29,10 +29,10 @@ const topLinks = [
   ['More', '/more'],
 ]
 export const moreLinks = [
-  ['Tags', '/tags'],
-  ['Completed Todos', '/done'],
   ['Settings', '/settings'],
   ['Help', '/help'],
+  ['Tags', '/tags'],
+  ['Completed Todos', '/done'],
 ]
 
 const TopLink: React.FC<{

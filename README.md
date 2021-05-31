@@ -8,6 +8,7 @@
 - drag & drop reordering
 - [Checklists](https://culturedcode.com/things/whats-new/)
 - filter, parse, santize with [zod](https://www.npmjs.com/package/zod)
+- add Settings data type, use it to store state such as cloud sync, hyperfocusing mode etc
 
 #### tags
 

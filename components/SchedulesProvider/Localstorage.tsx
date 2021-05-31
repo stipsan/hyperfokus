@@ -61,6 +61,7 @@ const asset = createAsset(
 const Localstorage = ({ children }: { children: ReactNode }) => {
   const logException = useLogException()
   const setSchedules = useStore((state) => state.setSchedules)
+  // Only runs once, and ensures the view is suspended until the initial schedules is fetched
   asset.read(setSchedules)
   const schedules = useStore((state) => state.schedules)
   const addSchedule = useStore((state) => state.addSchedule)

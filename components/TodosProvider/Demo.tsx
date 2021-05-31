@@ -3,109 +3,126 @@ import type { Todo } from 'database/types'
 import { nanoid } from 'nanoid'
 import { useMemo } from 'react'
 import type { ReactNode } from 'react'
+import create from 'zustand'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import { DispatchProvider, StateProvider } from './Context'
-import type { TodosDispatchContext } from './Context'
+import type { TodosDispatchContext, TodosContext } from './Context'
 
-const todosState = atom<Todo[]>({
-  key: 'demoTodos',
-  default: todos,
-})
+const useStore = create<{ todos: TodosContext } & TodosDispatchContext>(
+  (set) => ({
+    todos,
+    addTodo: async (data: Todo) => {
+      const id = nanoid()
 
-const Demo = ({ children }: { children: ReactNode }) => {
-  const [todos, setTodos] = useRecoilState(todosState)
+      set(({ todos }) => {
+        const todo = { ...data, id }
 
-  // @TODO trace if setTodos is referencial stable cross renders
-  //       useMemo should only call its setter once, only StateProvider should trigger rerenders
-  const context = useMemo(
-    (): TodosDispatchContext => ({
-      addTodo: async (data) => {
-        const id = nanoid()
+        if (todos.length < 1) {
+          return { todos: [todo] }
+        }
 
-        await setTodos((todos) => {
-          const todo = { ...data, id }
+        if (todo.order > 0) {
+          const { order: bottom } = todos[todos.length - 1]
+          return { todos: [...todos, { ...todo, order: bottom + 1 }] }
+        }
 
-          if (todos.length < 1) {
-            return [todo]
-          }
+        const { order: top } = todos[0]
+        return { todos: [{ ...todo, order: top - 1 }, ...todos] }
+      })
+      return { id }
+    },
+    editTodo: async (data, id) => {
+      set(({ todos }) => {
+        const index = todos.findIndex((search) => search.id === id)
+        const todo = {
+          ...todos[index],
+          ...data,
+        }
 
-          if (todo.order > 0) {
-            const { order: bottom } = todos[todos.length - 1]
-            return [...todos, { ...todo, order: bottom + 1 }]
-          }
+        if (todos.length < 1) {
+          return { todos: [todo] }
+        }
 
-          const { order: top } = todos[0]
-          return [{ ...todo, order: top - 1 }, ...todos]
-        })
-
-        return { id }
-      },
-      editTodo: async (data, id) => {
-        await setTodos((todos) => {
-          const index = todos.findIndex((search) => search.id === id)
-          const todo = {
-            ...todos[index],
-            ...data,
-          }
-
-          if (todos.length < 1) {
-            return [todo]
-          }
-
-          if (todos[index].order !== data.order && data.order === 1) {
-            const { order: bottom } = todos[todos.length - 1]
-            return [
+        if (todos[index].order !== data.order && data.order === 1) {
+          const { order: bottom } = todos[todos.length - 1]
+          return {
+            todos: [
               ...removeItemAtIndex(todos, index),
               { ...todo, order: bottom + 1 },
-            ]
-          } else if (todos[index].order !== data.order && data.order === -1) {
-            const { order: top } = todos[0]
-            return [
+            ],
+          }
+        } else if (todos[index].order !== data.order && data.order === -1) {
+          const { order: top } = todos[0]
+          return {
+            todos: [
               { ...todo, order: top - 1 },
               ...removeItemAtIndex(todos, index),
-            ]
+            ],
           }
+        }
 
-          return replaceItemAtIndex(todos, index, todo)
-        })
-
-        return { id }
-      },
-      deleteTodo: async (id) => {
-        await setTodos((todos) => {
-          const index = todos.findIndex((search) => search.id === id)
-          return removeItemAtIndex(todos, index)
-        })
-      },
-      completeTodo: async (id) => {
-        await setTodos((todos) => {
-          const index = todos.findIndex((search) => search.id === id)
-          return replaceItemAtIndex(todos, index, {
+        return { todos: replaceItemAtIndex(todos, index, todo) }
+      })
+    },
+    deleteTodo: async (id) => {
+      set(({ todos }) => {
+        const index = todos.findIndex((search) => search.id === id)
+        return { todos: removeItemAtIndex(todos, index) }
+      })
+    },
+    completeTodo: async (id) => {
+      set(({ todos }) => {
+        const index = todos.findIndex((search) => search.id === id)
+        return {
+          todos: replaceItemAtIndex(todos, index, {
             ...todos[index],
             completed: new Date(),
-          })
-        })
-      },
-      incompleteTodo: async (id) => {
-        await setTodos((todos) => {
-          const index = todos.findIndex((search) => search.id === id)
-          return replaceItemAtIndex(todos, index, {
+          }),
+        }
+      })
+    },
+    incompleteTodo: async (id) => {
+      set(({ todos }) => {
+        const index = todos.findIndex((search) => search.id === id)
+        return {
+          todos: replaceItemAtIndex(todos, index, {
             ...todos[index],
             completed: undefined,
             done: false,
-          })
-        })
-      },
-      archiveTodos: async () => {
-        setTodos((todos) =>
-          todos.map((todo) => ({
-            ...todo,
-            done: todo.done || !!todo.completed,
-          }))
-        )
-      },
+          }),
+        }
+      })
+    },
+    archiveTodos: async () => {
+      set(({ todos }) => ({
+        todos: todos.map((todo) => ({
+          ...todo,
+          done: todo.done || !!todo.completed,
+        })),
+      }))
+    },
+  })
+)
+
+const Demo = ({ children }: { children: ReactNode }) => {
+  const todos = useStore((state) => state.todos)
+  const addTodo = useStore((state) => state.addTodo)
+  const editTodo = useStore((state) => state.editTodo)
+  const deleteTodo = useStore((state) => state.deleteTodo)
+  const completeTodo = useStore((state) => state.completeTodo)
+  const incompleteTodo = useStore((state) => state.incompleteTodo)
+  const archiveTodos = useStore((state) => state.archiveTodos)
+
+  const context = useMemo(
+    (): TodosDispatchContext => ({
+      addTodo,
+      editTodo,
+      deleteTodo,
+      completeTodo,
+      incompleteTodo,
+      archiveTodos,
     }),
-    [setTodos]
+    [addTodo, editTodo, deleteTodo, completeTodo, incompleteTodo, archiveTodos]
   )
 
   return (

@@ -3,16 +3,12 @@ import { createContext, useContext, useMemo } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { sortByHoursMinutesString } from 'utils/time'
 
-// TODO don't export this, no need to do this split & merge
-export type SchedulesDispatchContext = {
+export type SchedulesContext = {
+  schedules: Schedule[]
   addSchedule(data: Schedule): Promise<{ id: string }>
   editSchedule(data: Schedule, id: string): Promise<void>
   deleteSchedule(id: string): Promise<void>
 }
-
-export type SchedulesContext = {
-  schedules: Schedule[]
-} & SchedulesDispatchContext
 
 const error = new ReferenceError(
   `SchedulesProvider isn't in the tree, the context for useSchedules is missing`
@@ -28,34 +24,20 @@ const context = createContext<SchedulesContext>({
   },
   get editSchedule() {
     throw error
-    return () => {}
+    return async () => {}
   },
   get deleteSchedule() {
     throw error
-    return () => {}
+    return async () => {}
   },
 })
 
 export const { Provider } = context
 
+// TODO rewrite to separate contexts for actions and state (one for each, as actions only change once)
 export const useSchedules = () => {
   const { schedules, addSchedule, editSchedule, deleteSchedule } =
     useContext(context)
-
-  /*
-  const setSortedSchedules: Dispatch<SetStateAction<Schedule[]>> = (value) => {
-    setSchedules((state) => {
-      const schedules = typeof value === 'function' ? value(state) : value
-      // Do the sorting on write instead of on read
-      schedules.sort((a, b) => {
-        let result = sortByHoursMinutesString(a.start, b.start)
-        return result !== 0 ? result : sortByHoursMinutesString(a.end, b.end)
-      })
-      // @TODO should filter and sanitize data to ensure no properties are missing
-      return schedules
-    })
-  }
-  // */
 
   return { schedules, addSchedule, editSchedule, deleteSchedule }
 }

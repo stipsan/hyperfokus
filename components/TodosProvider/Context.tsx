@@ -5,11 +5,11 @@ export type TodosContext = Todo[]
 
 export type TodosDispatchContext = {
   addTodo(data: Todo): Promise<{ id: string }>
-  editTodo(data: Todo, id: string): void
-  deleteTodo(id: string): void
-  completeTodo(id: string): void
-  incompleteTodo(id: string): void
-  archiveTodos(): void
+  editTodo(data: Todo, id: string): Promise<void>
+  deleteTodo(id: string): Promise<void>
+  completeTodo(id: string): Promise<void>
+  incompleteTodo(id: string): Promise<void>
+  archiveTodos(): Promise<void>
 }
 
 const error = new ReferenceError(
@@ -24,23 +24,23 @@ const dispatchContext = createContext<TodosDispatchContext>({
   },
   get editTodo() {
     throw error
-    return () => {}
+    return async () => {}
   },
   get deleteTodo() {
     throw error
-    return () => {}
+    return async () => {}
   },
   get completeTodo() {
     throw error
-    return () => {}
+    return async () => {}
   },
   get incompleteTodo() {
     throw error
-    return () => {}
+    return async () => {}
   },
   get archiveTodos() {
     throw error
-    return () => {}
+    return async () => {}
   },
 })
 

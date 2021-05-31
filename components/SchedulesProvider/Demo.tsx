@@ -1,23 +1,21 @@
 import { schedules } from 'database/demo'
-import type { Schedule } from 'database/types'
-import { useMemo } from 'react'
 import type { ReactNode } from 'react'
-import create from 'zustand'
-
-import { Provider } from './Context'
-import type { SchedulesContext } from './Context'
+import { useMemo } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
+import create from 'zustand'
+import type { SchedulesContext } from './Context'
+import { Provider } from './Context'
 import { sortByTime } from './utils'
 
 const useStore = create<SchedulesContext>((set) => ({
   schedules,
-  addSchedule: async (schedule: Schedule) => {
+  addSchedule: async (schedule) => {
     set((state) => ({
       schedules: [...state.schedules, schedule].sort(sortByTime),
     }))
     return { id: schedule.id }
   },
-  editSchedule: async (schedule: Schedule, id: string) =>
+  editSchedule: async (schedule, id) =>
     set((state) => {
       const index = state.schedules.findIndex((schedule) => schedule.id === id)
 
@@ -31,7 +29,7 @@ const useStore = create<SchedulesContext>((set) => ({
       })
       return { schedules: newSchedules.sort(sortByTime) }
     }),
-  deleteSchedule: async (id: string) =>
+  deleteSchedule: async (id) =>
     set((state) => {
       const index = state.schedules.findIndex((schedule) => schedule.id === id)
       const newSchedules = removeItemAtIndex(state.schedules, index)

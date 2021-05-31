@@ -14,25 +14,28 @@ type TagsStore = TagsContext & {
   setTags: (tags: Tag[]) => void
 }
 
-const useStore = create<TagsStore>((set) => ({
+const useStore = create<TagsStore>((set, get) => ({
   tags: [],
   setTags: (tags: Tag[]) => set({ tags }),
   addTag: async (tag) => {
     const id = nanoid()
-    set(({ tags }) => ({
-      tags: addTag(tags, tag, id),
-    }))
+    const { tags } = get()
+    const updatedTags = addTag(tags, tag, id)
+    await database.setTags(updatedTags)
+    set({ tags: updatedTags })
     return { id }
   },
   editTag: async (tag, id) => {
-    set(({ tags }) => ({
-      tags: editTag(tags, tag, id),
-    }))
+    const { tags } = get()
+    const updatedTags = editTag(tags, tag, id)
+    await database.setTags(updatedTags)
+    set({ tags: updatedTags })
   },
   deleteTag: async (id) => {
-    set(({ tags }) => ({
-      tags: deleteTag(tags, id),
-    }))
+    const { tags } = get()
+    const updatedTags = deleteTag(tags, id)
+    await database.setTags(updatedTags)
+    set({ tags: updatedTags })
   },
 }))
 

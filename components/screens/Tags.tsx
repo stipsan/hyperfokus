@@ -302,7 +302,7 @@ export default function TagsScreen() {
               data-focus={tag.id}
               className={cx(
                 styles.tag,
-                'block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2 text-gray-600'
+                'block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2 text-gray-600 whitespace-pre-wrap'
               )}
             >
               {tag.name}

@@ -39,7 +39,7 @@ export default function TagsFilter({ selected, setSelected }: Props) {
           <button
             key={tag.name}
             className={cx(
-              'ml-2 px-3 py-1 font-semibold focus:outline-none rounded-full',
+              'ml-2 px-3 py-1 font-semibold focus:outline-none rounded-full whitespace-pre-wrap',
               active
                 ? 'text-gray-100 hover:text-white bg-gray-600 hover:bg-gray-500'
                 : 'text-gray-800 hover:text-gray-900 bg-gray-100 hover:bg-gray-200',

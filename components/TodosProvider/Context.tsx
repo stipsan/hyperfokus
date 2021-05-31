@@ -3,6 +3,13 @@ import { createContext, useContext } from 'react'
 
 export type TodosContext = Todo[]
 
+export type addTodo = (data: Todo) => Promise<{ id: string }>
+export type editTodo = (data: Todo, id: string) => Promise<void>
+export type deleteTodo = (id: string) => Promise<void>
+export type completeTodo = (id: string) => Promise<void>
+export type incompleteTodo = (id: string) => Promise<void>
+export type archiveTodos = () => Promise<void>
+
 export type TodosDispatchContext = {
   addTodo(data: Todo): Promise<{ id: string }>
   editTodo(data: Todo, id: string): Promise<void>

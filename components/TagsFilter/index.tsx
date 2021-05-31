@@ -24,6 +24,8 @@ export default function TagsFilter({ selected, setSelected }: Props) {
     return null
   }
 
+  // TODO show filtering as "Everything" if every tag is selected
+
   return (
     <div
       className="px-inset py-2 bg-gray-100 flex flex-no-wrap overflow-x-auto items-center"

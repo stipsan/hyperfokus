@@ -1,7 +1,5 @@
 import type { Schedule } from 'database/types'
 import { createContext, useContext, useMemo } from 'react'
-import type { Dispatch, SetStateAction } from 'react'
-import { sortByHoursMinutesString } from 'utils/time'
 
 export type SchedulesContext = {
   schedules: Schedule[]

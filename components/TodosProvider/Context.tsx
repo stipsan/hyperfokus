@@ -65,20 +65,5 @@ export const useTodosDispatch = () => {
       id
     )
 
-  /*
-  const setSortedTodos: Dispatch<SetStateAction<Todo[]>> = (value) => {
-    setTodos((state) => {
-      const todos = typeof value === 'function' ? value(state) : value
-      // Do the sorting on write instead of on read
-      todos.sort((a, b) => {
-        let result = sortByHoursMinutesString(a.start, b.start)
-        return result !== 0 ? result : sortByHoursMinutesString(a.end, b.end)
-      })
-
-      return todos
-    })
-  }
-  // */
-
   return { ...context, addTodo: addTodoSanitized, editTodo: editTodoSanitized }
 }

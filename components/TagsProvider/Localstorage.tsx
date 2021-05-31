@@ -5,40 +5,59 @@ import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { Provider } from './Context'
 import type { TagsContext } from './Context'
+import create from 'zustand'
+import { addTag, deleteTag, editTag } from './utils'
+import { nanoid } from 'nanoid'
+import { createAsset } from 'use-asset'
 
-const tagsState = atom<Tag[]>({
-  key: 'localstorageTags',
-  default: null,
-})
+type TagsStore = TagsContext & {
+  setTags: (tags: Tag[]) => void
+}
 
-const asyncTagsState = selector<Tag[]>({
-  key: 'asyncLocalstorageTags',
-  get: async ({ get }) => {
-    const cache = get(tagsState)
-
-    // It's only null when it should be fetched
-    if (cache === null) {
-      //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
-      return database.getTags()
-    }
-
-    return cache
+const useStore = create<TagsStore>((set) => ({
+  tags: [],
+  setTags: (tags: Tag[]) => set({ tags }),
+  addTag: async (tag) => {
+    const id = nanoid()
+    set(({ tags }) => ({
+      tags: addTag(tags, tag, id),
+    }))
+    return { id }
   },
-  set: async ({ set }, tags: Tag[]) => {
-    set(tagsState, tags)
-    await database.setTags(tags)
+  editTag: async (tag, id) => {
+    set(({ tags }) => ({
+      tags: editTag(tags, tag, id),
+    }))
   },
+  deleteTag: async (id) => {
+    set(({ tags }) => ({
+      tags: deleteTag(tags, id),
+    }))
+  },
+}))
+
+const asset = createAsset(async (setTags: TagsStore['setTags']) => {
+  //await new Promise((resolve) => setTimeout(() => resolve(void 0), 3000))
+
+  const tags = await database.getTags()
+
+  setTags(tags)
 })
 
 const Localstorage = ({ children }: { children: ReactNode }) => {
   const logException = useLogException()
-  const syncTags = useSetRecoilState(tagsState)
-  const [tags, setTags] = useRecoilState(asyncTagsState)
+  const setTags = useStore((state) => state.setTags)
+  // Only runs once, and ensures the view is suspended until the initial tags is fetched
+  asset.read(setTags)
+  const tags = useStore((state) => state.tags)
+  const addTag = useStore((state) => state.addTag)
+  const editTag = useStore((state) => state.editTag)
+  const deleteTag = useStore((state) => state.deleteTag)
 
   // Sync the state in case it's been updated
   useEffect(() => {
     const unsubscribe = database.observeTags(
-      (tags) => syncTags(tags),
+      (tags) => setTags(tags),
       (err) => logException(err)
     )
 
@@ -48,9 +67,11 @@ const Localstorage = ({ children }: { children: ReactNode }) => {
   const context = useMemo(
     (): TagsContext => ({
       tags,
-      setTags,
+      addTag,
+      editTag,
+      deleteTag,
     }),
-    [tags]
+    [tags, addTag, editTag, deleteTag]
   )
 
   return <Provider value={context}>{children}</Provider>

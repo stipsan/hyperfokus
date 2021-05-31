@@ -1,37 +1,31 @@
 import { tags } from 'database/demo'
+import { nanoid } from 'nanoid'
 import type { ReactNode } from 'react'
 import { useMemo } from 'react'
-import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import create from 'zustand'
 import type { TagsContext } from './Context'
 import { Provider } from './Context'
-import { sortByName } from './utils'
+import { addTag, deleteTag, editTag } from './utils'
 
 const useStore = create<TagsContext>((set) => ({
   tags,
   addTag: async (tag) => {
-    set((state) => ({
-      tags: [...state.tags, tag].sort(sortByName),
+    const id = nanoid()
+    set(({ tags }) => ({
+      tags: addTag(tags, tag, id),
     }))
-    return { id: tag.id }
+    return { id }
   },
-  editTag: async (tag, id) =>
-    set((state) => {
-      const index = state.tags.findIndex((tag) => tag.id === id)
-
-      const newTags = replaceItemAtIndex(state.tags, index, {
-        ...state.tags[index],
-        name: tag.name,
-        color: tag.color,
-      })
-      return { tags: newTags.sort(sortByName) }
-    }),
-  deleteTag: async (id) =>
-    set((state) => {
-      const index = state.tags.findIndex((tag) => tag.id === id)
-      const newTags = removeItemAtIndex(state.tags, index)
-      return { tags: newTags }
-    }),
+  editTag: async (tag, id) => {
+    set(({ tags }) => ({
+      tags: editTag(tags, tag, id),
+    }))
+  },
+  deleteTag: async (id) => {
+    set(({ tags }) => ({
+      tags: deleteTag(tags, id),
+    }))
+  },
 }))
 
 const Demo = ({ children }: { children: ReactNode }) => {

@@ -32,23 +32,8 @@ const context = createContext<TagsContext>({
 
 export const { Provider } = context
 
-// TODO rewrite to separate contexts for actions and state (one for each, as actions only change once)
 export const useTags = () => {
   const { tags, addTag, editTag, deleteTag } = useContext(context)
 
   return { tags, addTag, editTag, deleteTag }
-
-  /*
-  const setSortedTags: Dispatch<SetStateAction<Tag[]>> = (value) => {
-    setTags((state) => {
-      const tags = typeof value === 'function' ? value(state) : value
-      // Do the sorting on write instead of on read
-      tags.sort((a, b) => a.name.localeCompare(b.name))
-      // @TODO should filter and sanitize data to ensure no properties are missing
-      return tags
-    })
-  }
-  */
-
-  return { tags, setTags: setSortedTags }
 }

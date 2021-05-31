@@ -4,15 +4,15 @@ import { lazy, useMemo } from 'react'
 import type { ReactNode } from 'react'
 
 const Demo = lazy(() => import('./Demo'))
-const Firebase = lazy(() => import('./Firebase'))
+//const Firebase = lazy(() => import('./Firebase'))
 const Localstorage = lazy(() => import('./Localstorage'))
 
 const getProvider = (session: SessionState) => {
   switch (session) {
     case 'demo':
       return Demo
-    case 'firebase':
-      return Firebase
+    //case 'firebase':
+    //return Firebase
     case 'localstorage':
       return Localstorage
     default:

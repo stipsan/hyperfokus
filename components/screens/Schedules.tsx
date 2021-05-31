@@ -13,7 +13,7 @@ import type { Dispatch, FC, SetStateAction } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import { getRepeatMessage } from 'utils/time'
 import styles from './Schedules.module.css'
-import { SchedulesDispatchContext } from 'components/SchedulesProvider/Context'
+import { SchedulesContext } from 'components/SchedulesProvider/Context'
 
 const TrackCreateDialog = () => {
   const analytics = useAnalytics()
@@ -30,7 +30,7 @@ const TrackCreateDialog = () => {
 const CreateDialog = ({
   addSchedule,
 }: {
-  addSchedule: SchedulesDispatchContext['addSchedule']
+  addSchedule: SchedulesContext['addSchedule']
 }) => {
   const analytics = useAnalytics()
   useEffect(() => {
@@ -455,8 +455,8 @@ const EditDialog = ({
   deleteSchedule,
 }: {
   schedules: Schedule[]
-  editSchedule: SchedulesDispatchContext['editSchedule']
-  deleteSchedule: SchedulesDispatchContext['deleteSchedule']
+  editSchedule: SchedulesContext['editSchedule']
+  deleteSchedule: SchedulesContext['deleteSchedule']
 }) => {
   const analytics = useAnalytics()
   const router = useRouter()

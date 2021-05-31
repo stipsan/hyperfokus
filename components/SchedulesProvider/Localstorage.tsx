@@ -17,7 +17,7 @@ type SchedulesStore = SchedulesContext & {
 const useStore = create<SchedulesStore>((set, get) => ({
   schedules: [],
   setSchedules: (schedules: Schedule[]) => set({ schedules }),
-  addSchedule: async (schedule: Schedule) => {
+  addSchedule: async (schedule) => {
     const { schedules } = get()
     const updatedSchedules = [...schedules, schedule].sort(sortByTime)
     await database.setSchedules(updatedSchedules)

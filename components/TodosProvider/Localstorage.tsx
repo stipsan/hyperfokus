@@ -2,142 +2,110 @@ import database from 'database/localstorage'
 import type { Todo } from 'database/types'
 import { useLogException } from 'hooks/analytics'
 import { nanoid } from 'nanoid'
-import { useEffect, useMemo } from 'react'
 import type { ReactNode } from 'react'
-import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
-import { DispatchProvider, StateProvider } from './Context'
+import { useEffect, useMemo } from 'react'
+import { createAsset } from 'use-asset'
+import create from 'zustand'
 import type { TodosDispatchContext } from './Context'
+import { DispatchProvider, StateProvider } from './Context'
+import {
+  addTodo,
+  archiveTodos,
+  completeTodo,
+  deleteTodo,
+  editTodo,
+  incompleteTodo,
+} from './utils'
 
-const todosState = atom<Todo[]>({
-  key: 'localstorageTodos',
-  default: [],
-})
-
-const asyncTodosState = selector<Todo[]>({
-  key: 'asyncLocalstorageTodos',
-  get: async ({ get }) => {
-    const cache = get(todosState)
-
-    // It's only null when it should be fetched
-    if (cache === null) {
-      //await new Promise((resolve) => setTimeout(() => resolve(), 3000))
-      return database.getTodos()
-    }
-
-    return cache
+const useStore = create<
+  {
+    todos: Todo[]
+    setTodos: (todos: Todo[]) => void
+  } & TodosDispatchContext
+>((set, get) => ({
+  todos: [],
+  setTodos: (todos: Todo[]) => set({ todos }),
+  addTodo: async (data) => {
+    const id = nanoid()
+    const { todos } = get()
+    const updatedTodos = addTodo(todos, data, id)
+    await database.setTodos(updatedTodos)
+    set({ todos: updatedTodos })
+    return { id }
   },
-  set: async ({ set }, todos: Todo[]) => {
-    set(todosState, todos)
-    await database.setTodos(todos)
+  editTodo: async (data, id) => {
+    const { todos } = get()
+    const updatedTodos = editTodo(todos, data, id)
+    await database.setTodos(updatedTodos)
+    set({ todos: updatedTodos })
   },
+  deleteTodo: async (id) => {
+    const { todos } = get()
+    const updatedTodos = deleteTodo(todos, id)
+    await database.setTodos(updatedTodos)
+    set({ todos: updatedTodos })
+  },
+  completeTodo: async (id) => {
+    const { todos } = get()
+    const updatedTodos = completeTodo(todos, id)
+    await database.setTodos(updatedTodos)
+    set({ todos: updatedTodos })
+  },
+  incompleteTodo: async (id) => {
+    const { todos } = get()
+    const updatedTodos = incompleteTodo(todos, id)
+    await database.setTodos(updatedTodos)
+    set({ todos: updatedTodos })
+  },
+  archiveTodos: async () => {
+    const { todos } = get()
+    const updatedTodos = archiveTodos(todos)
+    await database.setTodos(updatedTodos)
+    set({ todos: updatedTodos })
+  },
+}))
+
+const asset = createAsset(async (setTodos: (todos: Todo[]) => void) => {
+  //await new Promise((resolve) => setTimeout(() => resolve(void 0), 3000))
+
+  const todos = await database.getTodos()
+
+  setTodos(todos)
 })
 
 const Localstorage = ({ children }: { children: ReactNode }) => {
   const logException = useLogException()
-  const syncTodos = useSetRecoilState(todosState)
-  const [todos, setTodos] = useRecoilState(asyncTodosState)
+  const setTodosDirectly = useStore((state) => state.setTodos)
+  // Only runs once, and ensures the view is suspended until the initial todos is fetched
+  asset.read(setTodosDirectly)
+  const todos = useStore((state) => state.todos)
+  const addTodo = useStore((state) => state.addTodo)
+  const editTodo = useStore((state) => state.editTodo)
+  const deleteTodo = useStore((state) => state.deleteTodo)
+  const completeTodo = useStore((state) => state.completeTodo)
+  const incompleteTodo = useStore((state) => state.incompleteTodo)
+  const archiveTodos = useStore((state) => state.archiveTodos)
 
   // Sync the state in case it's been updated
   useEffect(() => {
     const unsubscribe = database.observeTodos(
-      (todos) => syncTodos(todos),
+      (todos) => setTodosDirectly(todos),
       (err) => logException(err)
     )
 
     return () => unsubscribe()
   }, [])
 
-  // @TODO trace if setTodos is referencial stable cross renders
-  //       useMemo should only call its setter once, only StateProvider should trigger rerenders
   const context = useMemo(
     (): TodosDispatchContext => ({
-      addTodo: async (data) => {
-        const id = nanoid()
-
-        await setTodos((todos) => {
-          const todo = { ...data, id }
-
-          if (todos.length < 1) {
-            return [todo]
-          }
-
-          if (todo.order > 0) {
-            const { order: bottom } = todos[todos.length - 1]
-            return [...todos, { ...todo, order: bottom + 1 }]
-          }
-
-          const { order: top } = todos[0]
-          return [{ ...todo, order: top - 1 }, ...todos]
-        })
-
-        return { id }
-      },
-      editTodo: async (data, id) => {
-        await setTodos((todos) => {
-          const index = todos.findIndex((search) => search.id === id)
-          const todo = {
-            ...todos[index],
-            ...data,
-          }
-
-          if (todos.length < 1) {
-            return [todo]
-          }
-
-          if (todos[index].order !== data.order && data.order === 1) {
-            const { order: bottom } = todos[todos.length - 1]
-            return [
-              ...removeItemAtIndex(todos, index),
-              { ...todo, order: bottom + 1 },
-            ]
-          } else if (todos[index].order !== data.order && data.order === -1) {
-            const { order: top } = todos[0]
-            return [
-              { ...todo, order: top - 1 },
-              ...removeItemAtIndex(todos, index),
-            ]
-          }
-
-          return replaceItemAtIndex(todos, index, todo)
-        })
-
-        return { id }
-      },
-      deleteTodo: async (id) => {
-        await setTodos((todos) => {
-          const index = todos.findIndex((search) => search.id === id)
-          return removeItemAtIndex(todos, index)
-        })
-      },
-      completeTodo: async (id) => {
-        await setTodos((todos) => {
-          const index = todos.findIndex((search) => search.id === id)
-          return replaceItemAtIndex(todos, index, {
-            ...todos[index],
-            completed: new Date(),
-          })
-        })
-      },
-      incompleteTodo: async (id) => {
-        await setTodos((todos) => {
-          const index = todos.findIndex((search) => search.id === id)
-          return replaceItemAtIndex(todos, index, {
-            ...todos[index],
-            completed: undefined,
-            done: false,
-          })
-        })
-      },
-      archiveTodos: async () => {
-        setTodos((todos) =>
-          todos.map((todo) => ({
-            ...todo,
-            done: todo.done || !!todo.completed,
-          }))
-        )
-      },
+      addTodo,
+      editTodo,
+      deleteTodo,
+      completeTodo,
+      incompleteTodo,
+      archiveTodos,
     }),
-    [setTodos]
+    [addTodo, editTodo, deleteTodo, completeTodo, incompleteTodo, archiveTodos]
   )
 
   return (

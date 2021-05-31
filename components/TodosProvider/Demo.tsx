@@ -1,105 +1,42 @@
 import { todos } from 'database/demo'
 import type { Todo } from 'database/types'
 import { nanoid } from 'nanoid'
-import { useMemo } from 'react'
 import type { ReactNode } from 'react'
+import { useMemo } from 'react'
 import create from 'zustand'
-import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
+import type { TodosContext, TodosDispatchContext } from './Context'
 import { DispatchProvider, StateProvider } from './Context'
-import type { TodosDispatchContext, TodosContext } from './Context'
+import {
+  addTodo,
+  archiveTodos,
+  completeTodo,
+  deleteTodo,
+  editTodo,
+  incompleteTodo,
+} from './utils'
 
 const useStore = create<{ todos: TodosContext } & TodosDispatchContext>(
   (set) => ({
     todos,
     addTodo: async (data: Todo) => {
       const id = nanoid()
-
-      set(({ todos }) => {
-        const todo = { ...data, id }
-
-        if (todos.length < 1) {
-          return { todos: [todo] }
-        }
-
-        if (todo.order > 0) {
-          const { order: bottom } = todos[todos.length - 1]
-          return { todos: [...todos, { ...todo, order: bottom + 1 }] }
-        }
-
-        const { order: top } = todos[0]
-        return { todos: [{ ...todo, order: top - 1 }, ...todos] }
-      })
+      set(({ todos }) => ({ todos: addTodo(todos, data, id) }))
       return { id }
     },
     editTodo: async (data, id) => {
-      set(({ todos }) => {
-        const index = todos.findIndex((search) => search.id === id)
-        const todo = {
-          ...todos[index],
-          ...data,
-        }
-
-        if (todos.length < 1) {
-          return { todos: [todo] }
-        }
-
-        if (todos[index].order !== data.order && data.order === 1) {
-          const { order: bottom } = todos[todos.length - 1]
-          return {
-            todos: [
-              ...removeItemAtIndex(todos, index),
-              { ...todo, order: bottom + 1 },
-            ],
-          }
-        } else if (todos[index].order !== data.order && data.order === -1) {
-          const { order: top } = todos[0]
-          return {
-            todos: [
-              { ...todo, order: top - 1 },
-              ...removeItemAtIndex(todos, index),
-            ],
-          }
-        }
-
-        return { todos: replaceItemAtIndex(todos, index, todo) }
-      })
+      set(({ todos }) => ({ todos: editTodo(todos, data, id) }))
     },
     deleteTodo: async (id) => {
-      set(({ todos }) => {
-        const index = todos.findIndex((search) => search.id === id)
-        return { todos: removeItemAtIndex(todos, index) }
-      })
+      set(({ todos }) => ({ todos: deleteTodo(todos, id) }))
     },
     completeTodo: async (id) => {
-      set(({ todos }) => {
-        const index = todos.findIndex((search) => search.id === id)
-        return {
-          todos: replaceItemAtIndex(todos, index, {
-            ...todos[index],
-            completed: new Date(),
-          }),
-        }
-      })
+      set(({ todos }) => ({ todos: completeTodo(todos, id) }))
     },
     incompleteTodo: async (id) => {
-      set(({ todos }) => {
-        const index = todos.findIndex((search) => search.id === id)
-        return {
-          todos: replaceItemAtIndex(todos, index, {
-            ...todos[index],
-            completed: undefined,
-            done: false,
-          }),
-        }
-      })
+      set(({ todos }) => ({ todos: incompleteTodo(todos, id) }))
     },
     archiveTodos: async () => {
-      set(({ todos }) => ({
-        todos: todos.map((todo) => ({
-          ...todo,
-          done: todo.done || !!todo.completed,
-        })),
-      }))
+      set(({ todos }) => ({ todos: archiveTodos(todos) }))
     },
   })
 )

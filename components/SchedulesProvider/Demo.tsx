@@ -1,6 +1,4 @@
 import { schedules } from 'database/demo'
-import type { ReactNode } from 'react'
-import { useMemo } from 'react'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import create from 'zustand'
 import type { SchedulesContext } from './Context'
@@ -39,21 +37,16 @@ const useStore = create<SchedulesContext>((set) => ({
 function selectSchedules(state: SchedulesContext) {
   return state.schedules
 }
-export const useSchedules = () => useStore(selectSchedules)
-
-const Demo = ({ children }) => {
-  const schedules = useStore((state) => state.schedules)
-  const addSchedule = useStore((state) => state.addSchedule)
-  const editSchedule = useStore((state) => state.editSchedule)
-  const deleteSchedule = useStore((state) => state.deleteSchedule)
-
-  const context = useMemo(
-    (): SchedulesContext => ({
-      schedules,
-      addSchedule,
-      editSchedule,
-      deleteSchedule,
-    }),
-    [schedules, addSchedule, editSchedule, deleteSchedule]
-  )
+function selectAddSchedule(state: SchedulesContext) {
+  return state.addSchedule
 }
+function selectEditSchedule(state: SchedulesContext) {
+  return state.editSchedule
+}
+function selectDeleteSchedule(state: SchedulesContext) {
+  return state.deleteSchedule
+}
+export const useSchedules = () => useStore(selectSchedules)
+export const useAddSchedule = () => useStore(selectAddSchedule)
+export const useEditSchedule = () => useStore(selectEditSchedule)
+export const useDeleteSchedule = () => useStore(selectDeleteSchedule)

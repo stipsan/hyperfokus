@@ -7,14 +7,14 @@ import { useEffect } from 'react'
 //const title = "Hyperfocus your idle time and get things done"
 const title = "Hyperfocus your todos until they're done"
 
-export default function WelcomeScreen() {
+export default function IntroScreen() {
   const setSession = useSessionSetState()
   const analytics = useAnalytics()
 
   useEffect(() => {
     analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
-      screen_name: 'Welcome',
+      screen_name: 'Intro',
     })
   }, [])
 

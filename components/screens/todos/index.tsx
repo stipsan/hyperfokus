@@ -701,7 +701,8 @@ export default function TodosScreen({
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
   )
-  const forecast = useWebBrowser(schedules, todos, lastReset, 10)
+  const [deadlineMs, setDeadlineMs] = useState(16)
+  const forecast = useWebBrowser(schedules, todos, lastReset, deadlineMs)
   useEffect(() => {
     console.log('forecast changed!', forecast)
   }, [forecast])
@@ -787,7 +788,12 @@ export default function TodosScreen({
         >
           <Header>Please review</Header>
           {withoutSchedule.length > 0 && (
-            <div className={cx(styles.warning, 'px-inset')}>
+            <div
+              className={cx(
+                styles.warning,
+                'ml-6 bg-red-200 rounded-l py-1 mb-1  px-inset'
+              )}
+            >
               Your current settings allow a max duration of{' '}
               <strong>
                 {forecast.maxTaskDuration}{' '}
@@ -817,7 +823,12 @@ export default function TodosScreen({
             ))}
           </Items>
           {withoutDuration.length > 0 && (
-            <div className={cx(styles.warning, 'px-inset')}>
+            <div
+              className={cx(
+                styles.warning,
+                'ml-6 bg-red-200 rounded-l py-1 mb-1 px-inset'
+              )}
+            >
               The following todos couldn't be scheduled because their{' '}
               <strong>duration</strong> isn't specified.
             </div>
@@ -885,6 +896,79 @@ export default function TodosScreen({
           </section>
         )
       })}
+      {forecast.timedout.length > 0 && (
+        <section key="timedout" className={cx(styles.section)}>
+          <Header>
+            <span className="font-bold block">Someday</span>
+          </Header>
+          {deadlineMs < 300 ? (
+            <div
+              key="try again"
+              className={cx(
+                styles.warning,
+                'ml-6 bg-orange-200 rounded-l py-1 mb-1 px-inset'
+              )}
+            >
+              Despite best efforts I couldn't squeeze all your todos into your
+              schedule.{' '}
+              <button
+                className="ml-1 px-2 py-1 text-sm text-orange-800 hover:text-orange-900 rounded-md bg-orange-100 hover:bg-orange-300"
+                onClick={() => setDeadlineMs(300)}
+              >
+                Go deeper.
+              </button>
+            </div>
+          ) : (
+            <div
+              key="give up"
+              className={cx(
+                styles.warning,
+                'ml-6 bg-orange-200 rounded-l py-1 mb-1 px-inset'
+              )}
+            >
+              One day, a beautiful 🌤️ shiny day, you'll have time to do that
+              thing you always wanted to do...
+            </div>
+          )}
+          <Items>
+            {forecast.timedout.map((activity) => (
+              <TodoItem
+                key={activity.id}
+                todo={{ ...activity, start: 'N/A', end: 'N/A' }}
+                now={now}
+                isToday={false}
+                completeTodo={completeTodo}
+                incompleteTodo={incompleteTodo}
+                displayTodoTagsOnItem={displayTodoTagsOnItem}
+                tags={tags}
+              />
+            ))}
+          </Items>
+          {withoutDuration.length > 0 && (
+            <div
+              className={cx(
+                styles.warning,
+                'ml-6 bg-red-200 rounded-l py-1 mb-1  px-inset'
+              )}
+            >
+              The following todos couldn't be scheduled because their{' '}
+              <strong>duration</strong> isn't specified.
+            </div>
+          )}
+          {withoutDuration.map((activity) => (
+            <TodoItem
+              key={activity.id}
+              todo={{ ...activity, start: 'N/A', end: 'N/A' }}
+              now={now}
+              isToday={false}
+              completeTodo={completeTodo}
+              incompleteTodo={incompleteTodo}
+              displayTodoTagsOnItem={displayTodoTagsOnItem}
+              tags={tags}
+            />
+          ))}
+        </section>
+      )}
       {somethingRecentlyCompleted && (
         <Button
           variant="primary"

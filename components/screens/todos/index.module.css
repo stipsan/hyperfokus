@@ -144,7 +144,6 @@
 }
 
 .warning {
-  @apply ml-6 bg-red-200 rounded-l py-1 mb-1;
   scroll-snap-align: start;
   scroll-margin-top: theme('height.8');
 }

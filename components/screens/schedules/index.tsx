@@ -597,29 +597,9 @@ const NoSchedulesPlaceholder = () => {
 
 function SchedulesFooter({ total }: { total: number }) {
   return (
-    <div className="px-5 py-24 mx-auto flex flex-col items-center justify-center">
-      <h1 className="text-2xl font-medium title-font text-gray-900">
-        No schedules
-      </h1>
-
-      <Link href="?create=true" shallow>
-        <a
-          className={cx(
-            className({ variant: 'primary' }),
-            'mt-10',
-            styles.noscheduleslink
-          )}
-        >
-          New schedule
-        </a>
-      </Link>
-      <div
-        className={cx(
-          styles.noscheduleslinkBackdrop,
-          'fixed left-0 top-0 right-0 bottom-0 z-30 pointer-events-none'
-        )}
-      />
-    </div>
+    <p className="px-5 py-8 mx-auto flex flex-col items-center justify-center text-sm text-gray-500">
+      {total} schedules
+    </p>
   )
 }
 

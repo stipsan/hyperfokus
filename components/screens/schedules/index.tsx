@@ -493,7 +493,7 @@ const EditDialog = ({
   return (
     <AnimatedDialog
       // TODO temporary workaround for rapid clicking different tags and form not refreshing
-      key={initialState.id}
+      key={initialState?.id}
       isOpen={
         !!router.query.edit &&
         !!initialState &&

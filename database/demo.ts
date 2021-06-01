@@ -14,8 +14,8 @@ import type {
 } from './types'
 
 export let tags = [
-  { name: 'Feature', color: '#2b6cb0' },
   { name: 'Bug', color: '#DC2626' },
+  { name: 'Feature', color: '#2b6cb0' },
 ].map(
   (tag, i): Tag => ({
     id: `tag-${i}`,

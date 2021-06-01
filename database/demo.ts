@@ -125,7 +125,7 @@ export let schedules = [
   ...schedule,
 }))
 
-export let todos = [
+const srcTodos = [
   {
     description: 'Ability to create todos.',
     duration: 30,
@@ -155,7 +155,6 @@ export let todos = [
     duration: 60,
     tags: [tags[1].id],
   },
-
   {
     description:
       'Implement daily reset for when todos are moved into the "Completed Todos" log and out of the planner.',
@@ -199,7 +198,9 @@ export let todos = [
   },
   { description: 'Norwegian locale and translations.', duration: 120 },
   { description: 'Add help page skeleton', duration: 15, done: true },
-].map((activity: TodoDelta, i): Todo => {
+]
+const duplicateTodos = [...srcTodos, ...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos]
+export let todos = [...duplicateTodos,...duplicateTodos,...duplicateTodos,...duplicateTodos,...duplicateTodos].map((activity: TodoDelta, i): Todo => {
   const { created = new Date(), done = false } = activity
   const { modified = created, completed = done ? new Date() : undefined } =
     activity

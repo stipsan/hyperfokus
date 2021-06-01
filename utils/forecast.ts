@@ -21,9 +21,10 @@ export type Forecast = {
   // Max allowed task duration by the schedule
   maxTaskDuration: number
   days: Day[]
+  timedout: Todo[]
 }
 
-const getWeekday = (date: Date) => {
+function getWeekday(date: Date) {
   const i = date.getDay() % 7
   switch (i) {
     case 0:
@@ -48,11 +49,10 @@ const getWeekday = (date: Date) => {
 
 // Break the loop if necessary, infinite loops are terrible
 const LOOP_SAFETY_LIMIT = 1000
-// Just a safety precaution until I get the algo right
-const MAX_SCHEDULE_DAYS_LENGTH = 14
 
 // Useful consts
 const DAY_IN_MS = 86400000
+const MAX_DAYS_IN_FORECAST = 100
 
 // Provide times and tasks and get a complete schedule in return
 // @TODO make it possible to specify the starting point, currently it's hardcoded to `today`
@@ -60,8 +60,23 @@ const DAY_IN_MS = 86400000
 export function getForecast(
   schedules: Schedule[],
   todos: Todo[],
-  lastReset: Date
+  lastReset: Date,
+  deadlineMs: number
 ): Forecast {
+  const todoIds = new Set(todos.map((todo) => todo.id))
+  // TODO deal with duplicate IDs
+  if (todoIds.size !== todos.length) {
+    console.warn(
+      'Size mismatch on todos array',
+      todos.length,
+      'and todoIds Set',
+      todoIds.size
+    )
+  }
+
+  console.time('getForecast duration')
+  console.count('getForecast count')
+  console.log({ schedules, todos, lastReset })
   let days: Day[] = []
   let now = getTime()
   let today = new Date(
@@ -85,13 +100,19 @@ export function getForecast(
 
   // Map caches to speed up loops
   const availableDurationsPerTime = new Map()
+  const timedout: Todo[] = []
 
-  reasonableTasks.forEach((task) => {
+  
+  const past = Date.now()
+  reasonableTasks.forEach((task, taskIndex) => {
     let i = 0
-    let search = true
-    while (i < LOOP_SAFETY_LIMIT && search) {
+    let scheduled = false
+    // Don't allow more than 300ms time spent searching
+    const start = Date.now()
+    while (i < LOOP_SAFETY_LIMIT && (Date.now() < start + deadlineMs)) {
       i++
-
+      console.log('looper interrupter', taskIndex, i, {scheduled}, `${Date.now() - past}ms`,`${Date.now() - start}ms`)
+      // Step 2, loop generated days hoping to find am available slot
       let reuseDay = days.find(
         (day) =>
           !!day.schedule.find((schedule) => {
@@ -102,14 +123,17 @@ export function getForecast(
           })
       )
 
+      // Step 3, found a slot!
       if (reuseDay) {
+        // TODO really wasteful to run the same exact loop again, just to find the schedule...
         const schedule = reuseDay.schedule.find((schedule) => {
           let availableDuration = availableDurationsPerTime
-            .get(reuseDay!.date)
+            .get(reuseDay.date)
             .get(schedule.id)
           return availableDuration >= task.duration
         })
 
+        // Step 4, updating the schedule now that the slot is filled
         if (schedule) {
           const availableDuration = availableDurationsPerTime
             .get(reuseDay.date)
@@ -141,85 +165,98 @@ export function getForecast(
 
           schedule.todos.push({ ...task, end, start })
 
-          search = false
+          // Step 5, Found a match , we done, end the loop
+          scheduled = true
+          break;
         }
+      } else if(MAX_DAYS_IN_FORECAST < days.length) {
+        break;
       }
 
-      const lastIndex = days.length
-      if (MAX_SCHEDULE_DAYS_LENGTH > lastIndex) {
-        const date = new Date(today.getTime() + DAY_IN_MS * lastIndex)
-        const weekday = getWeekday(date)
-        const schedule: ForecastSchedule[] = []
-        const shouldFilterOpportunitiesToday =
-          shouldFilterToday && isSameDay(date, today)
+      // Step 1, create `day` placeholders
+      const date = new Date(today.getTime() + DAY_IN_MS * days.length)
+      const weekday = getWeekday(date)
+      const schedule: ForecastSchedule[] = []
+      const shouldFilterOpportunitiesToday =
+        shouldFilterToday && isSameDay(date, today)
 
-        availableDurationsPerTime.set(date, new Map())
+      availableDurationsPerTime.set(date, new Map())
 
-        normalizedTimes.forEach((time) => {
-          const [startHours, startMinutes] = time.start
-            .split(':')
-            .map((_) => parseInt(_, 10))
-          const [endHours, endMinutes] = time.end
-            .split(':')
-            .map((_) => parseInt(_, 10))
-          const endTime = setMinutes(setHours(date, endHours), endMinutes)
+      normalizedTimes.forEach((time) => {
+        const [startHours, startMinutes] = time.start
+          .split(':')
+          .map((_) => parseInt(_, 10))
+        const [endHours, endMinutes] = time.end
+          .split(':')
+          .map((_) => parseInt(_, 10))
+        const endTime = setMinutes(setHours(date, endHours), endMinutes)
 
-          if (time.repeat[weekday]) {
-            if (!shouldFilterOpportunitiesToday || endTime > lastReset) {
-              schedule.push({ ...time, todos: [] })
-              availableDurationsPerTime.get(date).set(time.id, time.duration)
-            }
+        if (time.repeat[weekday]) {
+          if (!shouldFilterOpportunitiesToday || endTime > lastReset) {
+            schedule.push({ ...time, todos: [] })
+            availableDurationsPerTime.get(date).set(time.id, time.duration)
           }
+        }
 
+        if (
+          !time.repeat.monday &&
+          !time.repeat.tuesday &&
+          !time.repeat.wednesday &&
+          !time.repeat.thursday &&
+          !time.repeat.friday &&
+          !time.repeat.saturday &&
+          !time.repeat.sunday
+        ) {
+          let yes = false
+
+          // Check if it applys to the next day or same day
           if (
-            !time.repeat.monday &&
-            !time.repeat.tuesday &&
-            !time.repeat.wednesday &&
-            !time.repeat.thursday &&
-            !time.repeat.friday &&
-            !time.repeat.saturday &&
-            !time.repeat.sunday
+            startHours > time.after.getHours() ||
+            (startHours === time.after.getHours() &&
+              startMinutes > time.after.getMinutes())
           ) {
-            let yes = false
-
-            // Check if it applys to the next day or same day
-            if (
-              startHours > time.after.getHours() ||
-              (startHours === time.after.getHours() &&
-                startMinutes > time.after.getMinutes())
-            ) {
-              yes =
-                date.getFullYear() === time.after.getFullYear() &&
-                date.getMonth() === time.after.getMonth() &&
-                date.getDate() === time.after.getDate()
-              // Should apply if the "after" timestamp matches today
-            } else {
-              // Should apply when it's the day after the "after" timestamp
-              const after = new Date(time.after.getTime() + DAY_IN_MS)
-              yes =
-                date.getFullYear() === after.getFullYear() &&
-                date.getMonth() === after.getMonth() &&
-                date.getDate() === after.getDate()
-            }
-
-            if (yes) {
-              availableDurationsPerTime.get(date).set(time.id, time.duration)
-              schedule.push({ ...time, todos: [] })
-            }
+            yes =
+              date.getFullYear() === time.after.getFullYear() &&
+              date.getMonth() === time.after.getMonth() &&
+              date.getDate() === time.after.getDate()
+            // Should apply if the "after" timestamp matches today
+          } else {
+            // Should apply when it's the day after the "after" timestamp
+            const after = new Date(time.after.getTime() + DAY_IN_MS)
+            yes =
+              date.getFullYear() === after.getFullYear() &&
+              date.getMonth() === after.getMonth() &&
+              date.getDate() === after.getDate()
           }
-        })
 
-        const [firstLetter, ...rest] = weekday
-        const day = [firstLetter.toUpperCase(), ...rest].join('')
+          if (yes) {
+            availableDurationsPerTime.get(date).set(time.id, time.duration)
+            schedule.push({ ...time, todos: [] })
+          }
+        }
+      })
 
-        days.push({ date, day, schedule })
-      }
+      const [firstLetter, ...rest] = weekday
+      const day = [firstLetter.toUpperCase(), ...rest].join('')
+
+      days.push({ date, day, schedule })
+     
+    }
+
+    if(!scheduled) {
+      timedout.push(task)
+    }
+   
+    if(timedout.length > 0) {
+      console.warn({bailouts: timedout})
     }
   })
 
+  console.timeEnd('getForecast duration')
   return {
     days,
     maxTaskDuration,
+    timedout: timedout,
   }
 }
 

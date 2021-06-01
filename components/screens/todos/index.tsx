@@ -27,7 +27,7 @@ import {
 } from 'date-fns'
 import { useAnalytics, useLogException } from 'hooks/analytics'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import router, { useRouter } from 'next/router'
 import {
   ComponentProps,
   useEffect,
@@ -43,6 +43,7 @@ import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './index.module.css'
 import { useCallback } from 'react'
 import TagsSelect from 'components/TagsSelect'
+import { useWebBrowser } from 'hooks/forecast'
 
 type TagsSelectProps = Omit<
   ComponentProps<typeof TagsSelect>,
@@ -258,6 +259,7 @@ const TodoForm = ({
       )}
       <div className="py-4" />
       <DialogToolbar
+        sticky={false}
         left={
           onDelete ? (
             <Button variant="danger" onClick={onDelete}>
@@ -307,7 +309,7 @@ const TodoItem: React.FC<{
   now: Date
   completeTodo: CompleteTodo
   incompleteTodo: IncompleteTodo
-  isFilteringByTags: boolean
+  displayTodoTagsOnItem: boolean
   tags: Tags
 }> = ({
   todo,
@@ -315,7 +317,7 @@ const TodoItem: React.FC<{
   now,
   completeTodo,
   incompleteTodo,
-  isFilteringByTags,
+  displayTodoTagsOnItem,
   tags: allTags,
 }) => {
   const analytics = useAnalytics()
@@ -347,7 +349,7 @@ const TodoItem: React.FC<{
   }
 
   return (
-    <Link href={`?edit=${todo.id}`} shallow>
+    <Link href={{ query: { ...router.query, edit: todo.id } }} shallow>
       <li
         className={cx(styles.todo, 'cursor-pointer', {
           'is-current': isCurrent,
@@ -360,7 +362,7 @@ const TodoItem: React.FC<{
         >
           {todo.start} – {todo.end}
         </span>
-        <Link href={`?edit=${todo.id}`} shallow>
+        <Link href={{ query: { ...router.query, edit: todo.id } }} shallow>
           <a
             className={cx(styles.description, 'focus:outline-none px-inset-r')}
             data-focus={todo.id}
@@ -370,12 +372,12 @@ const TodoItem: React.FC<{
               : 'Untitled'}
           </a>
         </Link>
-        {!isFilteringByTags && todo.tags?.length > 0 && (
+        {displayTodoTagsOnItem && todo.tags?.length > 0 && (
           <div className={cx(styles.tags, 'flex')}>
             {tags.map((tag) => (
               <span
                 key={tag.id}
-                className="text-xs mr-1 my-1 px-2 py-1 block rounded-full bg-gray-200 bg-opacity-50 whitespace-pre-wrap"
+                className="text-xs mr-1 my-1 px-2 py-1 block rounded-full bg-gray-200 bg-opacity-50 whitespace-pre"
               >
                 {tag.name}
               </span>
@@ -485,73 +487,99 @@ const EditDialog = ({
 } & TagsSelectProps) => {
   const logException = useLogException()
   const analytics = useAnalytics()
-  useEffect(() => {
-    analytics.logEvent('screen_view', {
-      app_name: process.env.NEXT_PUBLIC_APP_NAME,
-      screen_name: 'Edit Todo',
-    })
-  }, [analytics])
+  const focusTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
-  const [initialState, setInitialState] = useState(() =>
-    todos.find((todo) => todo.id === id)
-  )
+  useEffect(() => {
+    if (id) {
+      analytics.logEvent('screen_view', {
+        app_name: process.env.NEXT_PUBLIC_APP_NAME,
+        screen_name: 'Edit Todo',
+      })
+    }
+  }, [analytics, id])
+
+  const [initialState, setInitialState] = useState(null)
 
   useEffect(() => {
     const nextInitialState = todos.find((todo) => todo.id === id)
     if (nextInitialState) {
+      console.log('setInitialState', { initialState, nextInitialState })
       setInitialState(nextInitialState)
-    }
-
-    // Handle focus on close
-    return () => {
-      setTimeout(() => {
-        const focusNode = document.querySelector(
-          `a[data-focus="${id}"]`
-        ) as HTMLElement
-        focusNode?.focus()
-      }, 300)
     }
   }, [id, todos])
 
+  const onSpringStart = useCallback<
+    ComponentProps<typeof AnimatedDialog>['onSpringStart']
+  >(
+    (event) => {
+      console.log(
+        'onSpringStart',
+        event.type,
+        focusTimeoutRef.current,
+        id,
+        initialState?.id
+      )
+      clearTimeout(focusTimeoutRef.current)
+      if (event.type === 'CLOSE') {
+        focusTimeoutRef.current = setTimeout(() => {
+          const focusNode = document.querySelector(
+            `a[data-focus="${id}"]`
+          ) as HTMLElement
+          // @ts-expect-error
+          focusNode?.focus({ behavior: 'smooth' })
+          console.log('calling focus!', { id }, initialState?.id)
+        })
+      }
+    },
+    [id]
+  )
+
   return (
-    <TodoForm
-      editing
-      addTag={addTag}
-      tags={tags}
-      initialState={initialState}
+    <AnimatedDialog
+      isOpen={initialState && id !== ''}
       onDismiss={onDismiss}
-      onSubmit={async (state) => {
-        try {
-          await editTodo(state, id)
-          setInitialState(state)
-          onDismiss()
-          analytics.logEvent('todo_edit', {
-            duration: state.duration,
-            order: state.order,
-          })
-        } catch (err) {
-          logException(err)
-        }
-      }}
-      onDelete={async () => {
-        if (
-          confirm(
-            `Are you sure you want to delete "${initialState.description}"?`
-          )
-        ) {
+      aria-label="Edit todo"
+      onSpringStart={onSpringStart}
+    >
+      <TodoForm
+        editing
+        addTag={addTag}
+        tags={tags}
+        initialState={initialState}
+        onDismiss={onDismiss}
+        onSubmit={async (state) => {
           try {
-            await deleteTodo(id)
+            await editTodo(state, id)
+            setInitialState(state)
             onDismiss()
-            analytics.logEvent('todo_delete', {
-              duration: initialState.duration,
-              order: initialState.order,
+            analytics.logEvent('todo_edit', {
+              duration: state.duration,
+              order: state.order,
             })
           } catch (err) {
             logException(err)
           }
-        }
-      }}
-    />
+        }}
+        onDelete={async () => {
+          if (
+            confirm(
+              `Are you sure you want to delete "${initialState.description}"?`
+            )
+          ) {
+            try {
+              await deleteTodo(id)
+              onDismiss()
+              analytics.logEvent('todo_delete', {
+                duration: initialState.duration,
+                order: initialState.order,
+              })
+            } catch (err) {
+              logException(err)
+            }
+          }
+        }}
+      />
+    </AnimatedDialog>
   )
 }
 
@@ -605,11 +633,39 @@ export default function TodosScreen({
 
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
+  const selectedTags = useMemo<Set<string>>(
+    () => new Set([...[].concat(router.query.t || '')]),
+    [router.query.t]
+  )
+  const setSelectedTags = useCallback<
+    (nextSelected: typeof selectedTags) => void
+  >(
+    (nextSelected) =>
+      router.push(
+        {
+          query: {
+            ...router.query,
+            t:
+              nextSelected.size > 0
+                ? [...nextSelected].filter(
+                    (id) =>
+                      id === 'untagged' || tags.some((tag) => tag.id === id)
+                  )
+                : '',
+          },
+        },
+        undefined,
+        { shallow: true }
+      ),
+    [router, tags]
+  )
+  /*
   const [selectedTags, setSelectedTags] = useState<Set<string | boolean>>(
     () => new Set()
   )
-  // TODO better variable name
-  const isFilteringByTags = selectedTags.size === 1
+  */
+  const displayTodoTagsOnItem =
+    selectedTags.has('') || selectedTags.has('untagged') || !!router.query.dt
 
   // @TODO filter schedules based on tags
   const schedules = useMemo<Schedules>(
@@ -619,14 +675,17 @@ export default function TodosScreen({
 
   // @TODO send tags filter to hook
   const todos = useMemo(() => {
-    if (selectedTags.size === 0) {
+    if (selectedTags.has('')) {
       return allTodos
     }
 
     return allTodos.filter((todo) => {
       // if Untagged, check if tags are emty, or empty array
       // Else if check if value exists in array
-      if (selectedTags.has(true) && (!todo.tags || todo.tags?.length === 0)) {
+      if (
+        selectedTags.has('untagged') &&
+        (!todo.tags || todo.tags?.length === 0)
+      ) {
         return true
       }
 
@@ -642,9 +701,11 @@ export default function TodosScreen({
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
   )
-  const [forecast, setForecast] = useState<Forecast>(() =>
-    getForecast(schedules, todos, lastReset)
-  )
+  const forecast = useWebBrowser(schedules, todos, lastReset, 10)
+  useEffect(() => {
+    console.log('forecast changed!', forecast)
+  }, [forecast])
+
   const [now, setNow] = useState(new Date())
   const todayRef = useRef<HTMLElement>(null)
 
@@ -658,18 +719,6 @@ export default function TodosScreen({
     setNow(new Date())
   }, 1000 * 60)
 
-  // Regen forecast when necessary
-  useLayoutEffect(() => {
-    if (schedules.length > 0 && todos.length > 0) {
-      setForecast(getForecast(schedules, todos, lastReset))
-    } else {
-      setForecast({
-        days: [],
-        maxTaskDuration: 0,
-      })
-    }
-  }, [schedules, todos, lastReset])
-
   /*
   const uniqueIds = useMemo(() => {
     const ids = todos.reduce((ids, todo) => ids.add(todo.id), new Set())
@@ -679,7 +728,9 @@ export default function TodosScreen({
   console.log(uniqueIds, todos.length)
 // */
   const onDismiss = () => {
-    router.push(router.pathname, undefined, { shallow: true })
+    // Exclude edit and create args
+    const { create, edit, ...query } = router.query
+    router.push({ pathname: '/', query }, undefined, { shallow: true })
   }
 
   const somethingRecentlyCompleted = todos.some(
@@ -699,6 +750,7 @@ export default function TodosScreen({
   // */
 
   let isThereToday = false
+  const [editId = ''] = [].concat(router.query.edit)
 
   return (
     <>
@@ -719,21 +771,15 @@ export default function TodosScreen({
           onDismiss={onDismiss}
         />
       </AnimatedDialog>
-      <AnimatedDialog
-        isOpen={!router.query.create && todoIds.has(router.query.edit)}
+      <EditDialog
+        addTag={addTag}
+        tags={tags}
         onDismiss={onDismiss}
-        aria-label="Edit todo"
-      >
-        <EditDialog
-          addTag={addTag}
-          tags={tags}
-          onDismiss={onDismiss}
-          todos={todos}
-          id={router.query.edit as string}
-          editTodo={editTodo}
-          deleteTodo={deleteTodo}
-        />
-      </AnimatedDialog>
+        todos={allTodos}
+        id={!router.query.create && todoIds.has(editId) ? editId : ''}
+        editTodo={editTodo}
+        deleteTodo={deleteTodo}
+      />
       {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
         <section
           key="review fuckup"
@@ -765,7 +811,7 @@ export default function TodosScreen({
                 isToday={false}
                 completeTodo={completeTodo}
                 incompleteTodo={incompleteTodo}
-                isFilteringByTags={isFilteringByTags}
+                displayTodoTagsOnItem={displayTodoTagsOnItem}
                 tags={tags}
               />
             ))}
@@ -784,7 +830,7 @@ export default function TodosScreen({
               isToday={false}
               completeTodo={completeTodo}
               incompleteTodo={incompleteTodo}
-              isFilteringByTags={isFilteringByTags}
+              displayTodoTagsOnItem={displayTodoTagsOnItem}
               tags={tags}
             />
           ))}
@@ -830,7 +876,7 @@ export default function TodosScreen({
                     now={now}
                     completeTodo={completeTodo}
                     incompleteTodo={incompleteTodo}
-                    isFilteringByTags={isFilteringByTags}
+                    displayTodoTagsOnItem={displayTodoTagsOnItem}
                     tags={tags}
                   />
                 ))

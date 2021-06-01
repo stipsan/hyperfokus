@@ -15,3 +15,7 @@
 
 Everything | Untagged | Netflix | Reading list
 Checkbox styling, selecting Everything unchecks the others. Have a link at the end with a cogwheel or something that takes you to the config screen.
+
+#### Cheat sheet
+
+- `?dt=true` force show tags in todos view

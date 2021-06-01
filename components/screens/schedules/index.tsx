@@ -492,8 +492,6 @@ const EditDialog = ({
 
   return (
     <AnimatedDialog
-      // TODO temporary workaround for rapid clicking different tags and form not refreshing
-      key={initialState?.id}
       isOpen={
         !!router.query.edit &&
         !!initialState &&
@@ -597,6 +595,34 @@ const NoSchedulesPlaceholder = () => {
   )
 }
 
+function SchedulesFooter({ total }: { total: number }) {
+  return (
+    <div className="px-5 py-24 mx-auto flex flex-col items-center justify-center">
+      <h1 className="text-2xl font-medium title-font text-gray-900">
+        No schedules
+      </h1>
+
+      <Link href="?create=true" shallow>
+        <a
+          className={cx(
+            className({ variant: 'primary' }),
+            'mt-10',
+            styles.noscheduleslink
+          )}
+        >
+          New schedule
+        </a>
+      </Link>
+      <div
+        className={cx(
+          styles.noscheduleslinkBackdrop,
+          'fixed left-0 top-0 right-0 bottom-0 z-30 pointer-events-none'
+        )}
+      />
+    </div>
+  )
+}
+
 export default function SchedulesScreen({
   schedules,
   addSchedule,
@@ -617,43 +643,46 @@ export default function SchedulesScreen({
   }, [analytics])
 
   return (
-    <div className={cx({ 'border-b-2': schedules.length > 0 })}>
-      {schedules.length < 1 && <NoSchedulesPlaceholder />}
-      {schedules.map((schedule) => {
-        const metaInformation = [`${schedule.duration} minutes`]
-        const repeatMessage = getRepeatMessage(schedule.repeat)
-        if (repeatMessage) metaInformation.push(repeatMessage)
+    <>
+      <div className={cx({ 'border-b-2': schedules.length > 0 })}>
+        {schedules.length < 1 && <NoSchedulesPlaceholder />}
+        {schedules.map((schedule) => {
+          const metaInformation = [`${schedule.duration} minutes`]
+          const repeatMessage = getRepeatMessage(schedule.repeat)
+          if (repeatMessage) metaInformation.push(repeatMessage)
 
-        return (
-          <Link shallow key={schedule.id} href={`?edit=${schedule.id}`}>
-            <a
-              data-focus={schedule.id}
-              className={cx(
-                styles.schedule,
-                'block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2'
-              )}
-            >
-              <div
-                className={cx('text-3xl tnum', {
-                  'text-gray-600': !schedule.enabled,
-                })}
-              >{`${schedule.start} – ${schedule.end}`}</div>
-              <div className={cx({ 'text-gray-600': !schedule.enabled })}>
-                {metaInformation.join(', ')}
-              </div>
-              {!schedule.enabled && (
-                <div className="font-bold text-gray-600">Disabled</div>
-              )}
-            </a>
-          </Link>
-        )
-      })}
-      <EditDialog
-        schedules={schedules}
-        editSchedule={editSchedule}
-        deleteSchedule={deleteSchedule}
-      />
-      <CreateDialog addSchedule={addSchedule} />
-    </div>
+          return (
+            <Link shallow key={schedule.id} href={`?edit=${schedule.id}`}>
+              <a
+                data-focus={schedule.id}
+                className={cx(
+                  styles.schedule,
+                  'block px-inset py-6 hover:bg-gray-200 focus:bg-gray-100 active:bg-gray-200 focus:outline-none border-t-2'
+                )}
+              >
+                <div
+                  className={cx('text-3xl tnum', {
+                    'text-gray-600': !schedule.enabled,
+                  })}
+                >{`${schedule.start} – ${schedule.end}`}</div>
+                <div className={cx({ 'text-gray-600': !schedule.enabled })}>
+                  {metaInformation.join(', ')}
+                </div>
+                {!schedule.enabled && (
+                  <div className="font-bold text-gray-600">Disabled</div>
+                )}
+              </a>
+            </Link>
+          )
+        })}
+        <EditDialog
+          schedules={schedules}
+          editSchedule={editSchedule}
+          deleteSchedule={deleteSchedule}
+        />
+        <CreateDialog addSchedule={addSchedule} />
+      </div>
+      {schedules.length > 1 && <SchedulesFooter total={schedules.length} />}
+    </>
   )
 }

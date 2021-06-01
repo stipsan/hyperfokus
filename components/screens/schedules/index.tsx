@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button, { className } from 'components/Button'
@@ -24,7 +25,7 @@ const TrackCreateDialog = () => {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Schedule',
     })
-  }, [])
+  }, [analytics])
 
   return null
 }
@@ -36,7 +37,7 @@ const CreateDialog = ({ addSchedule }: { addSchedule: AddSchedule }) => {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Schedule',
     })
-  }, [])
+  }, [analytics])
 
   const router = useRouter()
   const close = () => {
@@ -74,7 +75,7 @@ const getMinutesFromTime = (time: string) => {
 }
 
 const getDuration = (state: TimeState) => {
-  if (!state.start.match(/\:/) || !state.end.match(/\:/)) {
+  if (!state.start.match(/:/) || !state.end.match(/:/)) {
     return state.duration
   }
 
@@ -87,7 +88,7 @@ const getDuration = (state: TimeState) => {
 }
 
 const getEnd = (state: TimeState) => {
-  if (!state.start.match(/\:/) || !state.duration) {
+  if (!state.start.match(/:/) || !state.duration) {
     return state.end
   }
 
@@ -443,7 +444,7 @@ const TrackEditDialog = () => {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Edit Schedule',
     })
-  }, [])
+  }, [analytics])
 
   return null
 }
@@ -483,7 +484,7 @@ const EditDialog = ({
         }, 300)
       }
     }
-  }, [router.query.edit])
+  }, [router.query.edit, schedules])
 
   const close = () => {
     router.push(router.pathname, undefined, { shallow: true })
@@ -613,7 +614,7 @@ export default function SchedulesScreen({
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Schedules',
     })
-  }, [])
+  }, [analytics])
 
   return (
     <div className={cx({ 'border-b-2': schedules.length > 0 })}>

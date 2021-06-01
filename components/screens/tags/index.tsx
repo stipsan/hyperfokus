@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button, { className } from 'components/Button'
@@ -18,7 +19,7 @@ const TrackCreateDialog = () => {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Tag',
     })
-  }, [])
+  }, [analytics])
 
   return null
 }
@@ -30,7 +31,7 @@ const CreateDialog = ({ addTag }: { addTag: AddTag }) => {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Tag',
     })
-  }, [])
+  }, [analytics])
 
   const router = useRouter()
   const close = () => {
@@ -149,7 +150,7 @@ const TrackEditDialog = () => {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Edit Tag',
     })
-  }, [])
+  }, [analytics])
 
   return null
 }
@@ -187,7 +188,7 @@ const EditDialog = ({
         }, 300)
       }
     }
-  }, [router.query.edit])
+  }, [router.query.edit, tags])
 
   const close = () => {
     router.push(router.pathname, undefined, { shallow: true })
@@ -299,7 +300,7 @@ export default function TagsScreen({
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Tags',
     })
-  }, [])
+  }, [analytics])
 
   return (
     <div className={cx({ 'border-b-2': tags.length > 0 })}>

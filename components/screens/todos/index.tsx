@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import useInterval from '@use-it/interval'
 import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
@@ -377,7 +378,7 @@ const CreateDialog = ({
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Todo',
     })
-  }, [])
+  }, [analytics])
 
   const idRef = useRef(null)
 
@@ -436,7 +437,7 @@ const EditDialog = ({
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Edit Todo',
     })
-  }, [])
+  }, [analytics])
 
   const [initialState, setInitialState] = useState(() =>
     todos.find((todo) => todo.id === id)
@@ -457,7 +458,7 @@ const EditDialog = ({
         focusNode?.focus()
       }, 300)
     }
-  }, [id])
+  }, [id, todos])
 
   return (
     <TodoForm
@@ -526,7 +527,7 @@ export default function TodosScreen({
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Todos',
     })
-  }, [])
+  }, [analytics])
 
   const addTodo = useCallback<AddTodo>(
     ({ description, ...todo }) =>

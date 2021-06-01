@@ -41,6 +41,7 @@ import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './index.module.css'
 import { tags } from 'database/demo'
+import { useCallback } from 'react'
 
 const Field: FC<{
   className?: string
@@ -516,11 +517,11 @@ const EditDialog = ({
 }
 
 export default function TodosScreen({
-  addTodo,
+  addTodo: addTodoUnsafe,
   archiveTodos,
   completeTodo,
   deleteTodo,
-  editTodo,
+  editTodo: editTodoUnsafe,
   incompleteTodo,
   schedules: allSchedules,
   tags,
@@ -543,6 +544,24 @@ export default function TodosScreen({
       screen_name: 'Todos',
     })
   }, [])
+
+  const addTodo = useCallback<AddTodo>(
+    ({ description, ...todo }) =>
+      addTodoUnsafe({ ...todo, description: description.substring(0, 2048) }),
+    [addTodoUnsafe]
+  )
+  const editTodo = useCallback<EditTodo>(
+    ({ description, ...todo }, id) =>
+      editTodoUnsafe(
+        {
+          ...todo,
+          description: description.substring(0, 2048),
+          modified: new Date(),
+        },
+        id
+      ),
+    [editTodoUnsafe]
+  )
 
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)

@@ -28,7 +28,6 @@ import { useAnalytics, useLogException } from 'hooks/analytics'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  forwardRef,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -36,11 +35,10 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { FC, ReactNode } from 'react'
+import type { FC } from 'react'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './index.module.css'
-import { tags } from 'database/demo'
 import { useCallback } from 'react'
 
 const Field: FC<{
@@ -269,15 +267,6 @@ const CheckboxLabel: FC<{ onClick: (event: any) => void }> = ({
   </label>
 )
 
-const Time = forwardRef<
-  HTMLSpanElement,
-  { children: ReactNode; title?: string }
->(({ children, title, ...props }, forwardedRef) => (
-  <span {...props} ref={forwardedRef} className={cx(styles.time)} title={title}>
-    {children}
-  </span>
-))
-
 const StyledCheckbox: React.FC<{
   onChange: (event: any) => void
   onClick: (event: any) => void
@@ -329,9 +318,12 @@ const TodoItem: React.FC<{
       })}
     >
       <Link key="time" href={`?edit=${todo.id}`} shallow>
-        <Time title={`Duration: ${todo.duration} minutes`}>
+        <span
+          className={cx(styles.time)}
+          title={`Duration: ${todo.duration} minutes`}
+        >
           {todo.start} – {todo.end}
-        </Time>
+        </span>
       </Link>
       <Link key="description" href={`?edit=${todo.id}`} shallow>
         <a
@@ -370,15 +362,6 @@ const Items: FC = ({ children }) => <ul className={styles.items}>{children}</ul>
 const Header: FC<{ className?: string }> = ({ className, children }) => (
   <h3 className={cx('px-inset', styles.header, className)}>{children}</h3>
 )
-
-const Section = forwardRef<
-  HTMLElement,
-  { className?: string; children: ReactNode }
->(({ children, className }, forwardedRef) => (
-  <section ref={forwardedRef} className={cx(styles.section, className)}>
-    {children}
-  </section>
-))
 
 const CreateDialog = ({
   onDismiss,
@@ -686,7 +669,10 @@ export default function TodosScreen({
         />
       </AnimatedDialog>
       {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
-        <Section key="review fuckup" className="is-warning">
+        <section
+          key="review fuckup"
+          className={cx(styles.section, 'is-warning')}
+        >
           <Header>Please review</Header>
           {withoutSchedule.length > 0 && (
             <div className={cx(styles.warning, 'px-inset')}>
@@ -732,7 +718,7 @@ export default function TodosScreen({
               incompleteTodo={incompleteTodo}
             />
           ))}
-        </Section>
+        </section>
       )}
       {forecast.days?.map((day) => {
         if (!day.schedule?.some((pocket) => !!pocket.todos?.length)) {
@@ -753,10 +739,10 @@ export default function TodosScreen({
         }).format(day.date)
 
         return (
-          <Section
+          <section
             key={day.date.toString()}
             ref={isToday ? todayRef : undefined}
-            className={cx({
+            className={cx(styles.section, {
               'is-today': isToday,
               'is-hyperfocus': hyperfocusing,
             })}
@@ -778,7 +764,7 @@ export default function TodosScreen({
                 ))
               )}
             </Items>
-          </Section>
+          </section>
         )
       })}
       {somethingRecentlyCompleted && (

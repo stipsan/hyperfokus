@@ -1,13 +1,14 @@
 import cx from 'classnames'
 import type { Tags } from 'hooks/tags/types'
-import { useMemo } from 'react'
+
+import { useMemo, memo } from 'react'
 
 type Props = {
   tags: Tags
   selected: Set<string | boolean>
   setSelected: (selected: Set<string | boolean>) => void
 }
-export default function TagsFilter({ tags, selected, setSelected }: Props) {
+function TagsFilter({ tags, selected, setSelected }: Props) {
   const list = useMemo(
     () => [
       { name: 'Everything', id: false },
@@ -65,3 +66,5 @@ export default function TagsFilter({ tags, selected, setSelected }: Props) {
     </div>
   )
 }
+
+export default memo(TagsFilter)

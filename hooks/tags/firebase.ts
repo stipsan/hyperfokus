@@ -1,23 +1,20 @@
-import Button from 'components/Button'
 import type { Tag } from 'database/types'
 import type { User } from 'firebase/app'
-import Link from 'next/link'
-import type { ReactNode } from 'react'
 import { useMemo } from 'react'
-import {
-  AuthCheck,
-  useFirestore,
-  useFirestoreCollectionData,
-  useUser,
-} from 'reactfire'
-import type { TagsContext } from './Context'
-import { Provider } from './Context'
+import { useFirestore, useFirestoreCollectionData, useUser } from 'reactfire'
+import type { AddTag, DeleteTag, EditTag, Tags } from './types'
 
 type TagDoc = {
   author?: string
 } & Tag
 
-const TagsProvider = ({ children }: { children: ReactNode }) => {
+type Actions = {
+  addTag: AddTag
+  editTag: EditTag
+  deleteTag: DeleteTag
+}
+
+export function useTags(): [Tags, Actions] {
   const user = useUser<User>()
   const firestore = useFirestore()
   const tagsRef = firestore.collection('tags').where('author', '==', user.uid)
@@ -25,7 +22,7 @@ const TagsProvider = ({ children }: { children: ReactNode }) => {
     tagsRef.orderBy('name', 'asc'),
     { idField: 'id' }
   )
-  const tags = useMemo(
+  const tags = useMemo<Tags>(
     () =>
       tagsData.map((tag) => {
         const { id, name, color } = tag
@@ -34,9 +31,8 @@ const TagsProvider = ({ children }: { children: ReactNode }) => {
     [tagsData]
   )
 
-  const context = useMemo(
-    (): TagsContext => ({
-      tags,
+  const actions = useMemo<Actions>(
+    () => ({
       addTag: async ({ name, color }) => {
         const data = { author: user.uid, name, color }
 
@@ -53,26 +49,8 @@ const TagsProvider = ({ children }: { children: ReactNode }) => {
         await firestore.collection('tags').doc(id).delete()
       },
     }),
-    [tags, firestore, user.uid]
+    [firestore, user.uid]
   )
 
-  return <Provider value={context}>{children}</Provider>
+  return [tags, actions]
 }
-
-const Firebase = ({ children }: { children: ReactNode }) => (
-  <AuthCheck
-    fallback={
-      <>
-        <Link href="/settings">
-          <Button className="block mx-auto mt-32" variant="primary">
-            Login
-          </Button>
-        </Link>
-      </>
-    }
-  >
-    <TagsProvider>{children}</TagsProvider>
-  </AuthCheck>
-)
-
-export default Firebase

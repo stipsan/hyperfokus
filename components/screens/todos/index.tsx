@@ -32,7 +32,7 @@ import {
 import type { FC, ReactNode } from 'react'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
-import styles from './Todos.module.css'
+import styles from './index.module.css'
 import { tags } from 'database/demo'
 
 const Field: FC<{

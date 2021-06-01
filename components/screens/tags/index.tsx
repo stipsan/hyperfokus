@@ -2,15 +2,14 @@ import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button, { className } from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
-import { useTags } from 'components/TagsProvider'
-import { TagsContext } from 'components/TagsProvider/Context'
+import type { Tags, AddTag, EditTag, DeleteTag } from 'hooks/tags/types'
 import type { Tag } from 'database/types'
 import { useAnalytics } from 'hooks/analytics'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useReducer, useState } from 'react'
-import styles from './Tags.module.css'
+import styles from './index.module.css'
 
 const TrackCreateDialog = () => {
   const analytics = useAnalytics()
@@ -24,7 +23,7 @@ const TrackCreateDialog = () => {
   return null
 }
 
-const CreateDialog = ({ addTag }: { addTag: TagsContext['addTag'] }) => {
+const CreateDialog = ({ addTag }: { addTag: AddTag }) => {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -159,9 +158,9 @@ const EditDialog = ({
   editTag,
   deleteTag,
 }: {
-  tags: Tag[]
-  editTag: TagsContext['editTag']
-  deleteTag: TagsContext['deleteTag']
+  tags: Tags
+  editTag: EditTag
+  deleteTag: DeleteTag
 }) => {
   const analytics = useAnalytics()
   const router = useRouter()
@@ -196,6 +195,8 @@ const EditDialog = ({
 
   return (
     <AnimatedDialog
+      // TODO temporary workaround for rapid clicking different tags and form not refreshing
+      key={initialState.id}
       isOpen={
         !!router.query.edit &&
         !!initialState &&
@@ -281,7 +282,17 @@ const NoTagsPlaceholder = () => {
   )
 }
 
-export default function TagsScreen() {
+export default function TagsScreen({
+  tags,
+  addTag,
+  editTag,
+  deleteTag,
+}: {
+  tags: Tags
+  addTag: AddTag
+  editTag: EditTag
+  deleteTag: DeleteTag
+}) {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -289,8 +300,6 @@ export default function TagsScreen() {
       screen_name: 'Tags',
     })
   }, [])
-
-  const { tags, addTag, editTag, deleteTag } = useTags()
 
   return (
     <div className={cx({ 'border-b-2': tags.length > 0 })}>

@@ -492,6 +492,8 @@ const EditDialog = ({
 
   return (
     <AnimatedDialog
+      // TODO temporary workaround for rapid clicking different tags and form not refreshing
+      key={initialState.id}
       isOpen={
         !!router.query.edit &&
         !!initialState &&
@@ -595,7 +597,7 @@ const NoSchedulesPlaceholder = () => {
   )
 }
 
-export default function LazySchedulesScreen({
+export default function SchedulesScreen({
   schedules,
   addSchedule,
   editSchedule,

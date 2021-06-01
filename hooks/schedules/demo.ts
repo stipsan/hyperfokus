@@ -47,16 +47,13 @@ const useStore = create<StoreState>((set) => ({
 }))
 
 const selectSchedules = (state: StoreState) => state.schedules
-function selectAddSchedule(state: StoreState) {
-  return state.addSchedule
-}
-function selectEditSchedule(state: StoreState) {
-  return state.editSchedule
-}
-function selectDeleteSchedule(state: StoreState) {
-  return state.deleteSchedule
-}
 export const useSchedules = () => useStore(selectSchedules)
+
+const selectAddSchedule=(state: StoreState) => state.addSchedule
 export const useAddSchedule = () => useStore(selectAddSchedule)
+
+const selectEditSchedule =(state: StoreState) => state.editSchedule
 export const useEditSchedule = () => useStore(selectEditSchedule)
+
+const selectDeleteSchedule = (state: StoreState) => state.deleteSchedule
 export const useDeleteSchedule = () => useStore(selectDeleteSchedule)

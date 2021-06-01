@@ -40,12 +40,11 @@ import {
   useDeferredValue,
 } from 'react'
 import type { FC } from 'react'
-import { getForecast } from 'utils/forecast'
-import type { Forecast, ForecastTodo } from 'utils/forecast'
+import type { ForecastTodo } from 'utils/forecast'
 import styles from './index.module.css'
 import { useCallback } from 'react'
 import TagsSelect from 'components/TagsSelect'
-import { useWebBrowser } from 'hooks/forecast'
+import { useWebWorker, useWebBrowser } from 'hooks/forecast'
 
 type TagsSelectProps = Omit<
   ComponentProps<typeof TagsSelect>,

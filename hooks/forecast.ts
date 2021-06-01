@@ -2,34 +2,42 @@ import type { Schedule, Todo } from 'database/types'
 import type { Forecast } from 'utils/forecast'
 import { getForecast } from 'utils/forecast'
 import { createAsset } from 'use-asset'
-import { useEffect, useMemo, useState, 
+import { useEffect, useMemo, useState } from 'react'
+import * as React from 'react'
+
+// workaround @types/react being out of date
+const useDeferredValue: typeof React.unstable_useDeferredValue =
   // @ts-expect-error
-  useDeferredValue } from 'react'
+  React.useDeferredValue
 
-
-export function useWebWorker(schedules: Schedule[],
+export function useWebWorker(
+  schedules: Schedule[],
   todos: Todo[],
   lastReset: Date,
-  deadlineMs: number): Forecast {
+  deadlineMs: number
+): Forecast {
   return useWebBrowser(schedules, todos, lastReset, deadlineMs)
 }
 
-
-
-const asset = createAsset(async (schedules: Schedule[],
-  todos: Todo[],
-  lastReset: Date,
-  deadlineMs: number) => {
+const asset = createAsset(
+  async (
+    schedules: Schedule[],
+    todos: Todo[],
+    lastReset: Date,
+    deadlineMs: number
+  ) => {
     if (schedules.length > 0 && todos.length > 0) {
       return getForecast(schedules, todos, lastReset, deadlineMs)
     } else {
-      return ({
+      return {
         days: [],
         maxTaskDuration: 0,
-        timedout: []
-      })
+        timedout: [],
+      }
     }
-}, 15000)
+  },
+  15000
+)
 
 export function useWebBrowser(
   schedules: Schedule[],
@@ -39,7 +47,12 @@ export function useWebBrowser(
 ): Forecast {
   const forecast = asset.read(schedules, todos, lastReset, deadlineMs)
   console.log('delay', process.env.NEXT_PUBLIC_SUSPENSE_TIMEOUT_MS)
-  return useDeferredValue(forecast, { timeoutMs: 15000 })
+
+  return useDeferredValue(
+    forecast,
+    // @ts-expect-error
+    { timeoutMs: process.env.NEXT_PUBLIC_SUSPENSE_TIMEOUT_MS }
+  )
   /*
   const forecast = useMemo<Forecast>(() => {
     if (schedules.length > 0 && todos.length > 0) {

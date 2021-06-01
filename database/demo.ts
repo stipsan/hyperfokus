@@ -200,7 +200,7 @@ const srcTodos = [
   { description: 'Add help page skeleton', duration: 15, done: true },
 ]
 const duplicateTodos = [...srcTodos, ...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos,...srcTodos]
-export let todos = [...duplicateTodos,...duplicateTodos,...duplicateTodos,...duplicateTodos,...duplicateTodos].map((activity: TodoDelta, i): Todo => {
+export let todos = (process.env.NODE_ENV !== 'production' ? [...duplicateTodos,...duplicateTodos,...duplicateTodos,...duplicateTodos,...duplicateTodos] : srcTodos).map((activity: TodoDelta, i): Todo => {
   const { created = new Date(), done = false } = activity
   const { modified = created, completed = done ? new Date() : undefined } =
     activity

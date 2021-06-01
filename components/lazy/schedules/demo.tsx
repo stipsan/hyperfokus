@@ -1,12 +1,10 @@
-import { useSessionValue } from 'hooks/session'
 import {
   useSchedules,
   useAddSchedule,
   useEditSchedule,
   useDeleteSchedule,
-} from 'components/SchedulesProvider/Demo'
+} from 'hooks/schedules/demo'
 import SchedulesScreen from 'components/screens/schedules'
-import { lazy, useMemo } from 'react'
 
 export default function DemoSchedulesScreen() {
   const schedules = useSchedules()

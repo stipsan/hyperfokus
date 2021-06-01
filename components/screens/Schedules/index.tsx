@@ -3,14 +3,19 @@ import AnimatedDialog from 'components/AnimatedDialog'
 import Button, { className } from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import type { Schedule } from 'database/types'
+import type {
+  Schedules,
+  AddSchedule,
+  EditSchedule,
+  DeleteSchedule,
+} from 'hooks/schedules/types'
 import { useAnalytics } from 'hooks/analytics'
 import { nanoid } from 'nanoid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useReducer, useState } from 'react'
 import type { FC } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { getRepeatMessage } from 'utils/time'
-import type { SchedulesContext } from 'components/SchedulesProvider/Context'
 import styles from './index.module.css'
 
 const TrackCreateDialog = () => {
@@ -25,11 +30,7 @@ const TrackCreateDialog = () => {
   return null
 }
 
-const CreateDialog = ({
-  addSchedule,
-}: {
-  addSchedule: SchedulesContext['addSchedule']
-}) => {
+const CreateDialog = ({ addSchedule }: { addSchedule: AddSchedule }) => {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -452,9 +453,9 @@ const EditDialog = ({
   editSchedule,
   deleteSchedule,
 }: {
-  schedules: Schedule[]
-  editSchedule: SchedulesContext['editSchedule']
-  deleteSchedule: SchedulesContext['deleteSchedule']
+  schedules: Schedules
+  editSchedule: EditSchedule
+  deleteSchedule: DeleteSchedule
 }) => {
   const analytics = useAnalytics()
   const router = useRouter()
@@ -599,7 +600,12 @@ export default function LazySchedulesScreen({
   addSchedule,
   editSchedule,
   deleteSchedule,
-}: SchedulesContext) {
+}: {
+  schedules: Schedules
+  addSchedule: AddSchedule
+  editSchedule: EditSchedule
+  deleteSchedule: DeleteSchedule
+}) {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {

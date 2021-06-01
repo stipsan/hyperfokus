@@ -1,10 +1,22 @@
 import { schedules } from 'database/demo'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import create from 'zustand'
-import type { SchedulesContext } from './Context'
+import type {
+  Schedules,
+  AddSchedule,
+  EditSchedule,
+  DeleteSchedule,
+} from './types'
 import { sortByTime } from './utils'
 
-const useStore = create<SchedulesContext>((set) => ({
+type StoreState = {
+  schedules: Schedules
+  addSchedule: AddSchedule
+  editSchedule: EditSchedule
+  deleteSchedule: DeleteSchedule
+}
+
+const useStore = create<StoreState>((set) => ({
   schedules,
   addSchedule: async (schedule) => {
     set((state) => ({
@@ -34,16 +46,14 @@ const useStore = create<SchedulesContext>((set) => ({
     }),
 }))
 
-function selectSchedules(state: SchedulesContext) {
-  return state.schedules
-}
-function selectAddSchedule(state: SchedulesContext) {
+const selectSchedules = (state: StoreState) => state.schedules
+function selectAddSchedule(state: StoreState) {
   return state.addSchedule
 }
-function selectEditSchedule(state: SchedulesContext) {
+function selectEditSchedule(state: StoreState) {
   return state.editSchedule
 }
-function selectDeleteSchedule(state: SchedulesContext) {
+function selectDeleteSchedule(state: StoreState) {
   return state.deleteSchedule
 }
 export const useSchedules = () => useStore(selectSchedules)

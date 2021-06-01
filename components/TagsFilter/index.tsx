@@ -1,14 +1,13 @@
-import { useTags } from 'components/TagsProvider'
-import { useMemo } from 'react'
 import cx from 'classnames'
+import type { Tags } from 'hooks/tags/types'
+import { useMemo } from 'react'
 
 type Props = {
+  tags: Tags
   selected: Set<string | boolean>
   setSelected: (selected: Set<string | boolean>) => void
 }
-export default function TagsFilter({ selected, setSelected }: Props) {
-  const { tags } = useTags()
-
+export default function TagsFilter({ tags, selected, setSelected }: Props) {
   const list = useMemo(
     () => [
       { name: 'Everything', id: false },
@@ -17,8 +16,6 @@ export default function TagsFilter({ selected, setSelected }: Props) {
     ],
     [tags]
   )
-
-  console.log({ selected, tags, list, setSelected })
 
   if (!tags.length) {
     return null

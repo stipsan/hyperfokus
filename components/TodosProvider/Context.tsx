@@ -23,7 +23,6 @@ const error = new ReferenceError(
   `TodosProvider isn't in the tree, the context for useTodos is missing`
 )
 // @TODO implement thrower when attempting to read the default context
-const context = createContext<TodosContext>([])
 const dispatchContext = createContext<TodosDispatchContext>({
   get addTodo() {
     throw error
@@ -50,11 +49,6 @@ const dispatchContext = createContext<TodosDispatchContext>({
     return async () => {}
   },
 })
-
-export const { Provider: StateProvider } = context
-export const { Provider: DispatchProvider } = dispatchContext
-
-export const useTodos = () => useContext(context)
 
 export const useTodosDispatch = () => {
   const { addTodo, editTodo, ...context } = useContext(dispatchContext)

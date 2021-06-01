@@ -3,11 +3,18 @@ import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
+import type { Schedules } from 'hooks/schedules/types'
+import type { Tags, AddTag, DeleteTag } from 'hooks/tags/types'
+import type {
+  Todos,
+  AddTodo,
+  EditTodo,
+  DeleteTodo,
+  CompleteTodo,
+  IncompleteTodo,
+  ArchiveTodos,
+} from 'hooks/todos/types'
 import TagsFilter from 'components/TagsFilter'
-import { useActiveSchedules } from 'components/SchedulesProvider'
-import { useTodos, useTodosDispatch } from 'components/TodosProvider'
-import TagsProvider from 'components/TagsProvider'
-import type { addTodo } from 'components/TodosProvider/Context'
 import type { Todo } from 'database/types'
 import {
   isAfter,
@@ -286,10 +293,12 @@ const TodoItem: React.FC<{
   todo: ForecastTodo
   isToday: boolean
   now: Date
-}> = ({ todo, isToday, now }) => {
+  completeTodo: CompleteTodo
+  incompleteTodo: IncompleteTodo
+}> = ({ todo, isToday, now, completeTodo, incompleteTodo }) => {
   const analytics = useAnalytics()
   const logException = useLogException()
-  const { completeTodo, incompleteTodo } = useTodosDispatch()
+
   let isOverdue = false
   let isCurrent = false
   if (isToday) {
@@ -427,13 +436,16 @@ const EditDialog = ({
   todos,
   onDismiss,
   id,
+  editTodo,
+  deleteTodo,
 }: {
-  todos: Todo[]
+  todos: Todos
   onDismiss: () => void
   id: string
+  editTodo: EditTodo
+  deleteTodo: DeleteTodo
 }) => {
   const logException = useLogException()
-  const { editTodo, deleteTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -503,7 +515,27 @@ const EditDialog = ({
   )
 }
 
-export default function TodosScreen({ addTodo }: { addTodo }) {
+export default function TodosScreen({
+  addTodo,
+  archiveTodos,
+  completeTodo,
+  deleteTodo,
+  editTodo,
+  incompleteTodo,
+  schedules: allSchedules,
+  tags,
+  todos: allTodos,
+}: {
+  addTodo: AddTodo
+  archiveTodos: ArchiveTodos
+  completeTodo: CompleteTodo
+  deleteTodo: DeleteTodo
+  editTodo: EditTodo
+  incompleteTodo: IncompleteTodo
+  schedules: Schedules
+  tags: Tags
+  todos: Todos
+}) {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -517,10 +549,14 @@ export default function TodosScreen({ addTodo }: { addTodo }) {
   const [selectedTags, setSelectedTags] = useState<Set<string | boolean>>(
     () => new Set()
   )
+
   // @TODO filter schedules based on tags
-  const schedules = useActiveSchedules()
+  const schedules = useMemo<Schedules>(
+    () => allSchedules.filter((schedule) => schedule.enabled),
+    [allSchedules]
+  )
+
   // @TODO send tags filter to hook
-  const allTodos = useTodos()
   const todos = useMemo(() => {
     if (selectedTags.size === 0) {
       return allTodos
@@ -540,7 +576,6 @@ export default function TodosScreen({ addTodo }: { addTodo }) {
       return false
     })
   }, [allTodos, selectedTags])
-  const { archiveTodos } = useTodosDispatch()
   const logException = useLogException()
 
   const [lastReset, setLastReset] = useState<Date>(() =>
@@ -606,27 +641,31 @@ export default function TodosScreen({ addTodo }: { addTodo }) {
 
   return (
     <>
-      <TagsProvider>
-        <TagsFilter selected={selectedTags} setSelected={setSelectedTags} />
-        <AnimatedDialog
-          isOpen={!!router.query.create}
+      <TagsFilter
+        tags={tags}
+        selected={selectedTags}
+        setSelected={setSelectedTags}
+      />
+      <AnimatedDialog
+        isOpen={!!router.query.create}
+        onDismiss={onDismiss}
+        aria-label="Create new todo"
+      >
+        <CreateDialog addTodo={addTodo} onDismiss={onDismiss} />
+      </AnimatedDialog>
+      <AnimatedDialog
+        isOpen={!router.query.create && todoIds.has(router.query.edit)}
+        onDismiss={onDismiss}
+        aria-label="Edit todo"
+      >
+        <EditDialog
           onDismiss={onDismiss}
-          aria-label="Create new todo"
-        >
-          <CreateDialog addTodo={addTodo} onDismiss={onDismiss} />
-        </AnimatedDialog>
-        <AnimatedDialog
-          isOpen={!router.query.create && todoIds.has(router.query.edit)}
-          onDismiss={onDismiss}
-          aria-label="Edit todo"
-        >
-          <EditDialog
-            onDismiss={onDismiss}
-            todos={todos}
-            id={router.query.edit as string}
-          />
-        </AnimatedDialog>
-      </TagsProvider>
+          todos={todos}
+          id={router.query.edit as string}
+          editTodo={editTodo}
+          deleteTodo={deleteTodo}
+        />
+      </AnimatedDialog>
       {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
         <Section key="review fuckup" className="is-warning">
           <Header>Please review</Header>
@@ -653,6 +692,8 @@ export default function TodosScreen({ addTodo }: { addTodo }) {
                 todo={{ ...activity, start: 'N/A', end: 'N/A' }}
                 now={now}
                 isToday={false}
+                completeTodo={completeTodo}
+                incompleteTodo={incompleteTodo}
               />
             ))}
           </Items>
@@ -668,6 +709,8 @@ export default function TodosScreen({ addTodo }: { addTodo }) {
               todo={{ ...activity, start: 'N/A', end: 'N/A' }}
               now={now}
               isToday={false}
+              completeTodo={completeTodo}
+              incompleteTodo={incompleteTodo}
             />
           ))}
         </Section>
@@ -710,6 +753,8 @@ export default function TodosScreen({ addTodo }: { addTodo }) {
                     todo={task}
                     isToday={isToday}
                     now={now}
+                    completeTodo={completeTodo}
+                    incompleteTodo={incompleteTodo}
                   />
                 ))
               )}

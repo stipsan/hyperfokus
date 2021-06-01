@@ -1,3 +1,4 @@
+import { unstable_batchedUpdates } from 'react-dom'
 import { useLogException } from 'hooks/analytics'
 import { createAsset } from 'use-asset'
 import database from 'database/localstorage'
@@ -20,18 +21,13 @@ type StoreState = {
   deleteTag: DeleteTag
 }
 
-import * as r from 'react'
-import * as rd from 'react-dom'
-import * as s from 'scheduler'
-console.log({r,rd,s})
-
 const useStore = create<StoreState>((set,get) => ({
   tags: [],
   setTags: (tags) => set({ tags }),
   addTag: async (tag) => {
     const id = nanoid()
     const { tags } = get()
-    const updatedTags = addTag(tags, tag, id)
+    const updatedTags = addTag(tags, {...tag, id})
     await database.setTags(updatedTags)
     set({ tags: updatedTags })
     return { id }
@@ -55,7 +51,7 @@ const asset = createAsset(async (setTags: (tags: Tags) => void) => {
 
   const tags = await database.getTags()
 
-  setTags(tags)
+  unstable_batchedUpdates(() => setTags(tags))
 })
 
 
@@ -71,7 +67,7 @@ export const useTags = () => {
   // Sync the state in case it's been updated in other tabs
   useEffect(() => {
     const unsubscribe = database.observeTags(
-      (tags) => setTags(tags),
+      (tags) => unstable_batchedUpdates(() => setTags(tags)),
       (err) => logException(err)
     )
 

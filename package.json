@@ -14,7 +14,7 @@
     "nanoid": "^3.1.16",
     "next": "^10.2.3",
     "react": "0.0.0-experimental-1a7472624",
-    "react-dom": "0.0.0-experimental-bb1c82155",
+    "react-dom": "0.0.0-experimental-d75105fa9",
     "react-spring": "^9.1.2",
     "reactfire": "^2.0.3",
     "recoil": "^0.3.0"

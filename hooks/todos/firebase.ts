@@ -46,6 +46,7 @@ export function useTodos(): [Todos, Actions] {
           id,
           modified,
           order,
+          tags,
         } = todo
 
         return {
@@ -57,6 +58,7 @@ export function useTodos(): [Todos, Actions] {
           id,
           modified: modified ? new Date(modified.seconds) : undefined,
           order,
+          tags,
         }
       }),
     [todosData]
@@ -72,6 +74,7 @@ export function useTodos(): [Todos, Actions] {
         duration,
         modified,
         order,
+        tags,
       }) => {
         const data = {
           author: user.uid,
@@ -82,6 +85,7 @@ export function useTodos(): [Todos, Actions] {
           duration,
           modified: modified === undefined ? null : modified,
           order,
+          tags,
         }
 
         if (order > 0) {
@@ -111,6 +115,7 @@ export function useTodos(): [Todos, Actions] {
           duration,
           modified,
           order,
+          tags,
         },
         id
       ) => {
@@ -119,6 +124,7 @@ export function useTodos(): [Todos, Actions] {
           duration,
           modified,
           order,
+          tags,
         }
 
         if (order === 1) {

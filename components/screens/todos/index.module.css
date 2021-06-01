@@ -6,6 +6,10 @@
   scroll-margin-top: calc(var(--navbar-height) + theme('height.8'));
 }
 
+.tags {
+  grid-area: tags;
+}
+
 .description {
   @apply text-black;
   grid-area: description;
@@ -41,7 +45,8 @@
   grid-template-columns: min-content 1fr;
   grid-template-areas:
     'checkbox time'
-    'checkbox description';
+    'checkbox description'
+    'checkbox tags';
   scroll-snap-align: start;
   scroll-margin-top: theme('height.8');
   transition: background-color 100ms ease-out;

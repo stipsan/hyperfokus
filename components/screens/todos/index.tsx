@@ -307,9 +307,23 @@ const TodoItem: React.FC<{
   now: Date
   completeTodo: CompleteTodo
   incompleteTodo: IncompleteTodo
-}> = ({ todo, isToday, now, completeTodo, incompleteTodo }) => {
+  isFilteringByTags: boolean
+  tags: Tags
+}> = ({
+  todo,
+  isToday,
+  now,
+  completeTodo,
+  incompleteTodo,
+  isFilteringByTags,
+  tags: allTags,
+}) => {
   const analytics = useAnalytics()
   const logException = useLogException()
+  const tags = useMemo<Tags>(
+    () => allTags.filter((tag) => todo.tags?.includes(tag.id)),
+    [allTags, todo.tags]
+  )
 
   let isOverdue = false
   let isCurrent = false
@@ -357,6 +371,18 @@ const TodoItem: React.FC<{
             : 'Untitled'}
         </a>
       </Link>
+      {!isFilteringByTags && todo.tags?.length > 0 && (
+        <div className={cx(styles.tags, 'flex')}>
+          {tags.map((tag) => (
+            <span
+              key={tag.id}
+              className="text-xs mr-1 my-1 px-2 py-1 block rounded-full bg-gray-200 bg-opacity-50 whitespace-pre-wrap"
+            >
+              {tag.name}
+            </span>
+          ))}
+        </div>
+      )}
       <StyledCheckbox
         checked={!!todo.completed}
         onClick={(event) => event.stopPropagation()}
@@ -582,6 +608,8 @@ export default function TodosScreen({
   const [selectedTags, setSelectedTags] = useState<Set<string | boolean>>(
     () => new Set()
   )
+  // TODO better variable name
+  const isFilteringByTags = selectedTags.size === 1
 
   // @TODO filter schedules based on tags
   const schedules = useMemo<Schedules>(
@@ -737,6 +765,8 @@ export default function TodosScreen({
                 isToday={false}
                 completeTodo={completeTodo}
                 incompleteTodo={incompleteTodo}
+                isFilteringByTags={isFilteringByTags}
+                tags={tags}
               />
             ))}
           </Items>
@@ -754,6 +784,8 @@ export default function TodosScreen({
               isToday={false}
               completeTodo={completeTodo}
               incompleteTodo={incompleteTodo}
+              isFilteringByTags={isFilteringByTags}
+              tags={tags}
             />
           ))}
         </section>
@@ -798,6 +830,8 @@ export default function TodosScreen({
                     now={now}
                     completeTodo={completeTodo}
                     incompleteTodo={incompleteTodo}
+                    isFilteringByTags={isFilteringByTags}
+                    tags={tags}
                   />
                 ))
               )}

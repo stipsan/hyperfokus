@@ -3,7 +3,8 @@
   "packageRules": [
     {
       "packageNames": ["react", "react-dom"],
-      "followTag": "experimental"
+      "followTag": "experimental",
+      "automerge": false
     }
   ]
 }

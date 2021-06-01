@@ -36,6 +36,8 @@ import {
   useReducer,
   useRef,
   useState,
+  // @ts-expect-error
+  useDeferredValue,
 } from 'react'
 import type { FC } from 'react'
 import { getForecast } from 'utils/forecast'
@@ -707,8 +709,12 @@ export default function TodosScreen({
     console.log('forecast changed!', forecast)
   }, [forecast])
 
-  const [now, setNow] = useState(new Date())
+  const [_now, setNow] = useState(new Date())
+  const now = useDeferredValue(_now, { timeoutMs: 15000 })
   const todayRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    console.log('now useEffect!', now)
+  }, [now])
 
   const todoIds = useMemo(
     () => allTodos.reduce((ids, todo) => ids.add(todo.id), new Set()),
@@ -717,8 +723,9 @@ export default function TodosScreen({
 
   // Update the now value every minute in case it changes the schedule
   useInterval(() => {
+    console.log('setNow!')
     setNow(new Date())
-  }, 1000 * 60)
+  }, (1000 * 60) / 60)
 
   /*
   const uniqueIds = useMemo(() => {
@@ -944,29 +951,6 @@ export default function TodosScreen({
               />
             ))}
           </Items>
-          {withoutDuration.length > 0 && (
-            <div
-              className={cx(
-                styles.warning,
-                'ml-6 bg-red-200 rounded-l py-1 mb-1  px-inset'
-              )}
-            >
-              The following todos couldn't be scheduled because their{' '}
-              <strong>duration</strong> isn't specified.
-            </div>
-          )}
-          {withoutDuration.map((activity) => (
-            <TodoItem
-              key={activity.id}
-              todo={{ ...activity, start: 'N/A', end: 'N/A' }}
-              now={now}
-              isToday={false}
-              completeTodo={completeTodo}
-              incompleteTodo={incompleteTodo}
-              displayTodoTagsOnItem={displayTodoTagsOnItem}
-              tags={tags}
-            />
-          ))}
         </section>
       )}
       {somethingRecentlyCompleted && (

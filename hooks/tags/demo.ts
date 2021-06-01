@@ -21,7 +21,7 @@ const useStore = create<StoreState>((set) => ({
   addTag: async (tag) => {
     const id = nanoid()
     set(({ tags }) => ({
-      tags: addTag(tags, tag, id),
+      tags: addTag(tags, {...tag, id}),
     }))
     return { id }
   },

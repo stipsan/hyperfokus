@@ -3,7 +3,7 @@ import { lazy } from 'react'
 
 const Demo = lazy(() => import('./demo'))
 //const Firebase = lazy(() => import('./firebase'))
-//const Localstorage = lazy(() => import('./localstorage'))
+const Localstorage = lazy(() => import('./localstorage'))
 
 export default function LazySchedules() {
   const session = useSessionValue()
@@ -13,7 +13,7 @@ export default function LazySchedules() {
     case 'firebase':
     //return <Firebase />
     case 'localstorage':
-    //return <Localstorage />
+      return <Localstorage />
     default:
       throw new TypeError(`Invalid session: ${session}`)
   }

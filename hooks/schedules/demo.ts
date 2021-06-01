@@ -1,13 +1,10 @@
 import { schedules } from 'database/demo'
-import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
+import { nanoid } from 'nanoid'
 import create from 'zustand'
 import type {
-  Schedules,
-  AddSchedule,
-  EditSchedule,
-  DeleteSchedule,
+  AddSchedule, DeleteSchedule, EditSchedule, Schedules
 } from './types'
-import { sortByTime } from './utils'
+import { addSchedule, deleteSchedule, editSchedule } from './utils'
 
 type StoreState = {
   schedules: Schedules
@@ -19,31 +16,20 @@ type StoreState = {
 const useStore = create<StoreState>((set) => ({
   schedules,
   addSchedule: async (schedule) => {
-    set((state) => ({
-      schedules: [...state.schedules, schedule].sort(sortByTime),
+    const id = nanoid()
+    set(({ schedules }) => ({
+      schedules: addSchedule(schedules, {...schedule, id}),
     }))
-    return { id: schedule.id }
+    return { id }
   },
   editSchedule: async (schedule, id) =>
-    set((state) => {
-      const index = state.schedules.findIndex((schedule) => schedule.id === id)
-
-      const newSchedules = replaceItemAtIndex(state.schedules, index, {
-        ...state.schedules[index],
-        start: schedule.start,
-        duration: schedule.duration,
-        end: schedule.end,
-        repeat: schedule.repeat,
-        enabled: schedule.enabled,
-      })
-      return { schedules: newSchedules.sort(sortByTime) }
-    }),
+  set(({ schedules }) => ({
+    schedules: editSchedule(schedules, schedule, id),
+  })),
   deleteSchedule: async (id) =>
-    set((state) => {
-      const index = state.schedules.findIndex((schedule) => schedule.id === id)
-      const newSchedules = removeItemAtIndex(state.schedules, index)
-      return { schedules: newSchedules }
-    }),
+  set(({ schedules }) => ({
+    schedules: deleteSchedule(schedules, id),
+  })),
 }))
 
 const selectSchedules = (state: StoreState) => state.schedules

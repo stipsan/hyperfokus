@@ -1,7 +1,7 @@
 import type { Tag } from 'database/types'
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 
-export function addTag(tags: Tag[], data: Tag, id: string): Tag[] {
+export function addTag(tags: Tag[], data: Tag): Tag[] {
   return [...tags, data].sort(sortByName)
 }
 

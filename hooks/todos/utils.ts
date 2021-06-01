@@ -1,8 +1,7 @@
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import type { Todo } from 'database/types'
 
-export function addTodo(todos: Todo[], data: Todo, id: string): Todo[] {
-  const todo = { ...data, id }
+export function addTodo(todos: Todo[], todo: Todo): Todo[] {
 
   if (todos.length < 1) {
     return [todo]

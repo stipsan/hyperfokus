@@ -26,7 +26,7 @@ const useStore = create<StoreState>((set) => ({
   todos,
   addTodo: async (data: Todo) => {
     const id = nanoid()
-    set(({ todos }) => ({ todos: addTodo(todos, data, id) }))
+    set(({ todos }) => ({ todos: addTodo(todos, {...data, id}) }))
     return { id }
   },
   editTodo: async (data, id) => {

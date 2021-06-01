@@ -15,13 +15,3 @@
 
 Everything | Untagged | Netflix | Reading list
 Checkbox styling, selecting Everything unchecks the others. Have a link at the end with a cogwheel or something that takes you to the config screen.
-
-#### folder reorg
-
-- pages/schedules
-- lazy/schedules/index
-- lazy/schedules/firebase
-- hooks/schedules/firebase
-- hooks/schedules/types
-- hooks/schedules/utils
-- screens/schedules

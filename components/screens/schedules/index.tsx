@@ -3,14 +3,13 @@ import AnimatedDialog from 'components/AnimatedDialog'
 import Button, { className } from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import type { Schedule } from 'database/types'
-import type {
-  Schedules,
-  AddSchedule,
-  EditSchedule,
-  DeleteSchedule,
-} from 'hooks/schedules/types'
 import { useAnalytics } from 'hooks/analytics'
-import { nanoid } from 'nanoid'
+import type {
+  AddSchedule,
+  DeleteSchedule,
+  EditSchedule,
+  Schedules,
+} from 'hooks/schedules/types'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { FC } from 'react'
@@ -53,7 +52,7 @@ const CreateDialog = ({ addSchedule }: { addSchedule: AddSchedule }) => {
       <ScheduleForm
         onDismiss={close}
         onSubmit={async (state) => {
-          await addSchedule({ ...state, id: nanoid() })
+          await addSchedule(state)
           close()
           analytics.logEvent('schedule_create', {
             start: state.start,

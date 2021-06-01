@@ -25,3 +25,4 @@ export function deleteTag(tags: Tag[], id: string): Tag[] {
 function sortByName(a: Tag, b: Tag): number {
   return a.name.localeCompare(b.name)
 }
+

@@ -171,7 +171,7 @@ const TodoForm = ({
           )
         }
 
-        onSubmit(state)
+        onSubmit({ ...state, tags: selectedTags })
       }}
     >
       <Field className="block w-full" label="Description" htmlFor="description">

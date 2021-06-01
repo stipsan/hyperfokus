@@ -16,7 +16,7 @@ export default function IntroScreen() {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Intro',
     })
-  }, [])
+  }, [analytics])
 
   return (
     <>

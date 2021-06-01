@@ -1,11 +1,10 @@
-// Ensure this module is never run in an SSR env by mistake
-
-if (typeof window === 'undefined') {
-  throw new TypeError(`This module can't be run on the server!`)
-}
-
 import localforage from 'localforage'
-import { DatabaseType, Schedule, Todo, Tag } from './types'
+import { DatabaseType, Schedule, Tag, Todo } from './types'
+
+// Ensure this module is never run in an SSR env by mistake
+if (typeof window === 'undefined') {
+  throw new TypeError(`This module can't run on the server!`)
+}
 
 localforage.config({
   name: 'hyperfokus',

@@ -1,9 +1,3 @@
-// Ensure this module is never run in an SSR env by mistake
-
-if (typeof window === 'undefined') {
-  throw new TypeError(`This module can't be run on the server!`)
-}
-
 import type {
   DatabaseType,
   Repeat,
@@ -12,6 +6,11 @@ import type {
   Todo,
   TodoDelta,
 } from './types'
+
+// Ensure this module is never run in an SSR env by mistake
+if (typeof window === 'undefined') {
+  throw new TypeError(`This module can't run on the server!`)
+}
 
 export let tags = [
   { name: 'Bug', color: '#DC2626' },
@@ -126,8 +125,6 @@ export let schedules = [
   ...schedule,
 }))
 
-
-
 export let todos = [
   {
     description: 'Ability to create todos.',
@@ -147,7 +144,7 @@ export let todos = [
     completed: new Date(),
     tags: [tags[0].id],
   },
-  { description: 'Settings screen.', duration: 60,tags: [tags[0].id], },
+  { description: 'Settings screen.', duration: 60, tags: [tags[0].id] },
   {
     description: 'Notify the user of todos that lack duration.',
     duration: 60,
@@ -169,7 +166,11 @@ export let todos = [
     description: 'About page with link to GitHub and other info.',
     duration: 30,
   },
-  { description: 'Ability view completed todos.', duration: 30,tags: [tags[0].id], },
+  {
+    description: 'Ability view completed todos.',
+    duration: 30,
+    tags: [tags[0].id],
+  },
   {
     description: 'Ability to toggle completed status on todos.',
     duration: 30,

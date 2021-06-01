@@ -347,61 +347,61 @@ const TodoItem: React.FC<{
   }
 
   return (
-    <li
-      className={cx(styles.todo, {
-        'is-current': isCurrent,
-        'is-overdue': isOverdue,
-      })}
-    >
-      <Link key="time" href={`?edit=${todo.id}`} shallow>
+    <Link href={`?edit=${todo.id}`} shallow>
+      <li
+        className={cx(styles.todo, 'cursor-pointer', {
+          'is-current': isCurrent,
+          'is-overdue': isOverdue,
+        })}
+      >
         <span
           className={cx(styles.time)}
           title={`Duration: ${todo.duration} minutes`}
         >
           {todo.start} – {todo.end}
         </span>
-      </Link>
-      <Link key="description" href={`?edit=${todo.id}`} shallow>
-        <a
-          className={cx(styles.description, 'focus:outline-none px-inset-r')}
-          data-focus={todo.id}
-        >
-          {todo.description.trim()
-            ? todo.description.replace(/^\n|\n$/g, '')
-            : 'Untitled'}
-        </a>
-      </Link>
-      {!isFilteringByTags && todo.tags?.length > 0 && (
-        <div className={cx(styles.tags, 'flex')}>
-          {tags.map((tag) => (
-            <span
-              key={tag.id}
-              className="text-xs mr-1 my-1 px-2 py-1 block rounded-full bg-gray-200 bg-opacity-50 whitespace-pre-wrap"
-            >
-              {tag.name}
-            </span>
-          ))}
-        </div>
-      )}
-      <StyledCheckbox
-        checked={!!todo.completed}
-        onClick={(event) => event.stopPropagation()}
-        onChange={async (event) => {
-          const { checked } = event.target
-          try {
-            if (checked) {
-              await completeTodo(todo.id)
-            } else {
-              await incompleteTodo(todo.id)
-            }
+        <Link href={`?edit=${todo.id}`} shallow>
+          <a
+            className={cx(styles.description, 'focus:outline-none px-inset-r')}
+            data-focus={todo.id}
+          >
+            {todo.description.trim()
+              ? todo.description.replace(/^\n|\n$/g, '')
+              : 'Untitled'}
+          </a>
+        </Link>
+        {!isFilteringByTags && todo.tags?.length > 0 && (
+          <div className={cx(styles.tags, 'flex')}>
+            {tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="text-xs mr-1 my-1 px-2 py-1 block rounded-full bg-gray-200 bg-opacity-50 whitespace-pre-wrap"
+              >
+                {tag.name}
+              </span>
+            ))}
+          </div>
+        )}
+        <StyledCheckbox
+          checked={!!todo.completed}
+          onClick={(event) => event.stopPropagation()}
+          onChange={async (event) => {
+            const { checked } = event.target
+            try {
+              if (checked) {
+                await completeTodo(todo.id)
+              } else {
+                await incompleteTodo(todo.id)
+              }
 
-            analytics.logEvent('todo_toggle', { completed: checked })
-          } catch (err) {
-            logException(err)
-          }
-        }}
-      />
-    </li>
+              analytics.logEvent('todo_toggle', { completed: checked })
+            } catch (err) {
+              logException(err)
+            }
+          }}
+        />
+      </li>
+    </Link>
   )
 }
 

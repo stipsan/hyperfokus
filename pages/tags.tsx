@@ -1,9 +1,8 @@
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import HeadTitle from 'components/HeadTitle'
 import { AppLayout, MainContainer } from 'components/layouts'
-import TagsProvider from 'components/TagsProvider'
-import Tags from 'components/screens/Tags/LazyTags'
-import Welcome from 'components/screens/welcomeS'
+import Tags from 'components/lazy/tags'
+import Intro from 'components/screens/intro'
 import { useSessionValue } from 'hooks/session'
 
 const title = 'Tags'
@@ -12,7 +11,7 @@ export default function TagsPage() {
   const session = useSessionValue()
 
   if (session === '') {
-    return <Welcome />
+    return <Intro />
   }
 
   return (
@@ -21,9 +20,7 @@ export default function TagsPage() {
       <AppLayout title={title} createLink="New tag">
         <GetStartedBroadcast />
         <MainContainer>
-          <TagsProvider>
-            <Tags />
-          </TagsProvider>
+          <Tags />
         </MainContainer>
       </AppLayout>
     </>

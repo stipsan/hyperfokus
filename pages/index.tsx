@@ -1,9 +1,7 @@
 import GetStartedBroadcast from 'components/GetStartedBroadcast'
 import { AppLayout, MainContainer } from 'components/layouts'
-import SchedulesProvider from 'components/SchedulesProvider'
-import Todos from 'components/screens/Todos/LazyTodos'
-import Welcome from 'components/screens/welcomeS'
-import TodosProvider from 'components/TodosProvider'
+import Todos from 'components/lazy/todos'
+import Welcome from 'components/screens/intro'
 import { useSessionValue } from 'hooks/session'
 
 export default function IndexPage() {
@@ -18,11 +16,7 @@ export default function IndexPage() {
       <AppLayout createLink="New todo">
         <GetStartedBroadcast />
         <MainContainer>
-          <SchedulesProvider>
-            <TodosProvider>
-              <Todos />
-            </TodosProvider>
-          </SchedulesProvider>
+          <Todos />
         </MainContainer>
       </AppLayout>
     </>

@@ -30,14 +30,13 @@ import Link from 'next/link'
 import router, { useRouter } from 'next/router'
 import {
   ComponentProps,
+  memo,
   useEffect,
   useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
   useState,
-  // @ts-expect-error
-  useDeferredValue,
 } from 'react'
 import type { FC } from 'react'
 import type { ForecastTodo } from 'utils/forecast'
@@ -45,6 +44,14 @@ import styles from './index.module.css'
 import { useCallback } from 'react'
 import TagsSelect from 'components/TagsSelect'
 import { useWebWorker, useWebBrowser } from 'hooks/forecast'
+import { ChangeEventHandler } from 'react'
+// workaround @types/react being out of date
+const useDeferredValue: typeof React.unstable_useDeferredValue =
+  // @ts-expect-error
+  React.useDeferredValue
+const useTransition: typeof React.unstable_useTransition =
+  // @ts-expect-error
+  React.useTransition
 
 type TagsSelectProps = Omit<
   ComponentProps<typeof TagsSelect>,
@@ -283,26 +290,30 @@ const TodoForm = ({
   )
 }
 
-const CheckboxLabel: FC<{ onClick: (event: any) => void }> = ({
-  children,
-  onClick,
-}) => (
-  <label className={cx(styles.checkboxLabel, 'px-inset-l')} onClick={onClick}>
-    {children}
-  </label>
-)
-
-const StyledCheckbox: React.FC<{
-  onChange: (event: any) => void
-  onClick: (event: any) => void
+const StyledCheckbox = memo(function StyledCheckbox({
+  onChange,
+  checked,
+}: {
+  onChange: ChangeEventHandler<HTMLInputElement>
   checked?: boolean
-}> = ({ onClick, ...props }) => {
+}) {
+  const [isPending, startTransition] = useTransition()
+  console.log({ isPending, startTransition, React })
   return (
-    <CheckboxLabel onClick={onClick}>
-      <input className="form-checkbox" type="checkbox" {...props} />
-    </CheckboxLabel>
+    <label
+      className={cx(styles.checkboxLabel, 'px-inset-l')}
+      onClick={(event) => event.stopPropagation()}
+    >
+      <input
+        className="form-checkbox"
+        checked={checked}
+        type="checkbox"
+        onChange={(event) => startTransition(() => onChange(event))}
+      />{' '}
+      isPending: {JSON.stringify(isPending)}
+    </label>
   )
-}
+})
 
 const TodoItem: React.FC<{
   todo: ForecastTodo
@@ -349,6 +360,24 @@ const TodoItem: React.FC<{
     isCurrent = isBefore(startTime, now) && isAfter(endTime, now)
   }
 
+  const handleCheckboxChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { checked } = event.target
+      try {
+        if (checked) {
+          await completeTodo(todo.id)
+        } else {
+          await incompleteTodo(todo.id)
+        }
+
+        analytics.logEvent('todo_toggle', { completed: checked })
+      } catch (err) {
+        logException(err)
+      }
+    },
+    [analytics, completeTodo, incompleteTodo, logException, todo.id]
+  )
+
   return (
     <Link href={{ query: { ...router.query, edit: todo.id } }} shallow>
       <li
@@ -387,28 +416,12 @@ const TodoItem: React.FC<{
         )}
         <StyledCheckbox
           checked={!!todo.completed}
-          onClick={(event) => event.stopPropagation()}
-          onChange={async (event) => {
-            const { checked } = event.target
-            try {
-              if (checked) {
-                await completeTodo(todo.id)
-              } else {
-                await incompleteTodo(todo.id)
-              }
-
-              analytics.logEvent('todo_toggle', { completed: checked })
-            } catch (err) {
-              logException(err)
-            }
-          }}
+          onChange={handleCheckboxChange}
         />
       </li>
     </Link>
   )
 }
-
-const Items: FC = ({ children }) => <ul className={styles.items}>{children}</ul>
 
 const Header: FC<{ className?: string }> = ({ className, children }) => (
   <h3 className={cx('px-inset', styles.header, className)}>{children}</h3>
@@ -507,7 +520,7 @@ const EditDialog = ({
       console.log('setInitialState', { initialState, nextInitialState })
       setInitialState(nextInitialState)
     }
-  }, [id, todos])
+  }, [id, initialState, todos])
 
   const onSpringStart = useCallback<
     ComponentProps<typeof AnimatedDialog>['onSpringStart']
@@ -532,7 +545,7 @@ const EditDialog = ({
         })
       }
     },
-    [id]
+    [id, initialState?.id]
   )
 
   return (
@@ -712,7 +725,10 @@ export default function TodosScreen({
   const now = useDeferredValue(_now, { timeoutMs: 15000 })
   const todayRef = useRef<HTMLElement>(null)
   useEffect(() => {
-    console.log('now useEffect!', now)
+    console.log('_now useEffect!', _now)
+  }, [_now])
+  useEffect(() => {
+    console.log('now useDeferredValue!', now)
   }, [now])
 
   const todoIds = useMemo(
@@ -814,7 +830,7 @@ export default function TodosScreen({
             </div>
           )}
 
-          <Items>
+          <ul className={styles.items}>
             {withoutSchedule.map((activity) => (
               <TodoItem
                 key={activity.id}
@@ -827,7 +843,7 @@ export default function TodosScreen({
                 tags={tags}
               />
             ))}
-          </Items>
+          </ul>
           {withoutDuration.length > 0 && (
             <div
               className={cx(
@@ -883,7 +899,7 @@ export default function TodosScreen({
             <Header>
               <span className="font-bold block mr-1">{dayText}</span> {dateText}
             </Header>
-            <Items>
+            <ul className={styles.items}>
               {day.schedule.map((pocket) =>
                 pocket.todos?.map((task) => (
                   <TodoItem
@@ -898,7 +914,7 @@ export default function TodosScreen({
                   />
                 ))
               )}
-            </Items>
+            </ul>
           </section>
         )
       })}
@@ -936,7 +952,7 @@ export default function TodosScreen({
               thing you always wanted to do...
             </div>
           )}
-          <Items>
+          <ul className={styles.items}>
             {forecast.timedout.map((activity) => (
               <TodoItem
                 key={activity.id}
@@ -949,7 +965,7 @@ export default function TodosScreen({
                 tags={tags}
               />
             ))}
-          </Items>
+          </ul>
         </section>
       )}
       {somethingRecentlyCompleted && (

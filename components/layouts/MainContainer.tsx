@@ -11,6 +11,8 @@ type Props = {
 const MainContainer = ({ children }: Props) => {
   return (
     <Suspense
+      // TODO: https://github.com/facebook/react/pull/19936
+      // unstable_expectedLoadTime={2}
       fallback={
         <main className="my-40 text-xl text-blue-900 text-center loading">
           Loading...

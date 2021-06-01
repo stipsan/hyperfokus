@@ -53,6 +53,7 @@ const LOOP_SAFETY_LIMIT = 1000
 // Useful consts
 const DAY_IN_MS = 86400000
 const MAX_DAYS_IN_FORECAST = 100
+const debug = process.env.NODE_ENV !== 'production' && false
 
 // Provide times and tasks and get a complete schedule in return
 // @TODO make it possible to specify the starting point, currently it's hardcoded to `today`
@@ -63,6 +64,10 @@ export function getForecast(
   lastReset: Date,
   deadlineMs: number
 ): Forecast {
+  if (!schedules.length || !todos.length) {
+    return { days: [], maxTaskDuration: 0, timedout: [] }
+  }
+
   const todoIds = new Set(todos.map((todo) => todo.id))
   // TODO deal with duplicate IDs
   if (todoIds.size !== todos.length) {
@@ -74,9 +79,11 @@ export function getForecast(
     )
   }
 
-  console.time('getForecast duration')
-  console.count('getForecast count')
-  console.log({ schedules, todos, lastReset })
+  if (debug) {
+    console.time('getForecast duration')
+    console.count('getForecast count')
+    console.log({ schedules, todos, lastReset })
+  }
   let days: Day[] = []
   let now = getTime()
   let today = new Date(
@@ -102,16 +109,24 @@ export function getForecast(
   const availableDurationsPerTime = new Map()
   const timedout: Todo[] = []
 
-  
   const past = Date.now()
   reasonableTasks.forEach((task, taskIndex) => {
     let i = 0
     let scheduled = false
     // Don't allow more than 300ms time spent searching
     const start = Date.now()
-    while (i < LOOP_SAFETY_LIMIT && (Date.now() < start + deadlineMs)) {
+    while (i < LOOP_SAFETY_LIMIT && Date.now() < start + deadlineMs) {
       i++
-      console.log('looper interrupter', taskIndex, i, {scheduled}, `${Date.now() - past}ms`,`${Date.now() - start}ms`)
+      if (debug) {
+        console.log(
+          'looper interrupter',
+          taskIndex,
+          i,
+          { scheduled },
+          `${Date.now() - past}ms`,
+          `${Date.now() - start}ms`
+        )
+      }
       // Step 2, loop generated days hoping to find am available slot
       let reuseDay = days.find(
         (day) =>
@@ -167,10 +182,10 @@ export function getForecast(
 
           // Step 5, Found a match , we done, end the loop
           scheduled = true
-          break;
+          break
         }
-      } else if(MAX_DAYS_IN_FORECAST < days.length) {
-        break;
+      } else if (MAX_DAYS_IN_FORECAST < days.length) {
+        break
       }
 
       // Step 1, create `day` placeholders
@@ -240,19 +255,20 @@ export function getForecast(
       const day = [firstLetter.toUpperCase(), ...rest].join('')
 
       days.push({ date, day, schedule })
-     
     }
 
-    if(!scheduled) {
+    if (!scheduled) {
       timedout.push(task)
     }
-   
-    if(timedout.length > 0) {
-      console.warn({bailouts: timedout})
+
+    if (timedout.length > 0 && debug) {
+      console.warn({ bailouts: timedout })
     }
   })
 
-  console.timeEnd('getForecast duration')
+  if (debug) {
+    console.timeEnd('getForecast duration')
+  }
   return {
     days,
     maxTaskDuration,

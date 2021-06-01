@@ -9,6 +9,9 @@ import * as React from 'react'
 const useDeferredValue: typeof React.unstable_useDeferredValue =
   // @ts-expect-error
   React.useDeferredValue
+const useTransition: typeof React.unstable_useTransition =
+  // @ts-expect-error
+  React.useTransition
 
 export function useWebWorker(
   schedules: Schedule[],
@@ -45,12 +48,36 @@ export function useWebBrowser(
   lastReset: Date,
   deadlineMs: number
 ): Forecast {
-  const forecast = asset.read(schedules, todos, lastReset, deadlineMs)
-  console.log('delay', process.env.NEXT_PUBLIC_SUSPENSE_TIMEOUT_MS)
+  const [forecast, setForecast] = useState<Forecast>(() =>
+  asset.read(schedules, todos, lastReset, deadlineMs)
+  )
+  const [isPending, startTransition] = useTransition()
+useEffect(() => console.log({isPending}), [isPending])
 
+  // Regen forecast when necessary
+  useEffect(() => {
+    if (schedules.length > 0 && todos.length > 0) {
+      setForecast(getForecast(schedules, todos, lastReset, deadlineMs))
+    } else {
+      setForecast({
+        days: [],
+        maxTaskDuration: 0,
+        timedout: []
+      })
+    }
+  }, [schedules, todos, lastReset, deadlineMs])
+
+  /*
+useEffect(() => {
+  React.startTransition(() => {
+    asset.read(schedules, todos, lastReset, deadlineMs)
+  })
+}, [schedules, todos, lastReset, deadlineMs])
+// */
+
+  return forecast
   return useDeferredValue(
     forecast,
-    // @ts-expect-error
     { timeoutMs: process.env.NEXT_PUBLIC_SUSPENSE_TIMEOUT_MS }
   )
   /*
@@ -67,22 +94,7 @@ export function useWebBrowser(
   }, [schedules, todos, lastReset, deadlineMs])
   // */
   /*
-  const [forecast, setForecast] = useState<Forecast>(() =>
-    getForecast(schedules, todos, lastReset, deadlineMs)
-  )
-
-  // Regen forecast when necessary
-  useEffect(() => {
-    if (schedules.length > 0 && todos.length > 0) {
-      setForecast(getForecast(schedules, todos, lastReset, deadlineMs))
-    } else {
-      setForecast({
-        days: [],
-        maxTaskDuration: 0,
-        timedout: []
-      })
-    }
-  }, [schedules, todos, lastReset, deadlineMs])
+  
 */
 
   return forecast

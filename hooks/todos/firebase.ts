@@ -108,7 +108,6 @@ export function useTodos(): [Todos, Actions] {
       editTodo: async (
         {
           description,
-
           duration,
           modified,
           order,

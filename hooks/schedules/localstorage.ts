@@ -1,8 +1,8 @@
-import { unstable_batchedUpdates } from 'react-dom'
 import database from 'database/localstorage'
 import { useLogException } from 'hooks/analytics'
 import { nanoid } from 'nanoid'
 import { useEffect } from 'react'
+import { unstable_batchedUpdates } from 'react-dom'
 import { createAsset } from 'use-asset'
 import create from 'zustand'
 import type {

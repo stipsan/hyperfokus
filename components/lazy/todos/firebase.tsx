@@ -5,7 +5,7 @@ import { useTags } from 'hooks/tags/firebase'
 import { useTodos } from 'hooks/todos/firebase'
 
 export default function FirebaseTodosScreen() {
-  const [tags] = useTags()
+  const [tags, { addTag }] = useTags()
   const [schedules] = useSchedules()
   const [
     todos,
@@ -30,6 +30,7 @@ export default function FirebaseTodosScreen() {
         incompleteTodo={incompleteTodo}
         schedules={schedules}
         tags={tags}
+        addTag={addTag}
         todos={todos}
       />
     </FirebaseAuthCheck>

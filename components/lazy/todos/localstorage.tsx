@@ -1,6 +1,6 @@
 import TodosScreen from 'components/screens/todos'
 import { useSchedules } from 'hooks/schedules/localstorage'
-import { useTags } from 'hooks/tags/localstorage'
+import { useAddTag, useTags } from 'hooks/tags/localstorage'
 import {
   useAddTodo,
   useArchiveTodos,
@@ -18,6 +18,7 @@ export default function LocalstorageTodosScreen() {
   const completeTodo = useCompleteTodo()
   const incompleteTodo = useIncompleteTodo()
   const archiveTodos = useArchiveTodos()
+  const addTag = useAddTag()
 
   const tags = useTags()
   const schedules = useSchedules()
@@ -33,6 +34,7 @@ export default function LocalstorageTodosScreen() {
       incompleteTodo={incompleteTodo}
       schedules={schedules}
       tags={tags}
+      addTag={addTag}
       todos={todos}
     />
   )

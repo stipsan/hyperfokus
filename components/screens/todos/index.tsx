@@ -5,7 +5,7 @@ import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
 import type { Schedules } from 'hooks/schedules/types'
-import type { Tags, AddTag, DeleteTag } from 'hooks/tags/types'
+import type { Tags } from 'hooks/tags/types'
 import type {
   Todos,
   AddTodo,
@@ -29,6 +29,7 @@ import { useAnalytics, useLogException } from 'hooks/analytics'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
+  ComponentProps,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -41,6 +42,12 @@ import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
 import styles from './index.module.css'
 import { useCallback } from 'react'
+import TagsSelect from 'components/TagsSelect'
+
+type TagsSelectProps = Omit<
+  ComponentProps<typeof TagsSelect>,
+  'selected' | 'setSelected'
+>
 
 const Field: FC<{
   className?: string
@@ -131,14 +138,19 @@ const TodoForm = ({
   onSubmit,
   editing,
   onDelete,
+  addTag,
+  tags,
 }: {
   initialState?: Todo
   editing?: boolean
   onDismiss: () => void
   onSubmit: (state: Todo) => void
   onDelete?: () => void
-}) => {
+} & TagsSelectProps) => {
   const [state, dispatch] = useReducer(reducer, initialState)
+  const [selectedTags, setSelectedTags] = useState(
+    () => initialState?.tags || []
+  )
   let initialOrder = parseInt(initialState.order.toString(), 10)
   if (Number.isNaN(initialOrder)) initialOrder = 0
 
@@ -184,6 +196,15 @@ const TodoForm = ({
 
       <Field className="mt-4" label="Duration" htmlFor="duration">
         <Duration dispatch={dispatch} state={state} />
+      </Field>
+
+      <Field className="mt-4" label="Tags" htmlFor="tags">
+        <TagsSelect
+          tags={tags}
+          addTag={addTag}
+          selected={selectedTags}
+          setSelected={setSelectedTags}
+        />
       </Field>
 
       {editing ? (
@@ -367,10 +388,12 @@ const Header: FC<{ className?: string }> = ({ className, children }) => (
 const CreateDialog = ({
   onDismiss,
   addTodo,
+  addTag,
+  tags,
 }: {
   onDismiss: () => void
   addTodo
-}) => {
+} & TagsSelectProps) => {
   const logException = useLogException()
   const analytics = useAnalytics()
   useEffect(() => {
@@ -399,6 +422,8 @@ const CreateDialog = ({
 
   return (
     <TodoForm
+      addTag={addTag}
+      tags={tags}
       onDismiss={onDismiss}
       onSubmit={async (state) => {
         try {
@@ -423,13 +448,15 @@ const EditDialog = ({
   id,
   editTodo,
   deleteTodo,
+  addTag,
+  tags,
 }: {
   todos: Todos
   onDismiss: () => void
   id: string
   editTodo: EditTodo
   deleteTodo: DeleteTodo
-}) => {
+} & TagsSelectProps) => {
   const logException = useLogException()
   const analytics = useAnalytics()
   useEffect(() => {
@@ -463,6 +490,8 @@ const EditDialog = ({
   return (
     <TodoForm
       editing
+      addTag={addTag}
+      tags={tags}
       initialState={initialState}
       onDismiss={onDismiss}
       onSubmit={async (state) => {
@@ -510,6 +539,7 @@ export default function TodosScreen({
   schedules: allSchedules,
   tags,
   todos: allTodos,
+  addTag,
 }: {
   addTodo: AddTodo
   archiveTodos: ArchiveTodos
@@ -520,7 +550,7 @@ export default function TodosScreen({
   schedules: Schedules
   tags: Tags
   todos: Todos
-}) {
+} & TagsSelectProps) {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
@@ -654,7 +684,12 @@ export default function TodosScreen({
         onDismiss={onDismiss}
         aria-label="Create new todo"
       >
-        <CreateDialog addTodo={addTodo} onDismiss={onDismiss} />
+        <CreateDialog
+          addTodo={addTodo}
+          addTag={addTag}
+          tags={tags}
+          onDismiss={onDismiss}
+        />
       </AnimatedDialog>
       <AnimatedDialog
         isOpen={!router.query.create && todoIds.has(router.query.edit)}
@@ -662,6 +697,8 @@ export default function TodosScreen({
         aria-label="Edit todo"
       >
         <EditDialog
+          addTag={addTag}
+          tags={tags}
           onDismiss={onDismiss}
           todos={todos}
           id={router.query.edit as string}

@@ -4,7 +4,8 @@ import firebase from 'firebase/app'
 import type { User } from 'firebase/app'
 import { useAnalytics, useLogException } from 'hooks/analytics'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
-import { Suspense, unstable_SuspenseList } from 'react'
+import { Suspense } from 'react'
+import * as React from 'react'
 import {
   AuthCheck,
   useAuth,
@@ -16,9 +17,9 @@ import Button from './Button'
 import styles from './CloudSyncSettings.module.css'
 
 // workaround @types/react being out of date
-const SuspenseList: typeof unstable_SuspenseList =
+const SuspenseList: typeof React.unstable_SuspenseList =
   // @ts-expect-error
-  React.SuspenseList || unstable_SuspenseList
+  React.SuspenseList || React.unstable_SuspenseList
 
 const buttonClass = 'bg-gray-100 hover:bg-gray-300 text-gray-800 font-semibold'
 

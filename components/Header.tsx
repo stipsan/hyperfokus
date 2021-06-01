@@ -5,23 +5,13 @@ import TodosIcon from 'components/icons/todos'
 import Logo from 'components/Logo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import styles from './Header.module.css'
 
 type Props = {
   createLink?: string
   title?: React.ReactNode
 }
-
-const NavLink: React.FC<{ href: string }> = forwardRef(
-  ({ children, href, ...props }, ref: React.Ref<HTMLAnchorElement>) => (
-    <Link href={href}>
-      <a {...props} ref={ref}>
-        {children}
-      </a>
-    </Link>
-  )
-)
 
 const topLinks = [
   ['Todos', '/'],

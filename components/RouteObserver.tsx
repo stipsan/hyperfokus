@@ -12,7 +12,7 @@ const RouteObserver = memo(() => {
     return () => {
       Router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [])
+  }, [analytics])
 
   return null
 })

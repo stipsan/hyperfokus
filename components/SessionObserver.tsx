@@ -14,7 +14,7 @@ const SessionObserver = memo(() => {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.setUserProperties({ session })
-  }, [session])
+  }, [analytics, session])
 
   return null
 })

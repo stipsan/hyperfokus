@@ -5,7 +5,7 @@ import type { User } from 'firebase/app'
 import { useAnalytics, useLogException } from 'hooks/analytics'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
 // @ts-expect-error
-import { Suspense, unstable_SuspenseList as SuspenseList } from 'react'
+import { Suspense, SuspenseList } from 'react'
 import {
   AuthCheck,
   useAuth,
@@ -67,15 +67,17 @@ const RequestStep = () => {
   const firestore = useFirestore()
   const logException = useLogException()
   const betaReqRef = firestore.collection('betarequests').doc(user.uid)
-  const betaReq = useFirestoreDocData<{
-    email?: string
-    name?: string
-    message?: string
-  }>(betaReqRef)
+  const betaReq =
+    useFirestoreDocData<{
+      email?: string
+      name?: string
+      message?: string
+    }>(betaReqRef)
   const betaInviteRef = firestore.collection('betainvites').doc(user.uid)
-  const betaInvite = useFirestoreDocData<{
-    since?: Date
-  }>(betaInviteRef)
+  const betaInvite =
+    useFirestoreDocData<{
+      since?: Date
+    }>(betaInviteRef)
 
   const cancel = async () => {
     try {
@@ -142,15 +144,17 @@ const FinalStep = () => {
   const logException = useLogException()
 
   const betaReqRef = firestore.collection('betarequests').doc(user.uid)
-  const betaReq = useFirestoreDocData<{
-    email?: string
-    name?: string
-    message?: string
-  }>(betaReqRef)
+  const betaReq =
+    useFirestoreDocData<{
+      email?: string
+      name?: string
+      message?: string
+    }>(betaReqRef)
   const betaInviteRef = firestore.collection('betainvites').doc(user.uid)
-  const betaInvite = useFirestoreDocData<{
-    since?: Date
-  }>(betaInviteRef)
+  const betaInvite =
+    useFirestoreDocData<{
+      since?: Date
+    }>(betaInviteRef)
   let canEnable = !!betaInvite.since && !!betaReq.email
 
   const enable = async () => {

@@ -10,7 +10,7 @@ export default function LazySchedules() {
   switch (session) {
     case 'demo':
       return <Demo />
-    case 'firebase':
+    //case 'firebase':
     //return <Firebase />
     case 'localstorage':
       return <Localstorage />

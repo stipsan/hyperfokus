@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useAnalytics as useFirebaseAnalytics } from 'reactfire'
 
 export const useAnalytics = () => {
@@ -13,7 +14,7 @@ export const useAnalytics = () => {
 export const useLogException = () => {
   const analytics = useAnalytics()
 
-  return (error: Error, errorInfo?: unknown) => {
+  return useCallback((error: Error, errorInfo?: unknown) => {
     if (process.env.NODE_ENV === 'development') {
       console.error(error)
     }
@@ -27,5 +28,5 @@ export const useLogException = () => {
     if (!errorInfo) {
       alert(error)
     }
-  }
+  }, [analytics])
 }

@@ -9270,14 +9270,14 @@ react-docgen@^5.0.0:
     node-dir "^0.1.10"
     strip-indent "^3.0.0"
 
-react-dom@0.0.0-experimental-bb1c82155:
-  version "0.0.0-experimental-bb1c82155"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.0.0-experimental-bb1c82155.tgz#570fc951fdcc0c8e9ad7ac82d099bc058a21a9fe"
-  integrity sha512-kbae5ZZzJ1zJPGK4FEitmI8Mo0FyJlkrDUxOmtdYZHHGxVmdy0Y/8LexOXropqJ35hlYp4GvZBVr38h473ixzw==
+react-dom@experimental:
+  version "0.0.0-experimental-d75105fa9"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-0.0.0-experimental-d75105fa9.tgz#2196bfc3e6eeac95c815fb03601b8dcff5f1233e"
+  integrity sha512-MP/kL+EojcJ4nRZ40jjzYNeahOyl6PWJWZk9+vMuC2SzrDp3iUwba8EUexqbzuFpoYdO7/KhhWFphRpEh9flww==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    scheduler "0.0.0-experimental-bb1c82155"
+    scheduler "0.0.0-experimental-d75105fa9"
 
 react-draggable@^4.4.3:
   version "4.4.3"
@@ -9449,10 +9449,10 @@ react-use-gesture@^8.0.1:
   resolved "https://registry.yarnpkg.com/react-use-gesture/-/react-use-gesture-8.0.1.tgz#4360c0f7c9e26baf9fbe58f63fc9de7ef699c17f"
   integrity sha512-CXzUNkulUdgouaAlvAsC5ZVo0fi9KGSBSk81WrE4kOIcJccpANe9zZkAYr5YZZhqpicIFxitsrGVS4wmoMun9A==
 
-react@0.0.0-experimental-1a7472624:
-  version "0.0.0-experimental-1a7472624"
-  resolved "https://registry.yarnpkg.com/react/-/react-0.0.0-experimental-1a7472624.tgz#d6970c71ce063dff07b1dca7fc5417ef339ac6a4"
-  integrity sha512-7G+q2XIPUZvpgf58KFjmc+CqYaKPSWDBmml8er5SLauL2jzVXmP0LN9adwm9FlIShapi9jxtgj7mSpY7tElmlw==
+react@experimental:
+  version "0.0.0-experimental-d75105fa9"
+  resolved "https://registry.yarnpkg.com/react/-/react-0.0.0-experimental-d75105fa9.tgz#c57c119b4a020a525848b823049ec225bc572bfe"
+  integrity sha512-bVzACyURlSa7yWtdPuY8jSejETPZg7cBzHfr47ctm+2ni37QCrelrhurBd7f+s+sj3FdVwnDJ97WZfGy9tdt8Q==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -9852,10 +9852,10 @@ sane@^4.0.3:
     minimist "^1.1.1"
     walker "~1.0.5"
 
-scheduler@0.0.0-experimental-bb1c82155:
-  version "0.0.0-experimental-bb1c82155"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.0.0-experimental-bb1c82155.tgz#d34e67bb0e1f8194a6de97ca077b2b92093fb06a"
-  integrity sha512-SxVMs4KXB8nzC+GTeoh+L3luZmo7CNOpEDLKzDxkIhFrAt2rnxEeu+piS++wYdp33UM9pUOKcDPeCT2RQ3+DQw==
+scheduler@0.0.0-experimental-d75105fa9:
+  version "0.0.0-experimental-d75105fa9"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.0.0-experimental-d75105fa9.tgz#954d104f7d27e6602cb24d550d5440402df09478"
+  integrity sha512-WJvy763S7S9as+wfBwcsbSgYfRByMTF96od8bI5wcFjd6h4AM+yn12WWELRJzlOgCdmz0YbL0OHrQbB0o4eiCQ==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

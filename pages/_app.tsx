@@ -1,12 +1,10 @@
-import { useReduceMotion } from 'hooks/motion'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Globals } from 'react-spring'
 import { FirebaseAppProvider } from 'reactfire'
-import { RecoilRoot } from 'recoil'
 // global css, exempt from CSS module restrictions
 import 'styles/_app.css'
+import 'react-spring-bottom-sheet/dist/style.css'
 
 const SessionObserver = lazy(() => import('components/SessionObserver'))
 const RouteObserver = lazy(() => import('components/RouteObserver'))
@@ -29,14 +27,6 @@ export default function _AppPage({ Component, pageProps }: AppProps) {
   // the app is fully loaded and the user navigates somewhere
   useEffect(() => document.body.classList.add('loaded'), [])
 
-  // Globally disable animations when the user don't want them
-  const prefersReducedMotion = useReduceMotion()
-  useEffect(() => {
-    Globals.assign({
-      skipAnimation: prefersReducedMotion,
-    })
-  }, [prefersReducedMotion])
-
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     setMounted(true)
@@ -50,24 +40,22 @@ export default function _AppPage({ Component, pageProps }: AppProps) {
         <link rel="preconnect" href="https://www.googletagmanager.com" />
       </Head>
       <FirebaseAppProvider firebaseConfig={config}>
-        <RecoilRoot>
-          <Suspense
-            fallback={
-              <div className="my-40 text-xl text-blue-900 text-center loading">
-                Loading...
-              </div>
-            }
-          >
-            <Component {...pageProps} />
-            {mounted && (
-              <Suspense fallback={null}>
-                <SessionObserver />
-                <RouteObserver />
-                <PerformanceObserver />
-              </Suspense>
-            )}
-          </Suspense>
-        </RecoilRoot>
+        <Suspense
+          fallback={
+            <div className="my-40 text-xl text-blue-900 text-center loading">
+              Loading...
+            </div>
+          }
+        >
+          <Component {...pageProps} />
+          {mounted && (
+            <Suspense fallback={null}>
+              <SessionObserver />
+              <RouteObserver />
+              <PerformanceObserver />
+            </Suspense>
+          )}
+        </Suspense>
       </FirebaseAppProvider>
     </>
   )

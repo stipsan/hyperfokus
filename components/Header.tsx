@@ -5,7 +5,7 @@ import TodosIcon from 'components/icons/todos'
 import Logo from 'components/Logo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import styles from './Header.module.css'
 
 type Props = {
@@ -13,25 +13,16 @@ type Props = {
   title?: React.ReactNode
 }
 
-const NavLink: React.FC<{ href: string }> = forwardRef(
-  ({ children, href, ...props }, ref: React.Ref<HTMLAnchorElement>) => (
-    <Link href={href}>
-      <a {...props} ref={ref}>
-        {children}
-      </a>
-    </Link>
-  )
-)
-
 const topLinks = [
   ['Todos', '/'],
   ['Schedules', '/schedules'],
   ['More', '/more'],
 ]
 export const moreLinks = [
-  ['Completed Todos', '/done'],
   ['Settings', '/settings'],
   ['Help', '/help'],
+  ['Tags', '/tags'],
+  ['Completed Todos', '/done'],
 ]
 
 const TopLink: React.FC<{
@@ -47,8 +38,10 @@ const TopLink: React.FC<{
         className={cx(
           'py-1 px-4 focus:outline-none focus:shadow-outline',
           {
-            'bg-blue-500 hover:bg-blue-500 active:bg-blue-500 text-white': active,
-            'bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900': !active,
+            'bg-blue-500 hover:bg-blue-500 active:bg-blue-500 text-white':
+              active,
+            'bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-blue-900':
+              !active,
           },
           className
         )}

@@ -1,6 +1,8 @@
 // Defaults are defined in:
 // node_modules/tailwindcss/stubs/defaultConfig.stub.js
 
+const isStorybook = process.env.STORYBOOK === 'true'
+
 // https://tobiasahlin.com/blog/layered-smooth-box-shadows/
 const dreamySoftShadow = (length) =>
   Array.from(
@@ -11,6 +13,7 @@ const dreamySoftShadow = (length) =>
 module.exports = {
   mode: 'jit',
   purge: ['./components/**/*.tsx', './pages/**/*.tsx'],
+  darkMode: isStorybook ? 'class' : 'media',
   theme: {
     extend: {
       boxShadow: {

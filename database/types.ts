@@ -24,6 +24,12 @@ export interface Schedule {
   deleted?: boolean
 }
 
+export interface Tag {
+  id: string
+  name: string
+  color: string
+}
+
 export type ScheduleInput = Schedule & {
   added: boolean
   edited: boolean
@@ -49,6 +55,7 @@ export interface TodoDelta {
   created?: Date
   modified?: Date
   completed?: Date
+  tags?: string[]
 }
 
 export interface Todo {
@@ -60,9 +67,16 @@ export interface Todo {
   created: Date
   modified: Date
   completed?: Date
+  tags?: string[]
 }
 
 export interface DatabaseType {
+  setTags(tags: Tag[]): Promise<unknown>
+  getTags(): Promise<Tag[]>
+  observeTags(
+    success: (tags: Tag[]) => void,
+    failure: (reason: Error) => void
+  ): () => void
   setSchedules(schedules: Schedule[]): Promise<unknown>
   getSchedules(): Promise<Schedule[]>
   observeSchedules(

@@ -1,16 +1,26 @@
-// Ensure this module is never run in an SSR env by mistake
-
-if (typeof window === 'undefined') {
-  throw new TypeError(`This module can't be run on the server!`)
-}
-
 import type {
   DatabaseType,
   Repeat,
   ScheduleDelta,
+  Tag,
   Todo,
   TodoDelta,
 } from './types'
+
+// Ensure this module is never run in an SSR env by mistake
+if (typeof window === 'undefined') {
+  throw new TypeError(`This module can't run on the server!`)
+}
+
+export let tags = [
+  { name: 'Bug', color: '#DC2626' },
+  { name: 'Feature', color: '#2b6cb0' },
+].map(
+  (tag, i): Tag => ({
+    id: `tag-${i}`,
+    ...tag,
+  })
+)
 
 const repeatNone: Repeat = {
   monday: false,
@@ -120,40 +130,51 @@ export let todos = [
     description: 'Ability to create todos.',
     duration: 30,
     completed: new Date(),
+    tags: [tags[0].id],
   },
   {
     description: 'Ability to edit todos.',
     duration: 30,
     completed: new Date(),
+    tags: [tags[0].id],
   },
   {
     description: 'Ability to delete todos.',
     duration: 30,
     completed: new Date(),
+    tags: [tags[0].id],
   },
-  { description: 'Settings screen.', duration: 60 },
+  { description: 'Settings screen.', duration: 60, tags: [tags[0].id] },
   {
     description: 'Notify the user of todos that lack duration.',
     duration: 60,
+    tags: [tags[0].id, tags[1].id],
   },
   {
     description: 'Notify of todos that are missing from the forecast.',
     duration: 60,
+    tags: [tags[1].id],
   },
 
   {
     description:
       'Implement daily reset for when todos are moved into the "Completed Todos" log and out of the planner.',
     duration: 30,
+    tags: [tags[1].id],
   },
   {
     description: 'About page with link to GitHub and other info.',
     duration: 30,
   },
-  { description: 'Ability view completed todos.', duration: 30 },
+  {
+    description: 'Ability view completed todos.',
+    duration: 30,
+    tags: [tags[0].id],
+  },
   {
     description: 'Ability to toggle completed status on todos.',
     duration: 30,
+    tags: [tags[0].id],
   },
   {
     description:
@@ -169,6 +190,7 @@ export let todos = [
     description:
       'On mobile the "More" page should have a topbar over links to its subpages.',
     duration: 30,
+    tags: [tags[0].id],
   },
   {
     description:
@@ -177,27 +199,34 @@ export let todos = [
   },
   { description: 'Norwegian locale and translations.', duration: 120 },
   { description: 'Add help page skeleton', duration: 15, done: true },
-].map(
-  (activity: TodoDelta, i): Todo => {
-    const { created = new Date(), done = false } = activity
-    const {
-      modified = created,
-      completed = done ? new Date() : undefined,
-    } = activity
+].map((activity: TodoDelta, i): Todo => {
+  const { created = new Date(), done = false } = activity
+  const { modified = created, completed = done ? new Date() : undefined } =
+    activity
 
-    return {
-      id: `activity-${i}`,
-      order: i,
-      created,
-      modified,
-      done,
-      completed,
-      ...activity,
-    }
+  return {
+    id: `activity-${i}`,
+    order: i,
+    created,
+    modified,
+    done,
+    completed,
+    ...activity,
   }
-)
+})
 
 const database: DatabaseType = {
+  getTags() {
+    return Promise.resolve(tags)
+  },
+  setTags(nextTags) {
+    tags = JSON.parse(JSON.stringify(nextTags))
+
+    return Promise.resolve()
+  },
+  observeTags() {
+    return () => {}
+  },
   getSchedules() {
     return Promise.resolve(schedules)
   },

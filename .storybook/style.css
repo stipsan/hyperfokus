@@ -1,0 +1,25 @@
+:root {
+  --reach-tabs: 1;
+}
+
+select,
+textarea,
+[type='text'] {
+  border-radius: theme('borderRadius.lg');
+}
+
+html.dark {
+  background: theme('colors.gray.900');
+  color: theme('colors.gray.100');
+}
+
+html.dark select,
+html.dark textarea,
+html.dark [type='text'] {
+  background: theme('colors.gray.900');
+  border-radius: theme('borderRadius.lg');
+}
+
+.sb-show-main #root {
+  padding: 0 !important;
+}

@@ -1,10 +1,21 @@
+/* eslint-disable no-restricted-globals */
 import useInterval from '@use-it/interval'
 import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
-import { useActiveSchedules } from 'components/SchedulesProvider'
-import { useTodos, useTodosDispatch } from 'components/TodosProvider'
+import type { Schedules } from 'hooks/schedules/types'
+import type { Tags } from 'hooks/tags/types'
+import type {
+  Todos,
+  AddTodo,
+  EditTodo,
+  DeleteTodo,
+  CompleteTodo,
+  IncompleteTodo,
+  ArchiveTodos,
+} from 'hooks/todos/types'
+import TagsFilter from 'components/TagsFilter'
 import type { Todo } from 'database/types'
 import {
   isAfter,
@@ -18,7 +29,7 @@ import { useAnalytics, useLogException } from 'hooks/analytics'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  forwardRef,
+  ComponentProps,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -26,10 +37,17 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { FC, ReactNode } from 'react'
+import type { FC } from 'react'
 import { getForecast } from 'utils/forecast'
 import type { Forecast, ForecastTodo } from 'utils/forecast'
-import styles from './Todos.module.css'
+import styles from './index.module.css'
+import { useCallback } from 'react'
+import TagsSelect from 'components/TagsSelect'
+
+type TagsSelectProps = Omit<
+  ComponentProps<typeof TagsSelect>,
+  'selected' | 'setSelected'
+>
 
 const Field: FC<{
   className?: string
@@ -120,14 +138,19 @@ const TodoForm = ({
   onSubmit,
   editing,
   onDelete,
+  addTag,
+  tags,
 }: {
   initialState?: Todo
   editing?: boolean
   onDismiss: () => void
   onSubmit: (state: Todo) => void
   onDelete?: () => void
-}) => {
+} & TagsSelectProps) => {
   const [state, dispatch] = useReducer(reducer, initialState)
+  const [selectedTags, setSelectedTags] = useState(
+    () => initialState?.tags || []
+  )
   let initialOrder = parseInt(initialState.order.toString(), 10)
   if (Number.isNaN(initialOrder)) initialOrder = 0
 
@@ -148,7 +171,7 @@ const TodoForm = ({
           )
         }
 
-        onSubmit(state)
+        onSubmit({ ...state, tags: selectedTags })
       }}
     >
       <Field className="block w-full" label="Description" htmlFor="description">
@@ -173,6 +196,15 @@ const TodoForm = ({
 
       <Field className="mt-4" label="Duration" htmlFor="duration">
         <Duration dispatch={dispatch} state={state} />
+      </Field>
+
+      <Field className="mt-4" label="Tags" htmlFor="tags">
+        <TagsSelect
+          tags={tags}
+          addTag={addTag}
+          selected={selectedTags}
+          setSelected={setSelectedTags}
+        />
       </Field>
 
       {editing ? (
@@ -257,15 +289,6 @@ const CheckboxLabel: FC<{ onClick: (event: any) => void }> = ({
   </label>
 )
 
-const Time = forwardRef<
-  HTMLSpanElement,
-  { children: ReactNode; title?: string }
->(({ children, title, ...props }, forwardedRef) => (
-  <span {...props} ref={forwardedRef} className={cx(styles.time)} title={title}>
-    {children}
-  </span>
-))
-
 const StyledCheckbox: React.FC<{
   onChange: (event: any) => void
   onClick: (event: any) => void
@@ -282,10 +305,26 @@ const TodoItem: React.FC<{
   todo: ForecastTodo
   isToday: boolean
   now: Date
-}> = ({ todo, isToday, now }) => {
+  completeTodo: CompleteTodo
+  incompleteTodo: IncompleteTodo
+  isFilteringByTags: boolean
+  tags: Tags
+}> = ({
+  todo,
+  isToday,
+  now,
+  completeTodo,
+  incompleteTodo,
+  isFilteringByTags,
+  tags: allTags,
+}) => {
   const analytics = useAnalytics()
   const logException = useLogException()
-  const { completeTodo, incompleteTodo } = useTodosDispatch()
+  const tags = useMemo<Tags>(
+    () => allTags.filter((tag) => todo.tags?.includes(tag.id)),
+    [allTags, todo.tags]
+  )
+
   let isOverdue = false
   let isCurrent = false
   if (isToday) {
@@ -315,9 +354,12 @@ const TodoItem: React.FC<{
       })}
     >
       <Link key="time" href={`?edit=${todo.id}`} shallow>
-        <Time title={`Duration: ${todo.duration} minutes`}>
+        <span
+          className={cx(styles.time)}
+          title={`Duration: ${todo.duration} minutes`}
+        >
           {todo.start} – {todo.end}
-        </Time>
+        </span>
       </Link>
       <Link key="description" href={`?edit=${todo.id}`} shallow>
         <a
@@ -329,6 +371,18 @@ const TodoItem: React.FC<{
             : 'Untitled'}
         </a>
       </Link>
+      {!isFilteringByTags && todo.tags?.length > 0 && (
+        <div className={cx(styles.tags, 'flex')}>
+          {tags.map((tag) => (
+            <span
+              key={tag.id}
+              className="text-xs mr-1 my-1 px-2 py-1 block rounded-full bg-gray-200 bg-opacity-50 whitespace-pre-wrap"
+            >
+              {tag.name}
+            </span>
+          ))}
+        </div>
+      )}
       <StyledCheckbox
         checked={!!todo.completed}
         onClick={(event) => event.stopPropagation()}
@@ -357,25 +411,23 @@ const Header: FC<{ className?: string }> = ({ className, children }) => (
   <h3 className={cx('px-inset', styles.header, className)}>{children}</h3>
 )
 
-const Section = forwardRef<
-  HTMLElement,
-  { className?: string; children: ReactNode }
->(({ children, className }, forwardedRef) => (
-  <section ref={forwardedRef} className={cx(styles.section, className)}>
-    {children}
-  </section>
-))
-
-const CreateDialog = ({ onDismiss }: { onDismiss: () => void }) => {
+const CreateDialog = ({
+  onDismiss,
+  addTodo,
+  addTag,
+  tags,
+}: {
+  onDismiss: () => void
+  addTodo
+} & TagsSelectProps) => {
   const logException = useLogException()
-  const { addTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Todo',
     })
-  }, [])
+  }, [analytics])
 
   const idRef = useRef(null)
 
@@ -396,6 +448,8 @@ const CreateDialog = ({ onDismiss }: { onDismiss: () => void }) => {
 
   return (
     <TodoForm
+      addTag={addTag}
+      tags={tags}
       onDismiss={onDismiss}
       onSubmit={async (state) => {
         try {
@@ -418,20 +472,25 @@ const EditDialog = ({
   todos,
   onDismiss,
   id,
+  editTodo,
+  deleteTodo,
+  addTag,
+  tags,
 }: {
-  todos: Todo[]
+  todos: Todos
   onDismiss: () => void
   id: string
-}) => {
+  editTodo: EditTodo
+  deleteTodo: DeleteTodo
+} & TagsSelectProps) => {
   const logException = useLogException()
-  const { editTodo, deleteTodo } = useTodosDispatch()
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Edit Todo',
     })
-  }, [])
+  }, [analytics])
 
   const [initialState, setInitialState] = useState(() =>
     todos.find((todo) => todo.id === id)
@@ -452,11 +511,13 @@ const EditDialog = ({
         focusNode?.focus()
       }, 300)
     }
-  }, [id])
+  }, [id, todos])
 
   return (
     <TodoForm
       editing
+      addTag={addTag}
+      tags={tags}
       initialState={initialState}
       onDismiss={onDismiss}
       onSubmit={async (state) => {
@@ -494,20 +555,88 @@ const EditDialog = ({
   )
 }
 
-export default function TodosScreen() {
+export default function TodosScreen({
+  addTodo: addTodoUnsafe,
+  archiveTodos,
+  completeTodo,
+  deleteTodo,
+  editTodo: editTodoUnsafe,
+  incompleteTodo,
+  schedules: allSchedules,
+  tags,
+  todos: allTodos,
+  addTag,
+}: {
+  addTodo: AddTodo
+  archiveTodos: ArchiveTodos
+  completeTodo: CompleteTodo
+  deleteTodo: DeleteTodo
+  editTodo: EditTodo
+  incompleteTodo: IncompleteTodo
+  schedules: Schedules
+  tags: Tags
+  todos: Todos
+} & TagsSelectProps) {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Todos',
     })
-  }, [])
+  }, [analytics])
+
+  const addTodo = useCallback<AddTodo>(
+    ({ description, ...todo }) =>
+      addTodoUnsafe({ ...todo, description: description.substring(0, 2048) }),
+    [addTodoUnsafe]
+  )
+  const editTodo = useCallback<EditTodo>(
+    ({ description, ...todo }, id) =>
+      editTodoUnsafe(
+        {
+          ...todo,
+          description: description.substring(0, 2048),
+          modified: new Date(),
+        },
+        id
+      ),
+    [editTodoUnsafe]
+  )
 
   const router = useRouter()
   const [hyperfocusing, setHyperfocus] = useState(false)
-  const schedules = useActiveSchedules()
-  const todos = useTodos()
-  const { archiveTodos } = useTodosDispatch()
+  const [selectedTags, setSelectedTags] = useState<Set<string | boolean>>(
+    () => new Set()
+  )
+  // TODO better variable name
+  const isFilteringByTags = selectedTags.size === 1
+
+  // @TODO filter schedules based on tags
+  const schedules = useMemo<Schedules>(
+    () => allSchedules.filter((schedule) => schedule.enabled),
+    [allSchedules]
+  )
+
+  // @TODO send tags filter to hook
+  const todos = useMemo(() => {
+    if (selectedTags.size === 0) {
+      return allTodos
+    }
+
+    return allTodos.filter((todo) => {
+      // if Untagged, check if tags are emty, or empty array
+      // Else if check if value exists in array
+      if (selectedTags.has(true) && (!todo.tags || todo.tags?.length === 0)) {
+        return true
+      }
+
+      if (todo.tags?.some((tag) => selectedTags.has(tag))) {
+        return true
+      }
+
+      return false
+    })
+  }, [allTodos, selectedTags])
   const logException = useLogException()
 
   const [lastReset, setLastReset] = useState<Date>(() =>
@@ -520,8 +649,8 @@ export default function TodosScreen() {
   const todayRef = useRef<HTMLElement>(null)
 
   const todoIds = useMemo(
-    () => todos.reduce((ids, todo) => ids.add(todo.id), new Set()),
-    [todos]
+    () => allTodos.reduce((ids, todo) => ids.add(todo.id), new Set()),
+    [allTodos]
   )
 
   // Update the now value every minute in case it changes the schedule
@@ -573,8 +702,43 @@ export default function TodosScreen() {
 
   return (
     <>
+      <TagsFilter
+        tags={tags}
+        selected={selectedTags}
+        setSelected={setSelectedTags}
+      />
+      <AnimatedDialog
+        isOpen={!!router.query.create}
+        onDismiss={onDismiss}
+        aria-label="Create new todo"
+      >
+        <CreateDialog
+          addTodo={addTodo}
+          addTag={addTag}
+          tags={tags}
+          onDismiss={onDismiss}
+        />
+      </AnimatedDialog>
+      <AnimatedDialog
+        isOpen={!router.query.create && todoIds.has(router.query.edit)}
+        onDismiss={onDismiss}
+        aria-label="Edit todo"
+      >
+        <EditDialog
+          addTag={addTag}
+          tags={tags}
+          onDismiss={onDismiss}
+          todos={todos}
+          id={router.query.edit as string}
+          editTodo={editTodo}
+          deleteTodo={deleteTodo}
+        />
+      </AnimatedDialog>
       {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
-        <Section key="review fuckup" className="is-warning">
+        <section
+          key="review fuckup"
+          className={cx(styles.section, 'is-warning')}
+        >
           <Header>Please review</Header>
           {withoutSchedule.length > 0 && (
             <div className={cx(styles.warning, 'px-inset')}>
@@ -599,6 +763,10 @@ export default function TodosScreen() {
                 todo={{ ...activity, start: 'N/A', end: 'N/A' }}
                 now={now}
                 isToday={false}
+                completeTodo={completeTodo}
+                incompleteTodo={incompleteTodo}
+                isFilteringByTags={isFilteringByTags}
+                tags={tags}
               />
             ))}
           </Items>
@@ -614,9 +782,13 @@ export default function TodosScreen() {
               todo={{ ...activity, start: 'N/A', end: 'N/A' }}
               now={now}
               isToday={false}
+              completeTodo={completeTodo}
+              incompleteTodo={incompleteTodo}
+              isFilteringByTags={isFilteringByTags}
+              tags={tags}
             />
           ))}
-        </Section>
+        </section>
       )}
       {forecast.days?.map((day) => {
         if (!day.schedule?.some((pocket) => !!pocket.todos?.length)) {
@@ -637,10 +809,10 @@ export default function TodosScreen() {
         }).format(day.date)
 
         return (
-          <Section
+          <section
             key={day.date.toString()}
             ref={isToday ? todayRef : undefined}
-            className={cx({
+            className={cx(styles.section, {
               'is-today': isToday,
               'is-hyperfocus': hyperfocusing,
             })}
@@ -656,11 +828,15 @@ export default function TodosScreen() {
                     todo={task}
                     isToday={isToday}
                     now={now}
+                    completeTodo={completeTodo}
+                    incompleteTodo={incompleteTodo}
+                    isFilteringByTags={isFilteringByTags}
+                    tags={tags}
                   />
                 ))
               )}
             </Items>
-          </Section>
+          </section>
         )
       })}
       {somethingRecentlyCompleted && (
@@ -697,24 +873,6 @@ export default function TodosScreen() {
           {hyperfocusing ? 'Disable Hyperfocusing' : 'Enable Hyperfocusing'}
         </Button>
       )}
-      <AnimatedDialog
-        isOpen={!!router.query.create}
-        onDismiss={onDismiss}
-        aria-label="Create new todo"
-      >
-        <CreateDialog onDismiss={onDismiss} />
-      </AnimatedDialog>
-      <AnimatedDialog
-        isOpen={!router.query.create && todoIds.has(router.query.edit)}
-        onDismiss={onDismiss}
-        aria-label="Edit todo"
-      >
-        <EditDialog
-          onDismiss={onDismiss}
-          todos={todos}
-          id={router.query.edit as string}
-        />
-      </AnimatedDialog>
     </>
   )
 }

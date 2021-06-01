@@ -1,0 +1,19 @@
+.tag {
+  scroll-snap-align: start;
+}
+
+.notagslinkBackdrop {
+  transition: opacity 0.3s ease-out;
+  opacity: 0;
+  background-image: radial-gradient(
+    circle at calc(100% - 30px) calc(0% + 30px),
+    hsl(202deg 40% 96% / 0%) 60px,
+    hsl(202deg 40% 96%) 170px
+  );
+}
+
+@media (hover: hover) {
+  .notagslink:hover + .notagslinkBackdrop {
+    opacity: 1;
+  }
+}

@@ -1,18 +1,22 @@
+/* eslint-disable no-restricted-globals */
 import cx from 'classnames'
 import AnimatedDialog from 'components/AnimatedDialog'
 import Button, { className } from 'components/Button'
 import DialogToolbar from 'components/DialogToolbar'
-import { useSchedules } from 'components/SchedulesProvider'
 import type { Schedule } from 'database/types'
 import { useAnalytics } from 'hooks/analytics'
-import { nanoid } from 'nanoid'
+import type {
+  AddSchedule,
+  DeleteSchedule,
+  EditSchedule,
+  Schedules,
+} from 'hooks/schedules/types'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import type { FC } from 'react'
 import { useEffect, useReducer, useState } from 'react'
-import type { Dispatch, FC, SetStateAction } from 'react'
-import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import { getRepeatMessage } from 'utils/time'
-import styles from './Schedules.module.css'
+import styles from './index.module.css'
 
 const TrackCreateDialog = () => {
   const analytics = useAnalytics()
@@ -21,23 +25,19 @@ const TrackCreateDialog = () => {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Schedule',
     })
-  }, [])
+  }, [analytics])
 
   return null
 }
 
-const CreateDialog = ({
-  setSchedules,
-}: {
-  setSchedules: Dispatch<SetStateAction<Schedule[]>>
-}) => {
+const CreateDialog = ({ addSchedule }: { addSchedule: AddSchedule }) => {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'New Schedule',
     })
-  }, [])
+  }, [analytics])
 
   const router = useRouter()
   const close = () => {
@@ -52,10 +52,8 @@ const CreateDialog = ({
     >
       <ScheduleForm
         onDismiss={close}
-        onSubmit={(state) => {
-          setSchedules((schedules) => {
-            return [...schedules, { ...state, id: nanoid() }]
-          })
+        onSubmit={async (state) => {
+          await addSchedule(state)
           close()
           analytics.logEvent('schedule_create', {
             start: state.start,
@@ -77,7 +75,7 @@ const getMinutesFromTime = (time: string) => {
 }
 
 const getDuration = (state: TimeState) => {
-  if (!state.start.match(/\:/) || !state.end.match(/\:/)) {
+  if (!state.start.match(/:/) || !state.end.match(/:/)) {
     return state.duration
   }
 
@@ -90,7 +88,7 @@ const getDuration = (state: TimeState) => {
 }
 
 const getEnd = (state: TimeState) => {
-  if (!state.start.match(/\:/) || !state.duration) {
+  if (!state.start.match(/:/) || !state.duration) {
     return state.end
   }
 
@@ -446,16 +444,18 @@ const TrackEditDialog = () => {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Edit Schedule',
     })
-  }, [])
+  }, [analytics])
 
   return null
 }
 const EditDialog = ({
   schedules,
-  setSchedules,
+  editSchedule,
+  deleteSchedule,
 }: {
-  schedules: Schedule[]
-  setSchedules: Dispatch<SetStateAction<Schedule[]>>
+  schedules: Schedules
+  editSchedule: EditSchedule
+  deleteSchedule: DeleteSchedule
 }) => {
   const analytics = useAnalytics()
   const router = useRouter()
@@ -484,7 +484,7 @@ const EditDialog = ({
         }, 300)
       }
     }
-  }, [router.query.edit])
+  }, [router.query.edit, schedules])
 
   const close = () => {
     router.push(router.pathname, undefined, { shallow: true })
@@ -492,6 +492,8 @@ const EditDialog = ({
 
   return (
     <AnimatedDialog
+      // TODO temporary workaround for rapid clicking different tags and form not refreshing
+      key={initialState?.id}
       isOpen={
         !!router.query.edit &&
         !!initialState &&
@@ -504,7 +506,9 @@ const EditDialog = ({
         editing
         initialState={initialState}
         onDismiss={close}
-        onSubmit={(state) => {
+        onSubmit={async (state) => {
+          await editSchedule(state, initialState.id)
+          /*
           setSchedules((schedules) => {
             const index = schedules.findIndex(
               (schedule) => schedule.id === initialState.id
@@ -520,6 +524,7 @@ const EditDialog = ({
             })
             return newSchedules
           })
+          // */
           setInitialState(state)
           close()
           analytics.logEvent('schedule_edit', {
@@ -530,7 +535,7 @@ const EditDialog = ({
             enabled: state.enabled,
           })
         }}
-        onDelete={() => {
+        onDelete={async () => {
           if (
             confirm(
               `Are you sure you want to delete "${initialState.start} – ${
@@ -538,6 +543,8 @@ const EditDialog = ({
               }, ${getRepeatMessage(initialState.repeat)}"?`
             )
           ) {
+            await deleteSchedule(initialState.id)
+            /*
             setSchedules((schedules) => {
               const index = schedules.findIndex(
                 (schedule) => schedule.id === initialState.id
@@ -545,6 +552,7 @@ const EditDialog = ({
               const newSchedules = removeItemAtIndex(schedules, index)
               return newSchedules
             })
+            // */
             close()
             analytics.logEvent('schedule_delete', {
               start: initialState.start,
@@ -589,16 +597,24 @@ const NoSchedulesPlaceholder = () => {
   )
 }
 
-export default function SchedulesScreen() {
+export default function SchedulesScreen({
+  schedules,
+  addSchedule,
+  editSchedule,
+  deleteSchedule,
+}: {
+  schedules: Schedules
+  addSchedule: AddSchedule
+  editSchedule: EditSchedule
+  deleteSchedule: DeleteSchedule
+}) {
   const analytics = useAnalytics()
   useEffect(() => {
     analytics.logEvent('screen_view', {
       app_name: process.env.NEXT_PUBLIC_APP_NAME,
       screen_name: 'Schedules',
     })
-  }, [])
-
-  const { schedules, setSchedules } = useSchedules()
+  }, [analytics])
 
   return (
     <div className={cx({ 'border-b-2': schedules.length > 0 })}>
@@ -632,8 +648,12 @@ export default function SchedulesScreen() {
           </Link>
         )
       })}
-      <EditDialog schedules={schedules} setSchedules={setSchedules} />
-      <CreateDialog setSchedules={setSchedules} />
+      <EditDialog
+        schedules={schedules}
+        editSchedule={editSchedule}
+        deleteSchedule={deleteSchedule}
+      />
+      <CreateDialog addSchedule={addSchedule} />
     </div>
   )
 }

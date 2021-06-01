@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { atom, useRecoilValue, useSetRecoilState } from 'recoil'
+import create from 'zustand'
 
 export const sessionKey = 'hyperfokus.storage'
 export type SessionState = '' | 'demo' | 'localstorage' | 'firebase'
@@ -15,14 +15,20 @@ export const sanitize = (unsafeState: SessionState): SessionState => {
   }
 }
 
-export const sessionProviderState = atom({
-  key: 'SessionProvider',
-  default:
+type SessionStoreState = {
+  session: SessionState
+  setSession: (session: SessionState) => void
+}
+
+const useStore = create<SessionStoreState>((set) => ({
+  session:
     typeof window !== 'undefined'
       ? sanitize(localStorage.getItem(sessionKey) as SessionState)
       : '',
-})
+  setSession: (session: SessionState) => set({ session }),
+}))
 
+const selectSession = (state: SessionStoreState) => state.session
 export const useSessionValue = () => {
   // Suspend on the server only as we're reading the provider initial state from localStorage
   // which is a sync operation, thus we don't need to suspend on it in the client
@@ -30,22 +36,21 @@ export const useSessionValue = () => {
     throw new Promise((resolve) => setTimeout(() => resolve(void 0)))
   }
 
-  const session = useRecoilValue(sessionProviderState)
+  const session = useStore(selectSession)
 
-  return session as SessionState
+  return session
 }
 
+const selectSetSession = (state: SessionStoreState) => state.setSession
 const useSetSession = () => {
-  const setState = useSetRecoilState(sessionProviderState)
+  const setState = useStore(selectSetSession)
   // States that need to be reset when changing session
 
-  return (session: SessionState) => {
-    setState(session)
-  }
+  return setState
 }
 
 export const useSessionSetState = () => {
-  const prevState = useRecoilValue(sessionProviderState)
+  const prevState = useStore(selectSession)
   const setSession = useSetSession()
 
   return (unsafeSession: SessionState) => {
@@ -66,7 +71,7 @@ export const useSessionSetState = () => {
 }
 
 export const useObserveSession = () => {
-  const prevState = useRecoilValue(sessionProviderState)
+  const prevState = useStore(selectSession)
   const setSession = useSetSession()
 
   useEffect(() => {
@@ -95,5 +100,5 @@ export const useObserveSession = () => {
     return () => {
       window.removeEventListener('storage', handler)
     }
-  }, [prevState])
+  }, [prevState, setSession])
 }

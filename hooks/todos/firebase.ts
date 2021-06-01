@@ -1,18 +1,12 @@
-//useFirestoreCollectionData(query, { idField: 'id' })
-import Button from 'components/Button'
 import type { Todo } from 'database/types'
 import type { firestore, User } from 'firebase/app'
-import Link from 'next/link'
 import { useMemo } from 'react'
-import type { ReactNode } from 'react'
 import {
-  AuthCheck,
   useFirestore,
   useFirestoreCollectionData,
   useUser,
 } from 'reactfire'
-import { DispatchProvider, StateProvider } from './Context'
-import type { TodosDispatchContext } from './Context'
+import type { AddTodo, EditTodo, DeleteTodo, CompleteTodo, IncompleteTodo, ArchiveTodos, Todos } from './types'
 
 type TodoDoc = {
   completed?: firestore.Timestamp
@@ -21,7 +15,16 @@ type TodoDoc = {
 } & Exclude<Todo, 'completed' | 'created' | 'modified'>
 // @TODO should be a directive that does the union and Exclude thing automatically
 
-const TodosProviders = ({ children }: { children: ReactNode }) => {
+type Actions = {
+  addTodo: AddTodo
+  editTodo: EditTodo
+  deleteTodo: DeleteTodo
+  completeTodo: CompleteTodo
+  incompleteTodo: IncompleteTodo
+  archiveTodos: ArchiveTodos
+}
+
+export function useTodos(): [Todos, Actions] {
   const user = useUser<User>()
   const firestore = useFirestore()
   const todosRef = firestore.collection('todos').where('author', '==', user.uid)
@@ -43,6 +46,7 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
           id,
           modified,
           order,
+          tags,
         } = todo
 
         return {
@@ -54,14 +58,14 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
           id,
           modified: modified ? new Date(modified.seconds) : undefined,
           order,
+          tags,
         }
       }),
     [todosData]
   )
 
-  // @TODO verify that firestore is stable
-  const context = useMemo(
-    (): TodosDispatchContext => ({
+  const actions = useMemo<Actions>(
+    () => ({
       addTodo: async ({
         completed,
         created,
@@ -70,6 +74,7 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
         duration,
         modified,
         order,
+        tags,
       }) => {
         const data = {
           author: user.uid,
@@ -80,6 +85,7 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
           duration,
           modified: modified === undefined ? null : modified,
           order,
+          tags,
         }
 
         if (order > 0) {
@@ -106,10 +112,10 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
       editTodo: async (
         {
           description,
-
           duration,
           modified,
           order,
+          tags,
         },
         id
       ) => {
@@ -118,6 +124,7 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
           duration,
           modified,
           order,
+          tags,
         }
 
         if (order === 1) {
@@ -171,30 +178,8 @@ const TodosProviders = ({ children }: { children: ReactNode }) => {
         await Promise.all(ops)
       },
     }),
-    [firestore, user.uid]
+    [firestore, user.uid, todosRef]
   )
 
-  return (
-    <DispatchProvider value={context}>
-      <StateProvider value={todos}>{children}</StateProvider>
-    </DispatchProvider>
-  )
+  return [todos, actions]
 }
-
-const Firebase = ({ children }: { children: ReactNode }) => (
-  <AuthCheck
-    fallback={
-      <>
-        <Link href="/settings">
-          <Button className="block mx-auto mt-32" variant="primary">
-            Login
-          </Button>
-        </Link>
-      </>
-    }
-  >
-    <TodosProviders>{children}</TodosProviders>
-  </AuthCheck>
-)
-
-export default Firebase

@@ -4,8 +4,8 @@ import firebase from 'firebase/app'
 import type { User } from 'firebase/app'
 import { useAnalytics, useLogException } from 'hooks/analytics'
 import { useSessionSetState, useSessionValue } from 'hooks/session'
-// @ts-expect-error
-import { Suspense, unstable_SuspenseList as SuspenseList } from 'react'
+import { Suspense } from 'react'
+import * as React from 'react'
 import {
   AuthCheck,
   useAuth,
@@ -15,6 +15,11 @@ import {
 } from 'reactfire'
 import Button from './Button'
 import styles from './CloudSyncSettings.module.css'
+
+// workaround @types/react being out of date
+const SuspenseList: typeof React.unstable_SuspenseList =
+  // @ts-expect-error
+  React.SuspenseList || React.unstable_SuspenseList
 
 const buttonClass = 'bg-gray-100 hover:bg-gray-300 text-gray-800 font-semibold'
 
@@ -67,15 +72,17 @@ const RequestStep = () => {
   const firestore = useFirestore()
   const logException = useLogException()
   const betaReqRef = firestore.collection('betarequests').doc(user.uid)
-  const betaReq = useFirestoreDocData<{
-    email?: string
-    name?: string
-    message?: string
-  }>(betaReqRef)
+  const betaReq =
+    useFirestoreDocData<{
+      email?: string
+      name?: string
+      message?: string
+    }>(betaReqRef)
   const betaInviteRef = firestore.collection('betainvites').doc(user.uid)
-  const betaInvite = useFirestoreDocData<{
-    since?: Date
-  }>(betaInviteRef)
+  const betaInvite =
+    useFirestoreDocData<{
+      since?: Date
+    }>(betaInviteRef)
 
   const cancel = async () => {
     try {
@@ -142,15 +149,17 @@ const FinalStep = () => {
   const logException = useLogException()
 
   const betaReqRef = firestore.collection('betarequests').doc(user.uid)
-  const betaReq = useFirestoreDocData<{
-    email?: string
-    name?: string
-    message?: string
-  }>(betaReqRef)
+  const betaReq =
+    useFirestoreDocData<{
+      email?: string
+      name?: string
+      message?: string
+    }>(betaReqRef)
   const betaInviteRef = firestore.collection('betainvites').doc(user.uid)
-  const betaInvite = useFirestoreDocData<{
-    since?: Date
-  }>(betaInviteRef)
+  const betaInvite =
+    useFirestoreDocData<{
+      since?: Date
+    }>(betaInviteRef)
   let canEnable = !!betaInvite.since && !!betaReq.email
 
   const enable = async () => {

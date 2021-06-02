@@ -55,6 +55,8 @@ const DAY_IN_MS = 86400000
 const MAX_DAYS_IN_FORECAST = 100
 const debug = process.env.NODE_ENV !== 'production' && false
 
+// TODO make the process two-step, if only todos change and not the schedules they should be largely reusable
+
 // Provide times and tasks and get a complete schedule in return
 // @TODO make it possible to specify the starting point, currently it's hardcoded to `today`
 // @TODO filter out opportunities that are for today, if they have an endtime that is too late

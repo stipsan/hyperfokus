@@ -1,5 +1,10 @@
 import type { Repeat } from 'database/types'
 
+export function sleep(ms) {
+  // add ms millisecond timeout before promise resolution
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export function getTime() {
   return new Date()
 }

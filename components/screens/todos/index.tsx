@@ -31,8 +31,8 @@ import router, { useRouter } from 'next/router'
 import {
   ComponentProps,
   memo,
+  Suspense,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -43,8 +43,9 @@ import type { ForecastTodo } from 'utils/forecast'
 import styles from './index.module.css'
 import { useCallback } from 'react'
 import TagsSelect from 'components/TagsSelect'
-import { useWebWorker, useWebBrowser } from 'hooks/forecast'
+import { useForecastComputer } from 'hooks/forecast'
 import { ChangeEventHandler } from 'react'
+import * as React from 'react'
 // workaround @types/react being out of date
 const useDeferredValue: typeof React.unstable_useDeferredValue =
   // @ts-expect-error
@@ -292,13 +293,16 @@ const TodoForm = ({
 
 const StyledCheckbox = memo(function StyledCheckbox({
   onChange,
-  checked,
+  checked: initialChecked,
 }: {
   onChange: ChangeEventHandler<HTMLInputElement>
-  checked?: boolean
+  checked: boolean
 }) {
-  const [isPending, startTransition] = useTransition()
-  console.log({ isPending, startTransition, React })
+  const [checked, setChecked] = useState(initialChecked)
+  useEffect(() => {
+    setChecked(initialChecked)
+  }, [initialChecked])
+  console.log({ checked })
   return (
     <label
       className={cx(styles.checkboxLabel, 'px-inset-l')}
@@ -306,11 +310,13 @@ const StyledCheckbox = memo(function StyledCheckbox({
     >
       <input
         className="form-checkbox"
-        checked={checked}
+        checked={initialChecked}
         type="checkbox"
-        onChange={(event) => startTransition(() => onChange(event))}
+        onChange={(event) => {
+          setChecked((checked) => !checked)
+          onChange(event)
+        }}
       />{' '}
-      isPending: {JSON.stringify(isPending)}
     </label>
   )
 })
@@ -597,6 +603,223 @@ const EditDialog = ({
   )
 }
 
+const ForecastDisplay = memo(function ForecastDisplay({
+  completeTodo,
+  computer,
+  displayTodoTagsOnItem,
+  hyperfocusing,
+  incompleteTodo,
+  isThereToday,
+  lastReset,
+  now,
+  tags,
+  todayRef,
+  todos,
+}: {
+  completeTodo: CompleteTodo
+  computer: ReturnType<typeof useForecastComputer>[0]
+  displayTodoTagsOnItem: boolean
+  hyperfocusing: boolean
+  incompleteTodo: IncompleteTodo
+  isThereToday: boolean
+  lastReset: Date
+  now: Date
+  tags: Tags
+  todayRef: React.MutableRefObject<HTMLElement>
+  todos: Todos
+}) {
+  const [deadlineMs, setDeadlineMs] = useState(16)
+  const { days, maxTaskDuration, timedout } = computer.read(
+    lastReset,
+    deadlineMs
+  )
+
+  useEffect(() => {
+    console.log('days changed!', days)
+  }, [days])
+  useEffect(() => {
+    console.log('maxTaskDuration changed!', maxTaskDuration)
+  }, [maxTaskDuration])
+  useEffect(() => {
+    console.log('timedout changed!', timedout)
+  }, [timedout])
+
+  // TODO move into getForecast utility and logic
+  const withoutSchedule = todos.filter(
+    (todo) => todo.duration > maxTaskDuration
+  )
+  const withoutDuration = todos.filter((task) => task.duration < 1)
+
+  return (
+    <>
+      {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
+        <section
+          key="review fuckup"
+          className={cx(styles.section, 'is-warning')}
+        >
+          <Header>Please review</Header>
+          {withoutSchedule.length > 0 && (
+            <div
+              className={cx(
+                styles.warning,
+                'ml-6 bg-red-200 rounded-l py-1 mb-1  px-inset'
+              )}
+            >
+              Your current settings allow a max duration of{' '}
+              <strong>
+                {maxTaskDuration} {maxTaskDuration === 1 ? 'minute' : 'minutes'}
+              </strong>
+              . The todos below have longer durations, either shorten them or
+              update your{' '}
+              <Link href="/schedules">
+                <a className="hover:text-red-900 underline">Schedules</a>
+              </Link>{' '}
+              to allow more time.
+            </div>
+          )}
+
+          <ul className={styles.items}>
+            {withoutSchedule.map((activity) => (
+              <TodoItem
+                key={activity.id}
+                todo={{ ...activity, start: 'N/A', end: 'N/A' }}
+                now={now}
+                isToday={false}
+                completeTodo={completeTodo}
+                incompleteTodo={incompleteTodo}
+                displayTodoTagsOnItem={displayTodoTagsOnItem}
+                tags={tags}
+              />
+            ))}
+          </ul>
+          {withoutDuration.length > 0 && (
+            <div
+              className={cx(
+                styles.warning,
+                'ml-6 bg-red-200 rounded-l py-1 mb-1 px-inset'
+              )}
+            >
+              The following todos couldn't be scheduled because their{' '}
+              <strong>duration</strong> isn't specified.
+            </div>
+          )}
+          {withoutDuration.map((activity) => (
+            <TodoItem
+              key={activity.id}
+              todo={{ ...activity, start: 'N/A', end: 'N/A' }}
+              now={now}
+              isToday={false}
+              completeTodo={completeTodo}
+              incompleteTodo={incompleteTodo}
+              displayTodoTagsOnItem={displayTodoTagsOnItem}
+              tags={tags}
+            />
+          ))}
+        </section>
+      )}
+      {days.map((day) => {
+        if (!day.schedule?.some((pocket) => !!pocket.todos?.length)) {
+          return null
+        }
+
+        const isToday = isSameDay(day.date, now)
+
+        if (!isThereToday && isToday) {
+          isThereToday = true
+        }
+
+        const dayText = isToday ? 'Today' : day.day
+        const dateText = new Intl.DateTimeFormat(undefined, {
+          year: '2-digit',
+          month: 'numeric',
+          day: 'numeric',
+        }).format(day.date)
+
+        return (
+          <section
+            key={day.date.toString()}
+            ref={isToday ? todayRef : undefined}
+            className={cx(styles.section, {
+              'is-today': isToday,
+              'is-hyperfocus': hyperfocusing,
+            })}
+          >
+            <Header>
+              <span className="font-bold block mr-1">{dayText}</span> {dateText}
+            </Header>
+            <ul className={styles.items}>
+              {day.schedule.map((pocket) =>
+                pocket.todos?.map((task) => (
+                  <TodoItem
+                    key={task.id}
+                    todo={task}
+                    isToday={isToday}
+                    now={now}
+                    completeTodo={completeTodo}
+                    incompleteTodo={incompleteTodo}
+                    displayTodoTagsOnItem={displayTodoTagsOnItem}
+                    tags={tags}
+                  />
+                ))
+              )}
+            </ul>
+          </section>
+        )
+      })}
+      {timedout.length > 0 && (
+        <section key="timedout" className={cx(styles.section)}>
+          <Header>
+            <span className="font-bold block">Someday</span>
+          </Header>
+          {deadlineMs < 300 ? (
+            <div
+              key="try again"
+              className={cx(
+                styles.warning,
+                'ml-6 bg-orange-200 rounded-l py-1 mb-1 px-inset'
+              )}
+            >
+              Despite best efforts I couldn't squeeze all your todos into your
+              schedule.{' '}
+              <button
+                className="ml-1 px-2 py-1 text-sm text-orange-800 hover:text-orange-900 rounded-md bg-orange-100 hover:bg-orange-300"
+                onClick={() => setDeadlineMs(300)}
+              >
+                Go deeper.
+              </button>
+            </div>
+          ) : (
+            <div
+              key="give up"
+              className={cx(
+                styles.warning,
+                'ml-6 bg-orange-200 rounded-l py-1 mb-1 px-inset'
+              )}
+            >
+              One day, a beautiful 🌤️ shiny day, you'll have time to do that
+              thing you always wanted to do...
+            </div>
+          )}
+          <ul className={styles.items}>
+            {timedout.map((activity) => (
+              <TodoItem
+                key={activity.id}
+                todo={{ ...activity, start: 'N/A', end: 'N/A' }}
+                now={now}
+                isToday={false}
+                completeTodo={completeTodo}
+                incompleteTodo={incompleteTodo}
+                displayTodoTagsOnItem={displayTodoTagsOnItem}
+                tags={tags}
+              />
+            ))}
+          </ul>
+        </section>
+      )}
+    </>
+  )
+})
+
 export default function TodosScreen({
   addTodo: addTodoUnsafe,
   archiveTodos,
@@ -715,21 +938,19 @@ export default function TodosScreen({
   const [lastReset, setLastReset] = useState<Date>(() =>
     setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
   )
-  const [deadlineMs, setDeadlineMs] = useState(16)
-  const forecast = useWebBrowser(schedules, todos, lastReset, deadlineMs)
+
+  const [computer, isComputing] = useForecastComputer(schedules, todos)
+
   useEffect(() => {
-    console.log('forecast changed!', forecast)
-  }, [forecast])
+    console.log('computer changed!', computer)
+  }, [computer])
+  useEffect(() => {
+    console.log('isComputing changed!', isComputing)
+  }, [isComputing])
 
   const [_now, setNow] = useState(new Date())
-  const now = useDeferredValue(_now, { timeoutMs: 15000 })
+  const now = useDeferredValue(_now)
   const todayRef = useRef<HTMLElement>(null)
-  useEffect(() => {
-    console.log('_now useEffect!', _now)
-  }, [_now])
-  useEffect(() => {
-    console.log('now useDeferredValue!', now)
-  }, [now])
 
   const todoIds = useMemo(
     () => allTodos.reduce((ids, todo) => ids.add(todo.id), new Set()),
@@ -738,9 +959,8 @@ export default function TodosScreen({
 
   // Update the now value every minute in case it changes the schedule
   useInterval(() => {
-    console.log('setNow!')
     setNow(new Date())
-  }, (1000 * 60) / 60)
+  }, 1000 * 60)
 
   /*
   const uniqueIds = useMemo(() => {
@@ -759,21 +979,15 @@ export default function TodosScreen({
   const somethingRecentlyCompleted = todos.some(
     (todo) => !todo.done && !!todo.completed
   )
-  const withoutDuration = todos.filter((task) => task.duration < 1)
-  const withoutSchedule = todos.filter(
-    (todo) => todo.duration > forecast.maxTaskDuration
-  )
-  /*
-  console.log({
-    somethingRecentlyCompleted,
-    withoutDuration,
-    withoutSchedule,
-    maxTaskDuration: forecast.maxTaskDuration,
-  })
-  // */
 
   let isThereToday = false
   const [editId = ''] = [].concat(router.query.edit)
+
+  // Defer some expensive things
+  const deferredComputer = useDeferredValue(computer)
+  const deferredIsComputing = useDeferredValue(isComputing)
+
+  console.log({ computer, deferredComputer })
 
   return (
     <>
@@ -781,6 +995,7 @@ export default function TodosScreen({
         tags={tags}
         selected={selectedTags}
         setSelected={setSelectedTags}
+        isComputing={isComputing}
       />
       <AnimatedDialog
         isOpen={!!router.query.create}
@@ -803,171 +1018,29 @@ export default function TodosScreen({
         editTodo={editTodo}
         deleteTodo={deleteTodo}
       />
-      {(withoutSchedule.length > 0 || withoutDuration.length > 0) && (
-        <section
-          key="review fuckup"
-          className={cx(styles.section, 'is-warning')}
-        >
-          <Header>Please review</Header>
-          {withoutSchedule.length > 0 && (
-            <div
-              className={cx(
-                styles.warning,
-                'ml-6 bg-red-200 rounded-l py-1 mb-1  px-inset'
-              )}
-            >
-              Your current settings allow a max duration of{' '}
-              <strong>
-                {forecast.maxTaskDuration}{' '}
-                {forecast.maxTaskDuration === 1 ? 'minute' : 'minutes'}
-              </strong>
-              . The todos below have longer durations, either shorten them or
-              update your{' '}
-              <Link href="/schedules">
-                <a className="hover:text-red-900 underline">Schedules</a>
-              </Link>{' '}
-              to allow more time.
-            </div>
-          )}
-
-          <ul className={styles.items}>
-            {withoutSchedule.map((activity) => (
-              <TodoItem
-                key={activity.id}
-                todo={{ ...activity, start: 'N/A', end: 'N/A' }}
-                now={now}
-                isToday={false}
-                completeTodo={completeTodo}
-                incompleteTodo={incompleteTodo}
-                displayTodoTagsOnItem={displayTodoTagsOnItem}
-                tags={tags}
-              />
-            ))}
-          </ul>
-          {withoutDuration.length > 0 && (
-            <div
-              className={cx(
-                styles.warning,
-                'ml-6 bg-red-200 rounded-l py-1 mb-1 px-inset'
-              )}
-            >
-              The following todos couldn't be scheduled because their{' '}
-              <strong>duration</strong> isn't specified.
-            </div>
-          )}
-          {withoutDuration.map((activity) => (
-            <TodoItem
-              key={activity.id}
-              todo={{ ...activity, start: 'N/A', end: 'N/A' }}
-              now={now}
-              isToday={false}
-              completeTodo={completeTodo}
-              incompleteTodo={incompleteTodo}
-              displayTodoTagsOnItem={displayTodoTagsOnItem}
-              tags={tags}
-            />
-          ))}
-        </section>
-      )}
-      {forecast.days?.map((day) => {
-        if (!day.schedule?.some((pocket) => !!pocket.todos?.length)) {
-          return null
+      <Suspense
+        fallback={
+          <div className="flex h-screen -mt-2 items-center justify-center text-gray-700 text-xl w-screen loading">
+            Loading...
+          </div>
         }
-
-        const isToday = isSameDay(day.date, now)
-
-        if (!isThereToday && isToday) {
-          isThereToday = true
-        }
-
-        const dayText = isToday ? 'Today' : day.day
-        const dateText = new Intl.DateTimeFormat(undefined, {
-          year: '2-digit',
-          month: 'numeric',
-          day: 'numeric',
-        }).format(day.date)
-
-        return (
-          <section
-            key={day.date.toString()}
-            ref={isToday ? todayRef : undefined}
-            className={cx(styles.section, {
-              'is-today': isToday,
-              'is-hyperfocus': hyperfocusing,
-            })}
-          >
-            <Header>
-              <span className="font-bold block mr-1">{dayText}</span> {dateText}
-            </Header>
-            <ul className={styles.items}>
-              {day.schedule.map((pocket) =>
-                pocket.todos?.map((task) => (
-                  <TodoItem
-                    key={task.id}
-                    todo={task}
-                    isToday={isToday}
-                    now={now}
-                    completeTodo={completeTodo}
-                    incompleteTodo={incompleteTodo}
-                    displayTodoTagsOnItem={displayTodoTagsOnItem}
-                    tags={tags}
-                  />
-                ))
-              )}
-            </ul>
-          </section>
-        )
-      })}
-      {forecast.timedout.length > 0 && (
-        <section key="timedout" className={cx(styles.section)}>
-          <Header>
-            <span className="font-bold block">Someday</span>
-          </Header>
-          {deadlineMs < 300 ? (
-            <div
-              key="try again"
-              className={cx(
-                styles.warning,
-                'ml-6 bg-orange-200 rounded-l py-1 mb-1 px-inset'
-              )}
-            >
-              Despite best efforts I couldn't squeeze all your todos into your
-              schedule.{' '}
-              <button
-                className="ml-1 px-2 py-1 text-sm text-orange-800 hover:text-orange-900 rounded-md bg-orange-100 hover:bg-orange-300"
-                onClick={() => setDeadlineMs(300)}
-              >
-                Go deeper.
-              </button>
-            </div>
-          ) : (
-            <div
-              key="give up"
-              className={cx(
-                styles.warning,
-                'ml-6 bg-orange-200 rounded-l py-1 mb-1 px-inset'
-              )}
-            >
-              One day, a beautiful 🌤️ shiny day, you'll have time to do that
-              thing you always wanted to do...
-            </div>
-          )}
-          <ul className={styles.items}>
-            {forecast.timedout.map((activity) => (
-              <TodoItem
-                key={activity.id}
-                todo={{ ...activity, start: 'N/A', end: 'N/A' }}
-                now={now}
-                isToday={false}
-                completeTodo={completeTodo}
-                incompleteTodo={incompleteTodo}
-                displayTodoTagsOnItem={displayTodoTagsOnItem}
-                tags={tags}
-              />
-            ))}
-          </ul>
-        </section>
-      )}
+        // Calculating the first forecast is really CPU intensive
+        //unstable_expectedLoadTime={3000}
+      >
+        <ForecastDisplay
+          completeTodo={completeTodo}
+          computer={deferredComputer}
+          displayTodoTagsOnItem={displayTodoTagsOnItem}
+          hyperfocusing={hyperfocusing}
+          incompleteTodo={incompleteTodo}
+          isThereToday={isThereToday}
+          lastReset={lastReset}
+          now={now}
+          tags={tags}
+          todayRef={todayRef}
+          todos={todos}
+        />
+      </Suspense>
       {somethingRecentlyCompleted && (
         <Button
           variant="primary"

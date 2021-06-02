@@ -19,5 +19,6 @@ addEventListener('message', (event) => {
     deadlineMs: args[3]
   } = event.data
 */
+// @ts-expect-error
   postMessage(getForecast(schedules, todos, lastReset, deadlineMs))
 })

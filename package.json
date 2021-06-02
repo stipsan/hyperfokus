@@ -1,9 +1,12 @@
 {
   "scripts": {
+    "prebuild": "npm run build-worker",
     "build": "next build",
     "build-storybook": "STORYBOOK=true build-storybook",
+    "build-worker": "esbuild utils/worker.ts --bundle --minify --sourcemap --outfile=utils/worker.js",
     "lint": "eslint . --ext ts,tsx,js,jsx",
     "lint:strict": "npm run lint -- --max-warnings 0",
+    "predev": "npm run build-worker",
     "dev": "next",
     "storybook": "STORYBOOK=true start-storybook -p 6006",
     "start": "next start"

@@ -104,3 +104,5 @@ dist
 .env*.local
 .vercel
 .DS_Store
+worker.js.map
+worker.js

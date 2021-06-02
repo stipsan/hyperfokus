@@ -33,7 +33,7 @@ async function computeForecastWithWorker(
     return await new Promise((resolve, reject) => {
       if (!workerRef.current) {
         workerRef.current = new Worker(
-          new URL('../utils/worker.ts', import.meta.url), { type: "module" }
+          new URL('../utils/worker.js', import.meta.url), { type: "module" }
         )
       }
       workerRef.current.onerror = reject

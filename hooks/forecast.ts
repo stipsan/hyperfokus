@@ -28,7 +28,7 @@ async function computeForecastWithWorker(
   todos: Todo[],
   lastReset: Date,
   deadlineMs: number
-) {
+): Promise<ReturnType<typeof getForecast>> {
   try {
     return await new Promise((resolve, reject) => {
       if (!workerRef.current) {

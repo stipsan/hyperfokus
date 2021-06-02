@@ -524,10 +524,9 @@ const EditDialog = ({
   useEffect(() => {
     const nextInitialState = todos.find((todo) => todo.id === id)
     if (nextInitialState) {
-      console.log('setInitialState', { initialState, nextInitialState })
       setInitialState(nextInitialState)
     }
-  }, [id, initialState, todos])
+  }, [id, todos])
 
   const onSpringStart = useCallback<
     ComponentProps<typeof AnimatedDialog>['onSpringStart']
@@ -921,13 +920,6 @@ export default function TodosScreen({
   )
 
   const [computer, isComputing] = useForecastComputer(schedules, todos)
-
-  useEffect(() => {
-    console.log('computer changed!', computer)
-  }, [computer])
-  useEffect(() => {
-    console.log('isComputing changed!', isComputing)
-  }, [isComputing])
 
   const [_now, setNow] = useState(new Date())
   const now = useDeferredValue(_now)

@@ -93,7 +93,8 @@
 }
 
 .checkboxLabel {
-  @apply pr-2 pt-6 relative;
+  @apply pr-2 pt-5 relative;
+  top: 0.125em;
   grid-area: checkbox;
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);

@@ -18,10 +18,13 @@ interface Day {
 }
 
 export type Forecast = {
-  // Max allowed task duration by the schedule
+  // Max available task duration by the schedule
   maxTaskDuration: number
   days: Day[]
+  // Gave up finding a time to do these todos
   timedout: Todo[]
+  withoutSchedule: Todo[]
+  withoutDuration: Todo[]
 }
 
 function getWeekday(date: Date) {
@@ -67,7 +70,7 @@ export function getForecast(
   deadlineMs: number
 ): Forecast {
   if (!schedules.length || !todos.length) {
-    return { days: [], maxTaskDuration: 0, timedout: [] }
+    return { days: [], maxTaskDuration: 0, timedout: [], withoutDuration: [], withoutSchedule: [] }
   }
 
   const todoIds = new Set(todos.map((todo) => todo.id))
@@ -274,7 +277,9 @@ export function getForecast(
   return {
     days,
     maxTaskDuration,
-    timedout: timedout,
+    timedout,
+    withoutSchedule: todos.filter(      (todo) => todo.duration > maxTaskDuration    ),
+    withoutDuration: todos.filter((task) => task.duration < 1)
   }
 }
 

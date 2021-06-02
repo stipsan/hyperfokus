@@ -2,6 +2,14 @@ import cx from 'classnames'
 import type { Tags } from 'hooks/tags/types'
 import chroma from 'chroma-js'
 import { useMemo, memo } from 'react'
+import * as React from 'react'
+// workaround @types/react being out of date
+const useDeferredValue: typeof React.unstable_useDeferredValue =
+  // @ts-expect-error
+  React.useDeferredValue
+const useTransition: typeof React.unstable_useTransition =
+  // @ts-expect-error
+  React.useTransition
 
 const defaultBg = '#f7fafc'
 
@@ -12,6 +20,7 @@ type Props = {
   isComputing: boolean
 }
 function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
+  const [isPending, startTransition] = useTransition()
   const list = useMemo(
     () =>
       [
@@ -53,9 +62,10 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
       >
         <span
           className={cx(
-            'transition-all duration-150 transform absolute top-0 right-0 bottom-0 left-0 flex justify-center items-center',
+            'transition-all duration-300 transform absolute top-0 right-0 bottom-0 left-0 flex justify-center items-center',
             {
-              'scale-75 opacity-0': !isComputing,
+              'scale-75 opacity-0': !isComputing && !isPending,
+              'delay-150': isComputing || isPending,
             }
           )}
         >
@@ -81,8 +91,9 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
           </svg>
         </span>
         <span
-          className={cx('transition-all duration-150 transform block', {
-            'scale-75 opacity-0 text-opacity-0': isComputing,
+          className={cx('transition-all duration-300 transform block', {
+            'scale-75 opacity-0 text-opacity-0 delay-150':
+              isComputing || isPending,
           })}
           aria-label="I am deeply sorry for the shitty a11y, will fix!"
         >
@@ -131,7 +142,9 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
                 } else {
                   nextSelected.add(tag.id)
                 }
-                setSelected(nextSelected)
+                startTransition(() => {
+                  setSelected(nextSelected)
+                })
               }
             }}
           >

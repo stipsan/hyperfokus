@@ -46,6 +46,7 @@ const useStore = create<StoreState>((set, get) => ({
   },
 }))
 
+// TODO for later https://github.com/facebook/react/pull/19696
 const asset = createAsset(
   async (setSchedules: (schedules: Schedules) => void) => {
     //await new Promise((resolve) => setTimeout(() => resolve(void 0), 3000))

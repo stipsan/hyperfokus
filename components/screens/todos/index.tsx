@@ -293,29 +293,30 @@ const TodoForm = ({
 
 const StyledCheckbox = memo(function StyledCheckbox({
   onChange,
-  checked: initialChecked,
+  checked,
 }: {
   onChange: ChangeEventHandler<HTMLInputElement>
   checked: boolean
 }) {
-  const [checked, setChecked] = useState(initialChecked)
+  const nodeRef = useRef<HTMLInputElement>()
   useEffect(() => {
-    setChecked(initialChecked)
-  }, [initialChecked])
-  console.log({ checked })
+    if (nodeRef.current) {
+      // Way more performant than going through the entire Forecast calculation first
+      nodeRef.current.checked = checked
+    }
+  }, [checked])
+
   return (
     <label
       className={cx(styles.checkboxLabel, 'px-inset-l')}
       onClick={(event) => event.stopPropagation()}
     >
       <input
+        ref={nodeRef}
         className="form-checkbox"
-        checked={initialChecked}
+        defaultChecked={checked}
         type="checkbox"
-        onChange={(event) => {
-          setChecked((checked) => !checked)
-          onChange(event)
-        }}
+        onChange={onChange}
       />{' '}
     </label>
   )
@@ -614,7 +615,6 @@ const ForecastDisplay = memo(function ForecastDisplay({
   now,
   tags,
   todayRef,
-  todos,
 }: {
   completeTodo: CompleteTodo
   computer: ReturnType<typeof useForecastComputer>[0]
@@ -626,29 +626,10 @@ const ForecastDisplay = memo(function ForecastDisplay({
   now: Date
   tags: Tags
   todayRef: React.MutableRefObject<HTMLElement>
-  todos: Todos
 }) {
   const [deadlineMs, setDeadlineMs] = useState(16)
-  const { days, maxTaskDuration, timedout } = computer.read(
-    lastReset,
-    deadlineMs
-  )
-
-  useEffect(() => {
-    console.log('days changed!', days)
-  }, [days])
-  useEffect(() => {
-    console.log('maxTaskDuration changed!', maxTaskDuration)
-  }, [maxTaskDuration])
-  useEffect(() => {
-    console.log('timedout changed!', timedout)
-  }, [timedout])
-
-  // TODO move into getForecast utility and logic
-  const withoutSchedule = todos.filter(
-    (todo) => todo.duration > maxTaskDuration
-  )
-  const withoutDuration = todos.filter((task) => task.duration < 1)
+  const { days, maxTaskDuration, timedout, withoutSchedule, withoutDuration } =
+    computer.read(lastReset, deadlineMs)
 
   return (
     <>
@@ -984,10 +965,8 @@ export default function TodosScreen({
   const [editId = ''] = [].concat(router.query.edit)
 
   // Defer some expensive things
-  const deferredComputer = useDeferredValue(computer)
-  const deferredIsComputing = useDeferredValue(isComputing)
-
-  console.log({ computer, deferredComputer })
+  //const deferredComputer = useDeferredValue(computer)
+  //const deferredIsComputing = useDeferredValue(isComputing)
 
   return (
     <>
@@ -1029,7 +1008,7 @@ export default function TodosScreen({
       >
         <ForecastDisplay
           completeTodo={completeTodo}
-          computer={deferredComputer}
+          computer={computer}
           displayTodoTagsOnItem={displayTodoTagsOnItem}
           hyperfocusing={hyperfocusing}
           incompleteTodo={incompleteTodo}
@@ -1038,7 +1017,6 @@ export default function TodosScreen({
           now={now}
           tags={tags}
           todayRef={todayRef}
-          todos={todos}
         />
       </Suspense>
       {somethingRecentlyCompleted && (

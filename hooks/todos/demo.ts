@@ -1,6 +1,7 @@
 import { todos } from 'database/demo'
 import type { Todo } from 'database/types'
 import { nanoid } from 'nanoid'
+import { createAsset } from "use-asset"
 import create from 'zustand'
 import type {
   AddTodo, ArchiveTodos, CompleteTodo, DeleteTodo, EditTodo, IncompleteTodo, Todos
@@ -9,7 +10,8 @@ import {
   addTodo, archiveTodos, completeTodo,
   deleteTodo,
   editTodo,
-  incompleteTodo
+  incompleteTodo,
+  sanitize
 } from './utils'
 
 type StoreState = {
@@ -22,29 +24,40 @@ type StoreState = {
   archiveTodos: ArchiveTodos
 }
 
+export const todosResource = createAsset(async (id) => {
+  const {todos} = useStore.getState()
+  return todos.find((todo) => todo.id === id)
+})
+export type TodosResource = typeof todosResource
+
 const useStore = create<StoreState>((set) => ({
   todos,
   addTodo: async (data: Todo) => {
     const id = nanoid()
-    set(({ todos }) => ({ todos: addTodo(todos, {...data, id}) }))
+    set(({ todos }) => ({ todos: addTodo(todos, sanitize({...data, id}) as Todo) }))
     return { id }
   },
   editTodo: async (data, id) => {
-    set(({ todos }) => ({ todos: editTodo(todos, data, id) }))
+    todosResource.clear(id)
+    set(({ todos }) => ({ todos: editTodo(todos, sanitize({...data, modified: new Date() }) as Todo, id) }))
   },
   deleteTodo: async (id) => {
     set(({ todos }) => ({ todos: deleteTodo(todos, id) }))
   },
   completeTodo: async (id) => {
+    todosResource.clear(id)
     set(({ todos }) => ({ todos: completeTodo(todos, id) }))
   },
   incompleteTodo: async (id) => {
+    todosResource.clear(id)
     set(({ todos }) => ({ todos: incompleteTodo(todos, id) }))
   },
   archiveTodos: async () => {
     set(({ todos }) => ({ todos: archiveTodos(todos) }))
   },
 }))
+
+
 
 const selectTodos = (state: StoreState) => state.todos
 export const useTodos = () => useStore(selectTodos)

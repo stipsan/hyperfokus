@@ -3,8 +3,6 @@ import { getForecast } from './forecast'
 
 //type args = Parameters<typeof getForecast>
 addEventListener('message', (event) => {
-  console.log('Hello world!')
-  console.log(event)
   const { schedules, todos, lastReset, deadlineMs } = event.data
   /*
   const {
@@ -18,7 +16,7 @@ addEventListener('message', (event) => {
     lastReset: args[2]
     deadlineMs: args[3]
   } = event.data
-*/
-// @ts-expect-error
-  postMessage(getForecast(schedules, todos, lastReset, deadlineMs))
+  // */
+  // @ts-expect-error
+  postMessage(getForecast(schedules, todos, new Date(lastReset), deadlineMs))
 })

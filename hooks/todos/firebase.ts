@@ -6,7 +6,9 @@ import {
   useFirestoreCollectionData,
   useUser,
 } from 'reactfire'
+import { createAsset } from 'use-asset'
 import type { AddTodo, EditTodo, DeleteTodo, CompleteTodo, IncompleteTodo, ArchiveTodos, Todos } from './types'
+import { sanitize } from './utils'
 
 type TodoDoc = {
   completed?: firestore.Timestamp
@@ -24,7 +26,17 @@ type Actions = {
   archiveTodos: ArchiveTodos
 }
 
-export function useTodos(): [Todos, Actions] {
+// Unoptimized placeholder for now, will be rewritten to just use firebase apis instead of requiring a cache input
+async function todosResource(
+  todos: Todos,
+  id: string
+) {
+  return todos.find((todo) => todo.id === id)
+}
+const todosAsset = createAsset(todosResource)
+// allTodosResource will be used for plural
+
+export function useTodos() {
   const user = useUser<User>()
   const firestore = useFirestore()
   const todosRef = firestore.collection('todos').where('author', '==', user.uid)
@@ -63,6 +75,20 @@ export function useTodos(): [Todos, Actions] {
       }),
     [todosData]
   )
+  // TODO needs a rewrite to avoid all these explicit deps
+  const todosResource =  useMemo(
+    () => ({
+      read: (id: string) =>
+        todosAsset.read(todos, id),
+      preload: (id: string) =>
+        todosAsset.preload(todos, id),
+      clear: (id: string) =>
+        todosAsset.clear(todos, id),
+      peek: (id: string) =>
+        todosAsset.peek(todos, id),
+    }),
+    [ todos]
+  )
 
   const actions = useMemo<Actions>(
     () => ({
@@ -76,8 +102,7 @@ export function useTodos(): [Todos, Actions] {
         order,
         tags,
       }) => {
-        const data = {
-          author: user.uid,
+        const data = sanitize({
           completed: completed === undefined ? null : completed,
           created,
           description,
@@ -86,7 +111,9 @@ export function useTodos(): [Todos, Actions] {
           modified: modified === undefined ? null : modified,
           order,
           tags,
-        }
+        })
+        // add firebase only stuff
+        Object.assign(data, {author: user.uid,})
 
         if (order > 0) {
           const todos = await todosRef.orderBy('order', 'desc').limit(1).get()
@@ -113,19 +140,18 @@ export function useTodos(): [Todos, Actions] {
         {
           description,
           duration,
-          modified,
           order,
           tags,
         },
         id
       ) => {
-        const data = {
+        const data = sanitize({
           description,
           duration,
-          modified,
+          modified: new Date(),
           order,
           tags,
-        }
+        })
 
         if (order === 1) {
           const todos = await todosRef.orderBy('order', 'desc').limit(1).get()
@@ -181,5 +207,5 @@ export function useTodos(): [Todos, Actions] {
     [firestore, user.uid, todosRef]
   )
 
-  return [todos, actions]
+  return [todos, todosResource, actions] as const
 }

@@ -9,6 +9,7 @@ export default function FirebaseTodosScreen() {
   const [schedules] = useSchedules()
   const [
     todos,
+    todosResource,
     {
       addTodo,
       editTodo,
@@ -32,6 +33,7 @@ export default function FirebaseTodosScreen() {
         tags={tags}
         addTag={addTag}
         todos={todos}
+        todosResource={todosResource}
       />
     </FirebaseAuthCheck>
   )

@@ -1,6 +1,5 @@
 import CreatableSelect from 'react-select/creatable'
 import type { Tags, AddTag } from 'hooks/tags/types'
-import { useEffect, useState } from 'react'
 import { useMemo } from 'react'
 
 type Props = {

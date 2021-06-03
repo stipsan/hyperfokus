@@ -3,18 +3,16 @@ import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { createAsset } from 'use-asset'
 import { getForecast } from 'utils/forecast'
+import type { SkinnyTodo, SkinnySchedule } from 'utils/forecast'
 
 // workaround @types/react being out of date
-const useDeferredValue: typeof React.unstable_useDeferredValue =
-  // @ts-expect-error
-  React.useDeferredValue
 const useTransition: typeof React.unstable_useTransition =
   // @ts-expect-error
   React.useTransition
 
 async function computeForecastWithBrowser(
-  schedules: Schedule[],
-  todos: Todo[],
+  schedules: SkinnySchedule[],
+  todos: SkinnyTodo[],
   lastReset: Date,
   deadlineMs: number
 ) {
@@ -24,8 +22,8 @@ const slowAsset = createAsset(computeForecastWithBrowser)
 
 async function computeForecastWithWorker(
   workerRef: React.MutableRefObject<Worker>,
-  schedules: Schedule[],
-  todos: Todo[],
+  schedules: SkinnySchedule[],
+  todos: SkinnyTodo[],
   lastReset: Date,
   deadlineMs: number
 ): Promise<ReturnType<typeof getForecast>> {
@@ -33,12 +31,12 @@ async function computeForecastWithWorker(
     return await new Promise((resolve, reject) => {
       if (!workerRef.current) {
         workerRef.current = new Worker(
-          new URL('../utils/worker.js', import.meta.url), { type: "module" }
+          new URL('../utils/worker.js', import.meta.url),
+          { type: 'module' }
         )
       }
       workerRef.current.onerror = reject
       workerRef.current.onmessage = (event) => {
-        console.log('onmessage', event.data, event)
         const {
           days = [],
           maxTaskDuration = 0,
@@ -54,7 +52,12 @@ async function computeForecastWithWorker(
           withoutSchedule,
         })
       }
-      workerRef.current.postMessage({ schedules, todos, lastReset, deadlineMs })
+      workerRef.current.postMessage({
+        schedules,
+        todos,
+        lastReset: lastReset.toJSON(),
+        deadlineMs,
+      })
     })
   } catch (err) {
     console.error('Worker failed, falling back to slow path', err)
@@ -64,13 +67,24 @@ async function computeForecastWithWorker(
 const fastAsset = createAsset(computeForecastWithWorker)
 
 const goFast = 'Worker' in window
-export function useForecastComputer(schedules: Schedule[], todos: Todo[]) {
-  useEffect(() => {
-    console.log('todos changed', todos)
-  }, [todos])
-  useEffect(() => {
-    console.log('schedules changed', schedules)
-  }, [schedules])
+export function useForecastComputer(
+  chonkySchedules: Schedule[],
+  chonkyTodos: Todo[]
+) {
+  const schedules = useMemo<SkinnySchedule[]>(
+    () =>
+      chonkySchedules.map(({ id, after, duration, end, repeat, start }) => {
+        return { id, after, duration, end, repeat, start }
+      }),
+    [chonkySchedules]
+  )
+  const todos = useMemo<SkinnyTodo[]>(
+    () =>
+      chonkyTodos.map(({ id, duration, done, modified }) => {
+        return { id, duration, done, modified }
+      }),
+    [chonkyTodos]
+  )
   const [isPending, startTransition] = useTransition()
   const wrappedSlowAsset = useMemo(
     () => ({
@@ -99,13 +113,37 @@ export function useForecastComputer(schedules: Schedule[], todos: Todo[]) {
   const wrappedFastAsset = useMemo(
     () => ({
       read: (lastReset: Date, deadlineMs: number) =>
-        fastAsset.read(workerRef, schedules, todos, lastReset, deadlineMs),
+        fastAsset.read(
+          workerRef,
+          schedules,
+          todos,
+          lastReset,
+          deadlineMs
+        ),
       preload: (lastReset: Date, deadlineMs: number) =>
-        fastAsset.preload(workerRef, schedules, todos, lastReset, deadlineMs),
+        fastAsset.preload(
+          workerRef,
+          schedules,
+          todos,
+          lastReset,
+          deadlineMs
+        ),
       clear: (lastReset: Date, deadlineMs: number) =>
-        fastAsset.clear(workerRef, schedules, todos, lastReset, deadlineMs),
+        fastAsset.clear(
+          workerRef,
+          schedules,
+          todos,
+          lastReset,
+          deadlineMs
+        ),
       peek: (lastReset: Date, deadlineMs: number) =>
-        fastAsset.peek(workerRef, schedules, todos, lastReset, deadlineMs),
+        fastAsset.peek(
+          workerRef,
+          schedules,
+          todos,
+          lastReset,
+          deadlineMs
+        ),
     }),
     [workerRef, schedules, todos]
   )

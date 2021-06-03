@@ -2,25 +2,16 @@ import cx from 'classnames'
 import type { Tags } from 'hooks/tags/types'
 import chroma from 'chroma-js'
 import { useMemo, memo } from 'react'
-import * as React from 'react'
-// workaround @types/react being out of date
-const useDeferredValue: typeof React.unstable_useDeferredValue =
-  // @ts-expect-error
-  React.useDeferredValue
-const useTransition: typeof React.unstable_useTransition =
-  // @ts-expect-error
-  React.useTransition
 
 const defaultBg = '#f7fafc'
 
 type Props = {
   tags: Tags
-  selected: Set<string | number>
-  setSelected: (selected: Set<string | number>) => void
+  selected: Set<string>
+  setSelected: (selected: Set<string>) => void
   isComputing: boolean
 }
 function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
-  const [isPending, startTransition] = useTransition()
   const list = useMemo(
     () =>
       [
@@ -64,8 +55,8 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
           className={cx(
             'transition-all duration-300 transform absolute top-0 right-0 bottom-0 left-0 flex justify-center items-center',
             {
-              'scale-75 opacity-0': !isComputing && !isPending,
-              'delay-150': isComputing || isPending,
+              'scale-75 opacity-0': !isComputing,
+              'delay-150': isComputing,
             }
           )}
         >
@@ -92,8 +83,7 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
         </span>
         <span
           className={cx('transition-all duration-300 transform block', {
-            'scale-75 opacity-0 text-opacity-0 delay-150':
-              isComputing || isPending,
+            'scale-75 opacity-0 text-opacity-0 delay-150': isComputing,
           })}
           aria-label="I am deeply sorry for the shitty a11y, will fix!"
         >
@@ -134,17 +124,16 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
             aria-pressed={active}
             onClick={() => {
               if (tag.id === '') {
-                setSelected(new Set())
+                setSelected(new Set(['']))
               } else {
                 const nextSelected = new Set([...selected])
                 if (nextSelected.has(tag.id)) {
                   nextSelected.delete(tag.id)
                 } else {
+                  nextSelected.delete('')
                   nextSelected.add(tag.id)
                 }
-                startTransition(() => {
-                  setSelected(nextSelected)
-                })
+                setSelected(nextSelected)
               }
             }}
           >

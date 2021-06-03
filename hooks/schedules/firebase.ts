@@ -1,4 +1,5 @@
-import type { User } from 'firebase/app'
+import type { firestore, User } from 'firebase/app'
+import { Schedule } from 'database/types'
 import { nanoid } from 'nanoid'
 import { useCallback, useMemo } from 'react'
 import { useFirestore, useFirestoreCollectionData, useUser } from 'reactfire'
@@ -11,7 +12,9 @@ import type {
 import { addSchedule, deleteSchedule, editSchedule } from './utils'
 
 type ScheduleDoc = {
-  rules: Schedules
+  rules:  ({
+    after?: firestore.Timestamp
+  } & Exclude<Schedule, 'after'>)[]
 }
 
 type Actions = {
@@ -27,7 +30,7 @@ export function useSchedules(): [Schedules, Actions] {
     .collection('schedules')
     .where('author', '==', user.uid)
   const schedulesDoc = useFirestoreCollectionData<ScheduleDoc>(schedulesRef)
-  const schedules = useMemo<Schedules>(() => schedulesDoc?.[0]?.rules ?? [],[schedulesDoc])
+  const schedules = useMemo<Schedules>(() => (schedulesDoc?.[0]?.rules ?? []).map(schedule => ({...schedule, after: schedule.after?.seconds ? new Date(schedule.after.seconds) : undefined})),[schedulesDoc])
 
   // TODO refactor this, it's leftover from the old db structure that were nested
   // instead of a "rules" super property, each "rule" should be an item in the "schedules" collection
@@ -66,15 +69,18 @@ export function useSchedules(): [Schedules, Actions] {
       addSchedule: async (schedule) => {
         const id = nanoid()
         const updatedSchedules = addSchedule(schedules, { ...schedule, id })
+        // @ts-expect-error
         await setLegacySchedules(updatedSchedules)
         return { id }
       },
       editSchedule: async (schedule, id) => {
         const updatedSchedules = editSchedule(schedules, schedule, id)
+        // @ts-expect-error
         await setLegacySchedules(updatedSchedules)
       },
       deleteSchedule: async (id) => {
         const updatedSchedules = deleteSchedule(schedules, id)
+        // @ts-expect-error
         await setLegacySchedules(updatedSchedules)
       },
     }),

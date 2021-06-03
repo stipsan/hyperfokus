@@ -9,6 +9,7 @@ import {
   useEditTodo,
   useIncompleteTodo,
   useTodos,
+  todosResource,
 } from 'hooks/todos/demo'
 
 export default function DemoTodosScreen() {
@@ -36,6 +37,7 @@ export default function DemoTodosScreen() {
       tags={tags}
       addTag={addTag}
       todos={todos}
+      todosResource={todosResource}
     />
   )
 }

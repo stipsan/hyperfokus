@@ -2,12 +2,18 @@ import type { Schedule, Todo } from 'database/types'
 import { isSameDay, setHours, setMinutes } from 'date-fns'
 import { getTime } from './time'
 
-export type ForecastTodo = Todo & {
+// Stripping data where possible to keep IO between the worker & browser ont he down low
+export type SkinnyTodo = Pick<Todo, 'id' | 'done' | 'duration' | 'modified'>
+export type SkinnySchedule = Pick<
+  Schedule,
+  'id' | 'start' | 'duration' | 'end' | 'repeat' | 'after'
+>
+
+type ForecastTodo = SkinnyTodo & {
   start: string
   end: string
 }
-
-type ForecastSchedule = Schedule & {
+type ForecastSchedule = SkinnySchedule & {
   todos: ForecastTodo[]
 }
 
@@ -22,9 +28,9 @@ export type Forecast = {
   maxTaskDuration: number
   days: Day[]
   // Gave up finding a time to do these todos
-  timedout: Todo[]
-  withoutSchedule: Todo[]
-  withoutDuration: Todo[]
+  timedout: SkinnyTodo[]
+  withoutSchedule: SkinnyTodo[]
+  withoutDuration: SkinnyTodo[]
 }
 
 function getWeekday(date: Date) {
@@ -44,19 +50,14 @@ function getWeekday(date: Date) {
       return 'friday'
     case 6:
       return 'saturday'
-
     default:
       throw new TypeError(`Invalid weekday integer: ${JSON.stringify(i)}`)
   }
 }
 
-// Break the loop if necessary, infinite loops are terrible
-const LOOP_SAFETY_LIMIT = 1000
-
 // Useful consts
 const DAY_IN_MS = 86400000
 const MAX_DAYS_IN_FORECAST = 100
-const debug = process.env.NODE_ENV !== 'production' && false
 
 // TODO make the process two-step, if only todos change and not the schedules they should be largely reusable
 
@@ -64,13 +65,19 @@ const debug = process.env.NODE_ENV !== 'production' && false
 // @TODO make it possible to specify the starting point, currently it's hardcoded to `today`
 // @TODO filter out opportunities that are for today, if they have an endtime that is too late
 export function getForecast(
-  schedules: Schedule[],
-  todos: Todo[],
+  schedules: SkinnySchedule[],
+  todos: SkinnyTodo[],
   lastReset: Date,
   deadlineMs: number
 ): Forecast {
   if (!schedules.length || !todos.length) {
-    return { days: [], maxTaskDuration: 0, timedout: [], withoutDuration: [], withoutSchedule: [] }
+    return {
+      days: [],
+      maxTaskDuration: 0,
+      timedout: [],
+      withoutDuration: [],
+      withoutSchedule: [],
+    }
   }
 
   const todoIds = new Set(todos.map((todo) => todo.id))
@@ -84,11 +91,6 @@ export function getForecast(
     )
   }
 
-  if (debug) {
-    console.time('getForecast duration')
-    console.count('getForecast count')
-    console.log({ schedules, todos, lastReset })
-  }
   let days: Day[] = []
   let now = getTime()
   let today = new Date(
@@ -112,26 +114,14 @@ export function getForecast(
 
   // Map caches to speed up loops
   const availableDurationsPerTime = new Map()
-  const timedout: Todo[] = []
+  const timedout: SkinnyTodo[] = []
 
-  const past = Date.now()
-  reasonableTasks.forEach((task, taskIndex) => {
-    let i = 0
+  const safeDeadlineMs = Math.max(0, Math.min(15000, deadlineMs))
+  reasonableTasks.forEach((task) => {
     let scheduled = false
     // Don't allow more than 300ms time spent searching
     const start = Date.now()
-    while (i < LOOP_SAFETY_LIMIT && Date.now() < start + deadlineMs) {
-      i++
-      if (debug) {
-        console.log(
-          'looper interrupter',
-          taskIndex,
-          i,
-          { scheduled },
-          `${Date.now() - past}ms`,
-          `${Date.now() - start}ms`
-        )
-      }
+    while (Date.now() < start + safeDeadlineMs) {
       // Step 2, loop generated days hoping to find am available slot
       let reuseDay = days.find(
         (day) =>
@@ -265,28 +255,21 @@ export function getForecast(
     if (!scheduled) {
       timedout.push(task)
     }
-
-    if (timedout.length > 0 && debug) {
-      console.warn({ bailouts: timedout })
-    }
   })
 
-  if (debug) {
-    console.timeEnd('getForecast duration')
-  }
   return {
     days,
     maxTaskDuration,
     timedout,
-    withoutSchedule: todos.filter(      (todo) => todo.duration > maxTaskDuration    ),
-    withoutDuration: todos.filter((task) => task.duration < 1)
+    withoutSchedule: todos.filter((todo) => todo.duration > maxTaskDuration),
+    withoutDuration: todos.filter((task) => task.duration < 1),
   }
 }
 
 // Takes a list over times and returns a normalized list that can be looped
 // Filters out enabled: false, as well as checking if something without any repeat value is "enabled"
 // or: if it's "disabled" because the after value is more than 24 hours ago from current time
-export function normalizeTimes(times: Schedule[]) {
+export function normalizeTimes(times: SkinnySchedule[]) {
   const sortedTimes = [...times].sort((a, b) => {
     const [aStartHours, aStartMinutes] = a.start.split(':')
     const [bStartHours, bStartMinutes] = b.start.split(':')
@@ -310,5 +293,3 @@ export function normalizeTimes(times: Schedule[]) {
 
   return sortedTimes
 }
-
-// The generator should work through day by day, yielding one day at time

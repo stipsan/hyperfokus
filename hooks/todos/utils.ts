@@ -1,6 +1,15 @@
 import { removeItemAtIndex, replaceItemAtIndex } from 'utils/array'
 import type { Todo } from 'database/types'
 
+export function sanitize(todo: Partial<Todo>) {
+  let sanitized = todo
+  if(todo.description?.length > 2048) {
+    sanitized = {...sanitized, description: sanitized.description.substring(0, 2048) }
+  }
+
+  return sanitized
+}
+
 export function addTodo(todos: Todo[], todo: Todo): Todo[] {
 
   if (todos.length < 1) {

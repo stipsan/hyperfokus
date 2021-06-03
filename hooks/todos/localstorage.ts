@@ -1,4 +1,5 @@
 import database from 'database/localstorage'
+import { Todo } from 'database/types'
 import { useLogException } from 'hooks/analytics'
 import { nanoid } from 'nanoid'
 import { useEffect } from 'react'
@@ -21,6 +22,7 @@ import {
   deleteTodo,
   editTodo,
   incompleteTodo,
+  sanitize,
 } from './utils'
 
 type StoreState = {
@@ -34,21 +36,29 @@ type StoreState = {
   archiveTodos: ArchiveTodos
 }
 
+
+export const todosResource = createAsset(async (id) => {
+  const {todos} = useStore.getState()
+
+  return todos.find((todo) => todo.id === id)
+})
+
 const useStore = create<StoreState>((set, get) => ({
   todos: [],
   setTodos: (todos) => set({ todos }),
   addTodo: async (data) => {
     const id = nanoid()
     const { todos } = get()
-    const updatedTodos = addTodo(todos, { ...data, id })
+    const updatedTodos = addTodo(todos, sanitize({ ...data, id }) as Todo)
     await database.setTodos(updatedTodos)
     set({ todos: updatedTodos })
     return { id }
   },
   editTodo: async (data, id) => {
     const { todos } = get()
-    const updatedTodos = editTodo(todos, data, id)
+    const updatedTodos = editTodo(todos, sanitize({...data, modified: new Date()}) as Todo, id)
     await database.setTodos(updatedTodos)
+    todosResource.clear(id)
     set({ todos: updatedTodos })
   },
   deleteTodo: async (id) => {
@@ -61,12 +71,14 @@ const useStore = create<StoreState>((set, get) => ({
     const { todos } = get()
     const updatedTodos = completeTodo(todos, id)
     await database.setTodos(updatedTodos)
+    todosResource.clear(id)
     set({ todos: updatedTodos })
   },
   incompleteTodo: async (id) => {
     const { todos } = get()
     const updatedTodos = incompleteTodo(todos, id)
     await database.setTodos(updatedTodos)
+    todosResource.clear(id)
     set({ todos: updatedTodos })
   },
   archiveTodos: async () => {
@@ -77,12 +89,17 @@ const useStore = create<StoreState>((set, get) => ({
   },
 }))
 
+
 const asset = createAsset(async (setTodos: (todos: Todos) => void) => {
   //await new Promise((resolve) => setTimeout(() => resolve(void 0), 3000))
 
   const todos = await database.getTodos()
 
-  unstable_batchedUpdates(() => setTodos(todos))
+  unstable_batchedUpdates(() => {
+    // @ts-expect-error
+    todosResource.clear()
+    setTodos(todos)
+  })
 })
 
 const selectSetTodos = (state: StoreState) => state.setTodos

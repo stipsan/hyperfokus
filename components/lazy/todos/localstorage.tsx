@@ -9,6 +9,7 @@ import {
   useEditTodo,
   useIncompleteTodo,
   useTodos,
+  todosResource,
 } from 'hooks/todos/localstorage'
 
 export default function LocalstorageTodosScreen() {
@@ -36,6 +37,7 @@ export default function LocalstorageTodosScreen() {
       tags={tags}
       addTag={addTag}
       todos={todos}
+      todosResource={todosResource}
     />
   )
 }

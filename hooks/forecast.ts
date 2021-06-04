@@ -1,14 +1,8 @@
 import type { Schedule, Todo } from 'database/types'
-import * as React from 'react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useTransition, useRef } from 'react'
 import { createAsset } from 'use-asset'
 import { getForecast } from 'utils/forecast'
 import type { SkinnyTodo, SkinnySchedule } from 'utils/forecast'
-
-// workaround @types/react being out of date
-const useTransition: typeof React.unstable_useTransition =
-  // @ts-expect-error
-  React.useTransition
 
 async function computeForecastWithBrowser(
   schedules: SkinnySchedule[],
@@ -99,7 +93,7 @@ export function useForecastComputer(
     }),
     [schedules, todos]
   )
-  const workerRef = React.useRef<Worker>()
+  const workerRef = useRef<Worker>()
   useEffect(() => {
     return () => {
       if (workerRef.current) {

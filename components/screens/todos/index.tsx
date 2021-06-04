@@ -42,20 +42,11 @@ import {
 } from 'react'
 import type { FC } from 'react'
 import styles from './index.module.css'
-import { useCallback } from 'react'
+import { useCallback, useDeferredValue, useTransition } from 'react'
 import TagsSelect from 'components/TagsSelect'
 import { useForecastComputer } from 'hooks/forecast'
 import { ChangeEventHandler } from 'react'
-import * as React from 'react'
 import { TodosResource } from 'hooks/todos/demo'
-
-// workaround @types/react being out of date
-const useDeferredValue: typeof React.unstable_useDeferredValue =
-  // @ts-expect-error
-  React.useDeferredValue
-const useTransition: typeof React.unstable_useTransition =
-  // @ts-expect-error
-  React.useTransition
 
 type TagsSelectProps = Omit<
   ComponentProps<typeof TagsSelect>,

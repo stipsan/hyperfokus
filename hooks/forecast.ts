@@ -1,5 +1,5 @@
 import type { Schedule, Todo } from 'database/types'
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition, useRef } from 'react'
 import { createAsset } from 'use-asset'
 import { getForecast } from 'utils/forecast'
 import type { SkinnyTodo, SkinnySchedule } from 'utils/forecast'
@@ -93,7 +93,7 @@ export function useForecastComputer(
     }),
     [schedules, todos]
   )
-  const workerRef = React.useRef<Worker>()
+  const workerRef = useRef<Worker>()
   useEffect(() => {
     return () => {
       if (workerRef.current) {

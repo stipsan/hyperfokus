@@ -1002,14 +1002,11 @@ export default function TodosScreen({
     })
   }, [allTodos, selectedTags])
 
-  const todoIds = useMemo(() => {
-    return allTodos.reduce((ids, todo) => ids.add(todo.id), new Set())
-  }, [allTodos])
-
+  // TODO combine creating and editing states into a useReducer thingy to make sure no invalid state combos can happen
   const [creating, setCreating] = useState(() => !!router.query.create)
   const [editing, setEditing] = useState<string>(() => {
     const [editId = ''] = [].concat(router.query.edit)
-    return !router.query.create && todoIds.has(editId) ? editId : ''
+    return !router.query.create ? editId : ''
   })
 
   const displayTodoTagsOnItem =
@@ -1038,14 +1035,6 @@ export default function TodosScreen({
     setNow(new Date())
   }, 1000 * 60)
 
-  /*
-  const uniqueIds = useMemo(() => {
-    const ids = todos.reduce((ids, todo) => ids.add(todo.id), new Set())
-    return ids.size
-  }, [todos])
-
-  console.log(uniqueIds, todos.length)
-// */
   const onDismiss = useCallback(() => {
     setEditing('')
     setCreating(false)

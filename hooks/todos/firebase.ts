@@ -41,7 +41,7 @@ export function useTodos() {
   const firestore = useFirestore()
   const todosRef = firestore.collection('todos').where('author', '==', user.uid)
   const todosData = useFirestoreCollectionData<TodoDoc>(
-    todosRef.orderBy('order', 'asc'),
+    todosRef.where('done', '==', false).orderBy('order', 'asc'),
     {
       idField: 'id',
     }

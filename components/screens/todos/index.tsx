@@ -405,10 +405,7 @@ const TodoItem = memo(
     setEditing: React.Dispatch<React.SetStateAction<string>>
     todosResource: TodosResource
   }) => {
-    const todo = useMemo(
-      () => ({ id, start, end, modified, ...todosResource.read(id) }),
-      [end, id, modified, start, todosResource]
-    )
+    const todo = todosResource.read(id)
 
     const analytics = useAnalytics()
     const [isPending, startTransition] = useTransition()
@@ -421,15 +418,13 @@ const TodoItem = memo(
     let isOverdue = false
     let isCurrent = false
     if (isToday) {
-      let [endHours, endMinutes] = todo.end
-        .split(':')
-        .map((_) => parseInt(_, 10))
+      let [endHours, endMinutes] = end.split(':').map((_) => parseInt(_, 10))
       const endTime = setSeconds(
         setMinutes(setHours(now, endHours), endMinutes),
         0
       )
 
-      let [startHours, startMinutes] = todo.start
+      let [startHours, startMinutes] = start
         .split(':')
         .map((_) => parseInt(_, 10))
       const startTime = setSeconds(
@@ -466,6 +461,11 @@ const TodoItem = memo(
       })
     }
 
+    if (!todo.description) {
+      // TODO find out why todo === true, and how to use setReset to optimistically filter out todos while archiving happens
+      debugger
+    }
+
     return (
       <li
         className={cx(styles.todo, 'cursor-pointer', {
@@ -479,7 +479,7 @@ const TodoItem = memo(
           className={cx(styles.time)}
           title={`Duration: ${todo.duration} minutes`}
         >
-          {todo.start} – {todo.end}
+          {start} – {end}
         </span>
 
         <button
@@ -493,7 +493,7 @@ const TodoItem = memo(
             </span>
           )}
           <span className={styles.description}>
-            {todo.description.trim()
+            {todo.description?.trim()
               ? todo.description.replace(/^\n|\n$/g, '')
               : 'Untitled'}
           </span>

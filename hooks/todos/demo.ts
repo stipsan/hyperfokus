@@ -59,7 +59,7 @@ const useStore = create<StoreState>((set) => ({
 
 
 
-const selectTodos = (state: StoreState) => state.todos
+const selectTodos = (state: StoreState) => state.todos.filter(todo => !todo.done)
 export const useTodos = () => useStore(selectTodos)
 
 const selectAddTodo = (state: StoreState) => state.addTodo

@@ -44,7 +44,11 @@ import type { FC } from 'react'
 import styles from './index.module.css'
 import { useCallback, useDeferredValue, useTransition } from 'react'
 import TagsSelect from 'components/TagsSelect'
-import { useForecastComputer } from 'hooks/forecast'
+import {
+  slimChonkySchedules,
+  slimChonkyTodos,
+  useForecastComputer,
+} from 'hooks/forecast'
 import { ChangeEventHandler } from 'react'
 import { TodosResource } from 'hooks/todos/demo'
 
@@ -383,7 +387,6 @@ const TodoItem = memo(
     now,
     completeTodo,
     incompleteTodo,
-    displayTodoTagsOnItem,
     tags: allTags,
     setEditing,
     todosResource,
@@ -398,7 +401,6 @@ const TodoItem = memo(
     now: Date
     completeTodo: CompleteTodo
     incompleteTodo: IncompleteTodo
-    displayTodoTagsOnItem: boolean
     tags: Tags
     setEditing: React.Dispatch<React.SetStateAction<string>>
     todosResource: TodosResource
@@ -497,19 +499,18 @@ const TodoItem = memo(
           </span>
         </button>
 
-        {(displayTodoTagsOnItem || process.env.NODE_ENV !== 'production') &&
-          todo.tags?.length > 0 && (
-            <div className={cx(styles.tags, 'flex')}>
-              {tags.map((tag) => (
-                <span
-                  key={tag.id}
-                  className="text-xs mr-1 my-1 px-2 py-1 block rounded-full bg-gray-200 bg-opacity-50 whitespace-pre"
-                >
-                  {tag.name}
-                </span>
-              ))}
-            </div>
-          )}
+        {todo.tags?.length > 0 && (
+          <div className={cx(styles.tags, 'flex')}>
+            {tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="text-xs mr-1 my-1 px-2 py-1 block rounded-full bg-gray-200 bg-opacity-50 whitespace-pre"
+              >
+                {tag.name}
+              </span>
+            ))}
+          </div>
+        )}
         <StyledCheckbox
           checked={!!todo.completed}
           onChange={handleCheckboxChange}
@@ -679,33 +680,105 @@ const EditDialog = memo(
 const ForecastDisplay = memo(function ForecastDisplay({
   completeTodo,
   computer,
-  displayTodoTagsOnItem,
   hyperfocusing,
   incompleteTodo,
   isThereToday,
-  lastReset,
   now,
   tags,
   todayRef,
   setEditing,
   todosResource,
+  archiveTodos,
+  selectedTags,
+  ...props
 }: {
   completeTodo: CompleteTodo
-  computer: ReturnType<typeof useForecastComputer>[0]
-  displayTodoTagsOnItem: boolean
+  archiveTodos: ArchiveTodos
+  computer: ReturnType<typeof useForecastComputer>
   hyperfocusing: boolean
   incompleteTodo: IncompleteTodo
   isThereToday: boolean
-  lastReset: Date
   now: Date
   tags: Tags
   todayRef: React.MutableRefObject<HTMLElement>
   setEditing: React.Dispatch<React.SetStateAction<string>>
   todosResource: TodosResource
+  selectedTags: Array<string>
+  todos: Todos
+  schedules: Schedules
 }) {
+  const [isPendingLastReset, startLastResetTransition] = useTransition()
+  const [lastReset, setLastReset] = useState<Date>(() =>
+    setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
+  )
+  const [isPendingDeadline, startDeadlineTransition] = useTransition()
   const [deadlineMs, setDeadlineMs] = useState(16)
-  const { days, maxTaskDuration, timedout, withoutSchedule, withoutDuration } =
-    computer.read(lastReset, deadlineMs)
+  const [isPendingMaxDays, startMaxDaysTransition] = useTransition()
+  const [maxDays, setMaxDays] = useState(14)
+
+  const [isPendingSchedules, startSchedulesTransition] = useTransition()
+  const [schedules, setSchedules] = useState(() =>
+    slimChonkySchedules(props.schedules)
+  )
+  ///*
+  useEffect(
+    () =>
+      startSchedulesTransition(() =>
+        setSchedules(slimChonkySchedules(props.schedules))
+      ),
+    [props.schedules, startSchedulesTransition]
+  )
+  //*/
+  /*
+  useEffect(
+    () => setSchedules(slimChonkySchedules(props.schedules)),
+    [props.schedules]
+  )
+  //*/
+  useEffect(() => {
+    if (isPendingSchedules) {
+      console.group('isPendingSchedules')
+      console.time('isPendingSchedules')
+      console.warn({ schedules, 'props.schedules': props.schedules })
+      return () => {
+        console.timeEnd('isPendingSchedules')
+        console.groupEnd()
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPendingSchedules])
+
+  const [isPendingTodos, startTodosTransition] = useTransition()
+  const [todos, setTodos] = useState(() => slimChonkyTodos(props.todos))
+  useEffect(
+    () => startTodosTransition(() => setTodos(slimChonkyTodos(props.todos))),
+    [props.todos, startTodosTransition]
+  )
+  //useEffect(() => setTodos(slimChonkyTodos(props.todos)), [props.todos])
+  useEffect(() => {
+    if (isPendingTodos) {
+      console.group('isPendingTodos')
+      console.time('isPendingTodos')
+      console.warn({ todos, 'props.todos': props.todos })
+      return () => {
+        console.timeEnd('isPendingTodos')
+        console.groupEnd()
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPendingTodos])
+
+  const {
+    days: allDays,
+    maxTaskDuration,
+    timedout,
+    withoutSchedule,
+    withoutDuration,
+    recentlyCompleted,
+  } = computer.read(schedules, todos, selectedTags, lastReset, deadlineMs)
+  const logException = useLogException()
+  const analytics = useAnalytics()
+  const days = useMemo(() => allDays.slice(0, maxDays), [allDays, maxDays])
 
   return (
     <>
@@ -747,7 +820,6 @@ const ForecastDisplay = memo(function ForecastDisplay({
                 isToday={false}
                 completeTodo={completeTodo}
                 incompleteTodo={incompleteTodo}
-                displayTodoTagsOnItem={displayTodoTagsOnItem}
                 tags={tags}
                 setEditing={setEditing}
                 todosResource={todosResource}
@@ -776,7 +848,6 @@ const ForecastDisplay = memo(function ForecastDisplay({
               isToday={false}
               completeTodo={completeTodo}
               incompleteTodo={incompleteTodo}
-              displayTodoTagsOnItem={displayTodoTagsOnItem}
               tags={tags}
               setEditing={setEditing}
               todosResource={todosResource}
@@ -827,7 +898,6 @@ const ForecastDisplay = memo(function ForecastDisplay({
                     now={now}
                     completeTodo={completeTodo}
                     incompleteTodo={incompleteTodo}
-                    displayTodoTagsOnItem={displayTodoTagsOnItem}
                     tags={tags}
                     setEditing={setEditing}
                     todosResource={todosResource}
@@ -838,6 +908,24 @@ const ForecastDisplay = memo(function ForecastDisplay({
           </section>
         )
       })}
+      {days.length !== allDays.length && (
+        <Button
+          key="load more"
+          variant="primary"
+          className={cx('block mx-auto my-4', {
+            'animate-pulse': isPendingMaxDays,
+          })}
+          onClick={() =>
+            startMaxDaysTransition(() =>
+              setMaxDays((maxDays) => maxDays + maxDays)
+            )
+          }
+        >
+          {isPendingMaxDays ? 'Loading ' : 'Load '}
+          {Math.min(allDays.length, days.length + maxDays) - days.length} more
+          {isPendingMaxDays ? '...' : ''}
+        </Button>
+      )}
       {timedout.length > 0 && (
         <section key="timedout" className={cx(styles.section)}>
           <Header>
@@ -854,10 +942,15 @@ const ForecastDisplay = memo(function ForecastDisplay({
               Despite best efforts I couldn't squeeze all your todos into your
               schedule.{' '}
               <button
-                className="ml-1 px-2 py-1 text-sm text-orange-800 hover:text-orange-900 rounded-md bg-orange-100 hover:bg-orange-300"
-                onClick={() => setDeadlineMs(300)}
+                className={cx(
+                  'ml-1 px-2 py-1 text-sm text-orange-800 hover:text-orange-900 rounded-md bg-orange-100 hover:bg-orange-300',
+                  { 'animate-pulse': isPendingDeadline }
+                )}
+                onClick={() =>
+                  startDeadlineTransition(() => setDeadlineMs(300))
+                }
               >
-                Go deeper.
+                {isPendingDeadline ? 'Going deeper...' : 'Go deeper'}
               </button>
             </div>
           ) : (
@@ -884,7 +977,6 @@ const ForecastDisplay = memo(function ForecastDisplay({
                 isToday={false}
                 completeTodo={completeTodo}
                 incompleteTodo={incompleteTodo}
-                displayTodoTagsOnItem={displayTodoTagsOnItem}
                 tags={tags}
                 setEditing={setEditing}
                 todosResource={todosResource}
@@ -892,6 +984,29 @@ const ForecastDisplay = memo(function ForecastDisplay({
             ))}
           </ul>
         </section>
+      )}
+      {recentlyCompleted > 0 && (
+        <Button
+          variant="primary"
+          className={cx('block mx-auto my-4', {
+            'animate-pulse': isPendingLastReset,
+          })}
+          onClick={async () => {
+            try {
+              await archiveTodos()
+              startLastResetTransition(() => {
+                // TODO optimize this to filter out todos, fixing the archiveTodos race condition
+                setLastReset(new Date())
+              })
+              analytics.logEvent('todo_archive')
+            } catch (err) {
+              logException(err)
+            }
+          }}
+        >
+          {isPendingLastReset ? 'Archiving' : 'Archive'} {recentlyCompleted}{' '}
+          Completed {recentlyCompleted === 1 ? 'Todo' : 'Todos'}
+        </Button>
       )}
     </>
   )
@@ -906,7 +1021,7 @@ export default function TodosScreen({
   incompleteTodo,
   schedules: allSchedules,
   tags,
-  todos: allTodos,
+  todos,
   addTag,
   todosResource,
 }: {
@@ -929,43 +1044,18 @@ export default function TodosScreen({
     })
   }, [analytics])
 
+  // TODO move into appearance settings
   const [hyperfocusing, setHyperfocus] = useState(false)
-  /*
-  const selectedTags = useMemo<Set<string>>(
-    () => new Set([...[].concat(router.query.t || '')]),
-    []
-  )
-  const setSelectedTags = useCallback<
-    (nextSelected: typeof selectedTags) => void
-  >(
-    (nextSelected) =>
-      router.push(
-        {
-          query: {
-            ...router.query,
-            t:
-              nextSelected.size > 0
-                ? [...nextSelected].filter(
-                    (id) =>
-                      id === 'untagged' || tags.some((tag) => tag.id === id)
-                  )
-                : '',
-          },
-        },
-        undefined,
-        { shallow: true }
-      ),
-    [tags]
-  )
-  //*/
-  ///*
+
+  // TODO filter and ensure initial state only contain valid tags
   const [selectedTags, setSelectedTags] = useState<Set<string>>(
     () => new Set([...[].concat(router.query.t || '')])
   )
+  const memoSelectedTags = useMemo(() => [...selectedTags], [selectedTags])
   // Lag to prevent URL syncing running too soon and introduce jank
   const laggingSelectedTags = useDeferredValue(selectedTags)
   useEffect(() => {
-    router.push(
+    router.replace(
       {
         query: {
           ...router.query,
@@ -976,31 +1066,6 @@ export default function TodosScreen({
       { shallow: true }
     )
   }, [laggingSelectedTags])
-  //*/
-
-  // @TODO send tags filter to hook
-  const todos = useMemo(() => {
-    if (selectedTags.has('')) {
-      return allTodos
-    }
-
-    return allTodos.filter((todo) => {
-      // if Untagged, check if tags are emty, or empty array
-      // Else if check if value exists in array
-      if (
-        selectedTags.has('untagged') &&
-        (!todo.tags || todo.tags?.length === 0)
-      ) {
-        return true
-      }
-
-      if (todo.tags?.some((tag) => selectedTags.has(tag))) {
-        return true
-      }
-
-      return false
-    })
-  }, [allTodos, selectedTags])
 
   // TODO combine creating and editing states into a useReducer thingy to make sure no invalid state combos can happen
   const [creating, setCreating] = useState(() => !!router.query.create)
@@ -1009,22 +1074,13 @@ export default function TodosScreen({
     return !router.query.create ? editId : ''
   })
 
-  const displayTodoTagsOnItem =
-    selectedTags.has('') || selectedTags.has('untagged') || !!router.query.dt
-
   // @TODO filter schedules based on tags
   const schedules = useMemo<Schedules>(
     () => allSchedules.filter((schedule) => schedule.enabled),
     [allSchedules]
   )
 
-  const logException = useLogException()
-
-  const [lastReset, setLastReset] = useState<Date>(() =>
-    setSeconds(setMinutes(setHours(new Date(), 0), 0), 0)
-  )
-
-  const [computer, isComputing] = useForecastComputer(schedules, todos)
+  const computer = useForecastComputer()
 
   const [_now, setNow] = useState(new Date())
   const now = useDeferredValue(_now)
@@ -1043,11 +1099,6 @@ export default function TodosScreen({
     router.push({ pathname: '/', query }, undefined, { shallow: true })
   }, [])
 
-  const somethingRecentlyCompleted = useMemo(
-    () => todos.some((todo) => !todo.done && !!todo.completed),
-    [todos]
-  )
-
   let isThereToday = false
 
   return (
@@ -1056,7 +1107,6 @@ export default function TodosScreen({
         tags={tags}
         selected={selectedTags}
         setSelected={setSelectedTags}
-        isComputing={isComputing}
       />
       <CreateDialog
         creating={creating}
@@ -1083,37 +1133,22 @@ export default function TodosScreen({
         }
       >
         <ForecastDisplay
+          archiveTodos={archiveTodos}
           completeTodo={completeTodo}
           computer={computer}
-          displayTodoTagsOnItem={displayTodoTagsOnItem}
           hyperfocusing={hyperfocusing}
           incompleteTodo={incompleteTodo}
           isThereToday={isThereToday}
-          lastReset={lastReset}
           now={now}
+          setEditing={setEditing}
           tags={tags}
           todayRef={todayRef}
-          setEditing={setEditing}
+          selectedTags={memoSelectedTags}
           todosResource={todosResource}
+          todos={todos}
+          schedules={schedules}
         />
       </Suspense>
-      {somethingRecentlyCompleted && (
-        <Button
-          variant="primary"
-          className="block mx-auto my-4"
-          onClick={async () => {
-            try {
-              await archiveTodos()
-              setLastReset(new Date())
-              analytics.logEvent('todo_archive')
-            } catch (err) {
-              logException(err)
-            }
-          }}
-        >
-          Archive Completed Todos
-        </Button>
-      )}
       {isThereToday && (
         <Button
           className="block mx-auto my-4"

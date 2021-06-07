@@ -103,7 +103,7 @@ const asset = createAsset(async (setTodos: (todos: Todos) => void) => {
 })
 
 const selectSetTodos = (state: StoreState) => state.setTodos
-const selectTodos = (state: StoreState) => state.todos
+const selectTodos = (state: StoreState) => state.todos.filter(todo => !todo.done)
 export const useTodos = () => {
   const logException = useLogException()
   const setTodos = useStore(selectSetTodos)

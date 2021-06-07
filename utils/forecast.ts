@@ -3,7 +3,7 @@ import { isSameDay, setHours, setMinutes } from 'date-fns'
 import { getTime } from './time'
 
 // Stripping data where possible to keep IO between the worker & browser ont he down low
-export type SkinnyTodo = Pick<Todo, 'id' | 'done' | 'duration' | 'modified'>
+export type SkinnyTodo = Pick<Todo, 'id' | 'completed' | 'duration' | 'modified' | 'tags'>
 export type SkinnySchedule = Pick<
   Schedule,
   'id' | 'start' | 'duration' | 'end' | 'repeat' | 'after'
@@ -31,6 +31,7 @@ export type Forecast = {
   timedout: SkinnyTodo[]
   withoutSchedule: SkinnyTodo[]
   withoutDuration: SkinnyTodo[]
+  recentlyCompleted: number
 }
 
 function getWeekday(date: Date) {
@@ -57,7 +58,6 @@ function getWeekday(date: Date) {
 
 // Useful consts
 const DAY_IN_MS = 86400000
-const MAX_DAYS_IN_FORECAST = 100
 
 // TODO make the process two-step, if only todos change and not the schedules they should be largely reusable
 
@@ -66,10 +66,31 @@ const MAX_DAYS_IN_FORECAST = 100
 // @TODO filter out opportunities that are for today, if they have an endtime that is too late
 export function getForecast(
   schedules: SkinnySchedule[],
-  todos: SkinnyTodo[],
+  allTodos: SkinnyTodo[],
+  tags: string[],
   lastReset: Date,
   deadlineMs: number
 ): Forecast {
+
+  const todos: SkinnyTodo[] = (tags.length > 0 && !tags.includes('')) ? allTodos.filter((todo) => {
+    // if Untagged, check if tags are emty, or empty array
+    // Else if check if value exists in array
+    if (
+      tags.includes('untagged') &&
+      (!todo.tags || todo.tags?.length === 0)
+    ) {
+      return true
+    }
+
+    if (todo.tags?.some((tag) => tags.includes(tag))) {
+      return true
+    }
+
+    return false
+  })
+ : allTodos
+ 
+
   if (!schedules.length || !todos.length) {
     return {
       days: [],
@@ -77,6 +98,7 @@ export function getForecast(
       timedout: [],
       withoutDuration: [],
       withoutSchedule: [],
+      recentlyCompleted: 0,
     }
   }
 
@@ -90,7 +112,7 @@ export function getForecast(
       todoIds.size
     )
   }
-
+console.log({deadlineMs})
   let days: Day[] = []
   let now = getTime()
   let today = new Date(
@@ -106,10 +128,10 @@ export function getForecast(
     (acc, time) => (time.duration > acc ? time.duration : acc),
     0
   )
-
   // Filter out tasks that are too large for the current schedule
+  const withoutSchedule = todos.filter((todo) => todo.duration > maxTaskDuration)
   const reasonableTasks = todos.filter(
-    (task) => !task.done && task.duration <= maxTaskDuration
+    (task) => task.duration > 0 && task.duration <= maxTaskDuration
   )
 
   // Map caches to speed up loops
@@ -179,8 +201,6 @@ export function getForecast(
           scheduled = true
           break
         }
-      } else if (MAX_DAYS_IN_FORECAST < days.length) {
-        break
       }
 
       // Step 1, create `day` placeholders
@@ -261,8 +281,9 @@ export function getForecast(
     days,
     maxTaskDuration,
     timedout,
-    withoutSchedule: todos.filter((todo) => todo.duration > maxTaskDuration),
+    withoutSchedule,
     withoutDuration: todos.filter((task) => task.duration < 1),
+    recentlyCompleted: todos.reduce((count, todo) => (todo.completed) ? count + 1 : count, 0)
   }
 }
 

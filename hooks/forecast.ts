@@ -1,5 +1,5 @@
 import type { Schedule, Todo } from 'database/types'
-import { useEffect, useMemo, useState, useTransition, useRef } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { createAsset } from 'use-asset'
 import { getForecast } from 'utils/forecast'
 import type { SkinnyTodo, SkinnySchedule } from 'utils/forecast'
@@ -7,17 +7,31 @@ import type { SkinnyTodo, SkinnySchedule } from 'utils/forecast'
 async function computeForecastWithBrowser(
   schedules: SkinnySchedule[],
   todos: SkinnyTodo[],
+  tags: string[],
   lastReset: Date,
   deadlineMs: number
 ) {
-  return getForecast(schedules, todos, lastReset, deadlineMs)
+  return getForecast(schedules, todos, tags, lastReset, deadlineMs)
 }
 const slowAsset = createAsset(computeForecastWithBrowser)
+
+export function slimChonkySchedules(chonkySchedules: Schedule[]): SkinnySchedule[] {
+  return chonkySchedules.map(({ id, after, duration, end, repeat, start }) => {
+    return { id, after, duration, end, repeat, start }
+  })
+}
+
+export function slimChonkyTodos(chonkyTodos: Todo[]): SkinnyTodo[] {
+  return chonkyTodos.map(({ id, duration, completed, modified, tags, }) => {
+    return { id, duration, completed, modified, tags }
+  })
+}
 
 async function computeForecastWithWorker(
   workerRef: React.MutableRefObject<Worker>,
   schedules: SkinnySchedule[],
   todos: SkinnyTodo[],
+  tags: string[],
   lastReset: Date,
   deadlineMs: number
 ): Promise<ReturnType<typeof getForecast>> {
@@ -37,6 +51,7 @@ async function computeForecastWithWorker(
           timedout = [],
           withoutDuration = [],
           withoutSchedule = [],
+          recentlyCompleted = 0,
         } = event.data
         resolve({
           days,
@@ -44,55 +59,26 @@ async function computeForecastWithWorker(
           timedout,
           withoutDuration,
           withoutSchedule,
+          recentlyCompleted
         })
       }
       workerRef.current.postMessage({
         schedules,
         todos,
+        tags,
         lastReset: lastReset.toJSON(),
         deadlineMs,
       })
     })
   } catch (err) {
     console.error('Worker failed, falling back to slow path', err)
-    return getForecast(schedules, todos, lastReset, deadlineMs)
+    return getForecast(schedules, todos, tags, lastReset, deadlineMs)
   }
 }
 const fastAsset = createAsset(computeForecastWithWorker)
 
 const goFast = 'Worker' in window
-export function useForecastComputer(
-  chonkySchedules: Schedule[],
-  chonkyTodos: Todo[]
-) {
-  const schedules = useMemo<SkinnySchedule[]>(
-    () =>
-      chonkySchedules.map(({ id, after, duration, end, repeat, start }) => {
-        return { id, after, duration, end, repeat, start }
-      }),
-    [chonkySchedules]
-  )
-  const todos = useMemo<SkinnyTodo[]>(
-    () =>
-      chonkyTodos.map(({ id, duration, done, modified }) => {
-        return { id, duration, done, modified }
-      }),
-    [chonkyTodos]
-  )
-  const [isPending, startTransition] = useTransition()
-  const wrappedSlowAsset = useMemo(
-    () => ({
-      read: (lastReset: Date, deadlineMs: number) =>
-        slowAsset.read(schedules, todos, lastReset, deadlineMs),
-      preload: (lastReset: Date, deadlineMs: number) =>
-        slowAsset.preload(schedules, todos, lastReset, deadlineMs),
-      clear: (lastReset: Date, deadlineMs: number) =>
-        slowAsset.clear(schedules, todos, lastReset, deadlineMs),
-      peek: (lastReset: Date, deadlineMs: number) =>
-        slowAsset.peek(schedules, todos, lastReset, deadlineMs),
-    }),
-    [schedules, todos]
-  )
+export function useForecastComputer() {
   const workerRef = useRef<Worker>()
   useEffect(() => {
     return () => {
@@ -106,50 +92,37 @@ export function useForecastComputer(
   }, [])
   const wrappedFastAsset = useMemo(
     () => ({
-      read: (lastReset: Date, deadlineMs: number) =>
+      read: (...args:Parameters<typeof slowAsset.read>) =>
         fastAsset.read(
           workerRef,
-          schedules,
-          todos,
-          lastReset,
-          deadlineMs
+          ...args
         ),
-      preload: (lastReset: Date, deadlineMs: number) =>
+      preload: (...args:Parameters<typeof slowAsset.preload>) =>
         fastAsset.preload(
           workerRef,
-          schedules,
-          todos,
-          lastReset,
-          deadlineMs
+          ...args
         ),
-      clear: (lastReset: Date, deadlineMs: number) =>
+      clear: (...args:Parameters<typeof slowAsset.clear>) =>
         fastAsset.clear(
           workerRef,
-          schedules,
-          todos,
-          lastReset,
-          deadlineMs
+         ...args
         ),
-      peek: (lastReset: Date, deadlineMs: number) =>
+        peek: (...args:Parameters<typeof slowAsset.peek>) =>
         fastAsset.peek(
           workerRef,
-          schedules,
-          todos,
-          lastReset,
-          deadlineMs
+          ...args
         ),
     }),
-    [workerRef, schedules, todos]
+    [workerRef]
   )
+  useEffect(() => console.count('wrappedFastAsset changed'), [wrappedFastAsset])
   const [resource, setResource] = useState(() =>
-    goFast ? wrappedFastAsset : wrappedSlowAsset
+    goFast ? wrappedFastAsset : slowAsset
   )
 
   useEffect(() => {
-    startTransition(() => {
-      setResource(goFast ? wrappedFastAsset : wrappedSlowAsset)
-    })
-  }, [startTransition, wrappedFastAsset, wrappedSlowAsset])
+      setResource(goFast ? wrappedFastAsset : slowAsset)
+  }, [wrappedFastAsset])
 
-  return [resource, isPending] as const
+  return resource
 }

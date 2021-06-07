@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import type { Tags } from 'hooks/tags/types'
 import chroma from 'chroma-js'
-import { useMemo, memo } from 'react'
+import { useMemo, memo, useTransition } from 'react'
 
 const defaultBg = '#f7fafc'
 
@@ -9,9 +9,9 @@ type Props = {
   tags: Tags
   selected: Set<string>
   setSelected: (selected: Set<string>) => void
-  isComputing: boolean
 }
-function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
+function TagsFilter({ tags, selected, setSelected }: Props) {
+  const [isPending, startTransition] = useTransition()
   const list = useMemo(
     () =>
       [
@@ -55,8 +55,8 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
           className={cx(
             'transition-all duration-300 transform absolute top-0 right-0 bottom-0 left-0 flex justify-center items-center',
             {
-              'scale-75 opacity-0': !isComputing,
-              'delay-150': isComputing,
+              'scale-75 opacity-0': !isPending,
+              'delay-150': isPending,
             }
           )}
         >
@@ -83,7 +83,7 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
         </span>
         <span
           className={cx('transition-all duration-300 transform block', {
-            'scale-75 opacity-0 text-opacity-0 delay-150': isComputing,
+            'scale-75 opacity-0 text-opacity-0 delay-150': isPending,
           })}
           aria-label="I am deeply sorry for the shitty a11y, will fix!"
         >
@@ -123,18 +123,20 @@ function TagsFilter({ tags, selected, setSelected, isComputing }: Props) {
             }}
             aria-pressed={active}
             onClick={() => {
-              if (tag.id === '') {
-                setSelected(new Set(['']))
-              } else {
-                const nextSelected = new Set([...selected])
-                if (nextSelected.has(tag.id)) {
-                  nextSelected.delete(tag.id)
+              startTransition(() => {
+                if (tag.id === '') {
+                  setSelected(new Set(['']))
                 } else {
-                  nextSelected.delete('')
-                  nextSelected.add(tag.id)
+                  const nextSelected = new Set([...selected])
+                  if (nextSelected.has(tag.id)) {
+                    nextSelected.delete(tag.id)
+                  } else {
+                    nextSelected.delete('')
+                    nextSelected.add(tag.id)
+                  }
+                  setSelected(nextSelected)
                 }
-                setSelected(nextSelected)
-              }
+              })
             }}
           >
             {tag.name}

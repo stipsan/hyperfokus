@@ -1059,10 +1059,17 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.10.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10", "@babel/runtime@^7.14.0", "@babel/runtime@^7.3.1", "@babel/runtime@^7.5.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.10.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.10", "@babel/runtime@^7.14.0", "@babel/runtime@^7.5.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
   version "7.14.0"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.14.0.tgz#46794bc20b612c5f75e62dd071e24dfd95f1cbe6"
   integrity sha512-JELkvo/DlpNdJ7dlyw/eY7E0suy5i5GQH+Vlxaq1nsNJ+H7f4Vtv3jMeCEgRhZZQFXTjldYfQgv2qmM6M1v5wA==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
+"@babel/runtime@^7.3.1":
+  version "7.14.6"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.14.6.tgz#535203bc0892efc7dec60bdc27b2ecf6e409062d"
+  integrity sha512-/PCB2uJ7oM44tz8YhC4Z/6PeOKXp4K588f+5M3clr1M4zbqztlo0XEfJ2LEzj/FgwfgGcIdl8n7YYjTCI0BYwg==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -6076,9 +6083,9 @@ flush-write-stream@^1.0.0:
     readable-stream "^2.3.6"
 
 focus-trap@^6.2.2:
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-6.4.0.tgz#e9951484fddf933d9b9b0e95b499f9420f6a54d6"
-  integrity sha512-RpH291GjfNhy1ek+Iwe00oCaqJN0sBaB+S/v7BpCIldf39IslPI7657nOZ6HwgoEHpjCmUJoAY+Mfgrm0rohvQ==
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-6.5.0.tgz#d99fdf5f3da07c08e7f5b9cad33746db2b215f97"
+  integrity sha512-mezVantxaWNMrcJcrdw/bDfW3rVkl0xcdHKiHbNZzJ2R+KfcW9S6j48wFUAu7C52GFeQDGEWgDEIAvk9PxFvZw==
   dependencies:
     tabbable "^5.2.0"
 
@@ -10047,9 +10054,9 @@ react-sizeme@^3.0.1:
     throttle-debounce "^3.0.1"
 
 react-spring-bottom-sheet@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/react-spring-bottom-sheet/-/react-spring-bottom-sheet-3.2.1.tgz#cdb28b64f4885891f8cf4d0b5aee6e41db53204b"
-  integrity sha512-WyrG6QvkVPRd40g2tmkn6l310HbPbXFNPLw7Bb/M4/SbSF9cWBKzXedY/AtUM5Ux5OjjdhOmQ+jm8IDyB0+2WA==
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/react-spring-bottom-sheet/-/react-spring-bottom-sheet-3.3.0.tgz#9d9de03936b92d19cbe9511900778c21d41853ff"
+  integrity sha512-PNzfU6Mq1ALVMdIwgSI5tbUJOdFc4unQ/HVthXOcAf2jcCGeJkMTR8guXNWA+uOuxYn9zRjJ/7a7hb9vWm68dw==
   dependencies:
     "@juggle/resize-observer" "^3.2.0"
     "@reach/portal" "^0.13.0"
@@ -11647,10 +11654,15 @@ tslib@^1.11.1, tslib@^1.8.1, tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.0.0, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0:
+tslib@^2.0.0, tslib@^2.0.1, tslib@^2.0.3:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.2.0.tgz#fb2c475977e35e241311ede2693cee1ec6698f5c"
   integrity sha512-gS9GVHRU+RGn5KQM2rllAlR3dU6m7AcpJKdtH8gFvQiC4Otgk98XnmMU+nZenHt/+VhnBPWwgrJsyrdcw6i23w==
+
+tslib@^2.1.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.0.tgz#803b8cdab3e12ba581a4ca41c8839bbb0dacb09e"
+  integrity sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==
 
 tsutils@^3.21.0:
   version "3.21.0"

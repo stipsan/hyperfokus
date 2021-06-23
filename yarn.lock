@@ -6097,9 +6097,9 @@ flush-write-stream@^1.0.0:
     readable-stream "^2.3.6"
 
 focus-trap@^6.2.2:
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-6.5.0.tgz#d99fdf5f3da07c08e7f5b9cad33746db2b215f97"
-  integrity sha512-mezVantxaWNMrcJcrdw/bDfW3rVkl0xcdHKiHbNZzJ2R+KfcW9S6j48wFUAu7C52GFeQDGEWgDEIAvk9PxFvZw==
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-6.5.1.tgz#2d2bb91198f17e8bc52070f1fb48ac36be4230b5"
+  integrity sha512-q57JebeQXVThn9DWvWLP2rUwuArvk8w3PyqZLSddto0thmVmklFzYJQO97Aq3pUcWkTXjflUa88fT0CrASsaHQ==
   dependencies:
     tabbable "^5.2.0"
 
@@ -10068,9 +10068,9 @@ react-sizeme@^3.0.1:
     throttle-debounce "^3.0.1"
 
 react-spring-bottom-sheet@^3.2.1:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/react-spring-bottom-sheet/-/react-spring-bottom-sheet-3.3.0.tgz#9d9de03936b92d19cbe9511900778c21d41853ff"
-  integrity sha512-PNzfU6Mq1ALVMdIwgSI5tbUJOdFc4unQ/HVthXOcAf2jcCGeJkMTR8guXNWA+uOuxYn9zRjJ/7a7hb9vWm68dw==
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/react-spring-bottom-sheet/-/react-spring-bottom-sheet-3.4.0.tgz#b65e2b46c372b37eefcc686a8ff4736e7dd22d3c"
+  integrity sha512-zKwTymxrTRMHPjfBiMw8reQlWoVqlCGMTefmMYkAlBvR7n3hBe5sntuQJAEjmrAnA+cLSGp44mtmgBtT2ksL5Q==
   dependencies:
     "@juggle/resize-observer" "^3.2.0"
     "@reach/portal" "^0.13.0"
@@ -12454,9 +12454,9 @@ yocto-queue@^0.1.0:
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
 zustand@^3.5.1:
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.5.2.tgz#cf162a8bd1d86475bf308bc856c4d02ff13fd53c"
-  integrity sha512-HUCQI9O77/D/zvoWPNv4dwLriiiY2xtEqnQ0TVY8uaPjmOHls04Okd0w3sWUE9Ex2LaYlSk11DbPPIOZ6shEWg==
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.5.4.tgz#9050a15042ced663b10588327b9210df91f0e13e"
+  integrity sha512-EtS3D83il8eiydRS+xUcpczffT0MpD9ePIqAT10ns2tfzPvq85nmMmYJl9mOLOJjPLaXAMK8lgk0iCz2h7CxGg==
 
 zwitch@^1.0.0:
   version "1.0.5"

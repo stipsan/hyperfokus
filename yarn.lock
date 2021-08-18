@@ -12639,9 +12639,9 @@ yocto-queue@^0.1.0:
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
 zustand@^3.5.1:
-  version "3.5.8"
-  resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.5.8.tgz#820d12b3a5855a5b93fa75ed52b320b091bb8f76"
-  integrity sha512-QA5h4cyJFPG0Gsk7u9gvwF7x6HbrjllSifwePluFK+tcthvaIo9zqiwjoUrXwb4e3BGxzVOXEgbhaB6jVCD7Kw==
+  version "3.5.9"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-3.5.9.tgz#93fcf9eb29d10bc7fc37bdb5806464af516e7da9"
+  integrity sha512-ELj8XLrf5TZoiffbsZKaJ0uGnT1t4PGU9IgFLfiLsjMhOXFfKEl3fEUa5mNAWTzrietJuA1R2YY6GBE1siyE5Q==
 
 zwitch@^1.0.0:
   version "1.0.5"

@@ -18,7 +18,7 @@
     "classnames": "^2.2.6",
     "firebase": "^7.24.0",
     "localforage": "^1.9.0",
-    "nanoid": "^3.1.16",
+    "nanoid": "^4.0.0",
     "next": "^10.2.3",
     "react": "experimental",
     "react-color": "^2.19.3",

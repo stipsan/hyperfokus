@@ -28,7 +28,7 @@
     "reactfire": "^2.0.3",
     "smooth-scroll-into-view-if-needed": "^1.1.32",
     "use-asset": "^1.0.4",
-    "zustand": "^3.5.1"
+    "zustand": "^4.0.0"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^6.2.9",

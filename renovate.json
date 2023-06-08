@@ -2,7 +2,7 @@
   "extends": ["github>stipsan/renovate-presets:auto"],
   "packageRules": [
     {
-      "packageNames": ["react", "react-dom"],
+      "matchPackageNames": ["react", "react-dom"],
       "followTag": "experimental",
       "automerge": false
     }
